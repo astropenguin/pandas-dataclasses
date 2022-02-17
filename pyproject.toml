@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "pandas-dataclasses"
+version = "0.1.0"
+description = "pandas extension for typed Series and DataFrame creation"
+authors = ["Akio Taniguchi <taniguchi@a.phys.nagoya-u.ac.jp>"]
+keywords = ["pandas", "dataclass", "series", "dataframe", "typing"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/astropenguin/pandas-dataclasses/"
+documentation = "https://astropenguin.github.io/pandas-dataclasses/"
+
+[tool.poetry.dependencies]
+python = ">=3.7.1, <3.11"
+morecopy = "^0.2"
+pandas = "^1.3"
+typing-extensions = "^3.10"
+
+[tool.poetry.dev-dependencies]
+black = "^22.1"
+ipython = "^7.31"
+myst-parser = "^0.16"
+pydata-sphinx-theme = "^0.8"
+pytest = "^6.2"
+sphinx = "^4.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

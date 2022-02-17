@@ -1,0 +1,27 @@
+{
+    "name": "pandas-dataclasses",
+    "build": {
+        "context": "..",
+        "dockerfile": "Dockerfile",
+    },
+    "postCreateCommand": "poetry install",
+    "extensions": [
+        "github.vscode-pull-request-github",
+        "mhutchie.git-graph",
+        "ms-python.python",
+        "streetsidesoftware.code-spell-checker",
+        "tamasfe.even-better-toml",
+    ],
+    "settings": {
+        "files.insertFinalNewline": true,
+        "files.trimTrailingWhitespace": true,
+        "python.analysis.typeCheckingMode": "strict",
+        "python.formatting.provider": "black",
+        "python.languageServer": "Pylance",
+        "[python]": {
+            "editor.formatOnSave": true,
+            "editor.insertSpaces": true,
+            "editor.tabSize": 4,
+        },
+    },
+}
