@@ -1,0 +1,4 @@
+#!/bin/bash -eu
+
+sphinx-apidoc -efT -o docs/_apidoc pandas_dataclasses
+sphinx-build -a docs docs/_build
