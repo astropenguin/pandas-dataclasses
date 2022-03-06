@@ -3,8 +3,7 @@ __all__ = ["Data", "Index", "NamedData", "NamedIndex"]
 
 # standard library
 from enum import Enum
-from typing import Hashable, TypeVar, Union
-from typing import Collection as Collection_
+from typing import Collection, Hashable, TypeVar, Union
 
 
 # dependencies
@@ -12,26 +11,25 @@ from typing_extensions import Annotated, Protocol
 
 
 # type hints (private)
-Tdtype = TypeVar("Tdtype", covariant=True)
-Tname = TypeVar("Tname", bound=Hashable, covariant=True)
+TDtype = TypeVar("TDtype", covariant=True)
+TName = TypeVar("TName", bound=Hashable, covariant=True)
 
 
-class Named(Protocol[Tname]):
+class Named(Protocol[TName]):
     pass
 
 
-class Collection(Collection_[Tdtype], Named[Tname], Protocol):
+class Collection(Collection[TDtype], Named[TName], Protocol):
     pass
 
 
-# constants
+# type hints (public)
 class FieldType(Enum):
     DATA = "data"
     INDEX = "index"
 
 
-# type hints (public)
-Data = Annotated[Union[Collection[Tdtype, None], Tdtype], FieldType.DATA]
-Index = Annotated[Union[Collection[Tdtype, None], Tdtype], FieldType.INDEX]
-NamedData = Annotated[Union[Collection[Tdtype, Tname], Tdtype], FieldType.DATA]
-NamedIndex = Annotated[Union[Collection[Tdtype, Tname], Tdtype], FieldType.INDEX]
+Data = Annotated[Union[Collection[TDtype, None], TDtype], FieldType.DATA]
+Index = Annotated[Union[Collection[TDtype, None], TDtype], FieldType.INDEX]
+NamedData = Annotated[Union[Collection[TDtype, TName], TDtype], FieldType.DATA]
+NamedIndex = Annotated[Union[Collection[TDtype, TName], TDtype], FieldType.INDEX]
