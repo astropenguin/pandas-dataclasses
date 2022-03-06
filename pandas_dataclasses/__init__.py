@@ -4,8 +4,10 @@ __version__ = "0.1.0"
 
 
 # submodules
+from . import datamodel
 from . import typing
 
 
 # aliases
+from .datamodel import *
 from .typing import *
