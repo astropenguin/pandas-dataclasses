@@ -23,30 +23,48 @@ TName = TypeVar("TName", bound=Hashable, covariant=True)
 
 
 class Named(Protocol[TName]):
+    """Type hint for named objects."""
+
     pass
 
 
 class Collection(Named[TName], Collection[TDtype], Protocol):
+    """Type hint for named collection objects."""
+
     pass
 
 
 # type hints (public)
 class FieldType(Enum):
-    DATA = "data"
-    INDEX = "index"
+    """Annotations for pandas-related type hints."""
 
-    def annotates(self, hint: Any) -> bool:
-        return self in get_args(hint)[1:]
+    DATA = "data"
+    """Annotation for data fields."""
+
+    INDEX = "index"
+    """Annotation for index fields."""
+
+    def annotates(self, type_: Any) -> bool:
+        """Check if a type is annotated by the annotation."""
+        return self in get_args(type_)[1:]
 
 
 Data = Annotated[Union[Collection[None, TDtype], TDtype], FieldType.DATA]
+"""Type hint for data fields (``Data[TDtype]``)."""
+
 Index = Annotated[Union[Collection[None, TDtype], TDtype], FieldType.INDEX]
+"""Type hint for index fields (``Index[TDtype]``)."""
+
 NamedData = Annotated[Union[Collection[TName, TDtype], TDtype], FieldType.DATA]
+"""Type hint for named data fields (``NamedData[TName, TDtype]``)."""
+
 NamedIndex = Annotated[Union[Collection[TName, TDtype], TDtype], FieldType.INDEX]
+"""Type hint for named index fields (``NamedIndex[TName, TDtype]``)."""
 
 
 # runtime functions
 def get_dtype(type_: Any) -> Optional[str]:
+    """Parse a type and return a dtype."""
     args = get_args(type_)
     origin = get_origin(type_)
 
@@ -66,6 +84,7 @@ def get_dtype(type_: Any) -> Optional[str]:
 
 
 def get_ftype(type_: Any) -> FieldType:
+    """Parse a type and return a field type (ftype)."""
     if FieldType.DATA.annotates(type_):
         return FieldType.DATA
 
@@ -76,6 +95,7 @@ def get_ftype(type_: Any) -> FieldType:
 
 
 def get_name(type_: Any) -> Optional[Hashable]:
+    """Parse a type and return a name."""
     args = get_args(type_)
     origin = get_origin(type_)
 
@@ -92,6 +112,8 @@ def get_name(type_: Any) -> Optional[Hashable]:
 
 
 def get_rtype(type_: Any) -> Any:
+    """Parse a type and return a representative type (rtype)."""
+
     class Temporary:
         __annotations__ = dict(type=type_)
 
