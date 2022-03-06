@@ -10,8 +10,10 @@ from typing_extensions import Annotated, Literal
 # submodules
 from pandas_dataclasses.typing import (
     Collection,
+    Attr,
     Data,
     Index,
+    Name,
     get_dtype,
     get_ftype,
     get_name,
@@ -21,7 +23,7 @@ from pandas_dataclasses.typing import (
 
 # type hints
 Int64 = Literal["int64"]
-Name = Literal["name"]
+Label = Literal["label"]
 NoneType = type(None)
 
 
@@ -38,15 +40,17 @@ testdata_dtype = [
 ]
 
 testdata_ftype = [
+    (Attr[Any], "attr"),
     (Data[Any], "data"),
     (Index[Any], "index"),
+    (Name[Any], "name"),
 ]
 
 testdata_name = [
     (NoneType, None),
-    (Name, "name"),
+    (Label, "label"),
     (Collection[None, Any], None),
-    (Collection[Name, Any], "name"),
+    (Collection[Label, Any], "label"),
 ]
 
 testdata_rtype = [
