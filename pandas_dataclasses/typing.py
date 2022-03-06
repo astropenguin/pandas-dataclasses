@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Data", "Index", "NamedData", "NamedIndex"]
+__all__ = ["Attr", "Data", "Index", "Name", "NamedData", "NamedIndex"]
 
 
 # standard library
@@ -48,6 +48,9 @@ class FieldType(Enum):
     INDEX = "index"
     """Annotation for index fields."""
 
+    NAME = "name"
+    """Annotation for name fields."""
+
     def annotates(self, type_: Any) -> bool:
         """Check if a type is annotated by the annotation."""
         return self in get_args(type_)[1:]
@@ -61,6 +64,9 @@ Data = Annotated[Union[Collection[None, TDtype], TDtype], FieldType.DATA]
 
 Index = Annotated[Union[Collection[None, TDtype], TDtype], FieldType.INDEX]
 """Type hint for index fields (``Index[TDtype]``)."""
+
+Name = Annotated[TName, FieldType.NAME]
+"""Type hint for name fields (``Name[TName]``)."""
 
 NamedData = Annotated[Union[Collection[TName, TDtype], TDtype], FieldType.DATA]
 """Type hint for named data fields (``NamedData[TName, TDtype]``)."""
@@ -100,6 +106,9 @@ def get_ftype(type_: Any) -> FieldType:
 
     if FieldType.INDEX.annotates(type_):
         return FieldType.INDEX
+
+    if FieldType.NAME.annotates(type_):
+        return FieldType.NAME
 
     raise ValueError(f"Could not convert {type_!r} to ftype.")
 
