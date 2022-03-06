@@ -10,6 +10,7 @@ from typing_extensions import Annotated, Literal
 # submodules
 from pandas_dataclasses.typing import (
     Collection,
+    Attr,
     Data,
     Index,
     get_dtype,
@@ -38,6 +39,7 @@ testdata_dtype = [
 ]
 
 testdata_ftype = [
+    (Attr[Any], "attr"),
     (Data[Any], "data"),
     (Index[Any], "index"),
 ]
