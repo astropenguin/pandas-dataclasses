@@ -19,7 +19,7 @@ class Named(Protocol[TName]):
     pass
 
 
-class Collection(Collection[TDtype], Named[TName], Protocol):
+class Collection(Named[TName], Collection[TDtype], Protocol):
     pass
 
 
@@ -29,7 +29,7 @@ class FieldType(Enum):
     INDEX = "index"
 
 
-Data = Annotated[Union[Collection[TDtype, None], TDtype], FieldType.DATA]
-Index = Annotated[Union[Collection[TDtype, None], TDtype], FieldType.INDEX]
-NamedData = Annotated[Union[Collection[TDtype, TName], TDtype], FieldType.DATA]
-NamedIndex = Annotated[Union[Collection[TDtype, TName], TDtype], FieldType.INDEX]
+Data = Annotated[Union[Collection[None, TDtype], TDtype], FieldType.DATA]
+Index = Annotated[Union[Collection[None, TDtype], TDtype], FieldType.INDEX]
+NamedData = Annotated[Union[Collection[TName, TDtype], TDtype], FieldType.DATA]
+NamedIndex = Annotated[Union[Collection[TName, TDtype], TDtype], FieldType.INDEX]
