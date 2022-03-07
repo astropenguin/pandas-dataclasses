@@ -38,6 +38,7 @@ testdata_ftype = [
     (Data[Any], "data"),
     (Index[Any], "index"),
     (Name[Any], "name"),
+    (Any, "other"),
 ]
 
 testdata_name = [

@@ -39,6 +39,9 @@ class FieldType(Enum):
     NAME = "name"
     """Annotation for name fields."""
 
+    OTHER = "other"
+    """Annotation for other fields."""
+
     def annotates(self, type_: Any) -> bool:
         """Check if a type is annotated by the annotation."""
         return self in get_args(type_)[1:]
@@ -94,7 +97,7 @@ def get_ftype(type_: Any) -> FieldType:
     if FieldType.NAME.annotates(type_):
         return FieldType.NAME
 
-    raise ValueError(f"Could not convert {type_!r} to ftype.")
+    return FieldType.OTHER
 
 
 def get_name(type_: Any) -> Optional[Hashable]:
