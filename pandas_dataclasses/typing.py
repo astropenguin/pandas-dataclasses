@@ -61,7 +61,7 @@ Named = Annotated
 
 
 # runtime functions
-def get_dtype(type_: Any) -> Optional[np.dtype[Any]]:
+def get_dtype(type_: Any) -> Optional["np.dtype[Any]"]:
     """Parse a type and return a data type (dtype)."""
     try:
         t_dtype = get_args(unannotate(type_))[1]
