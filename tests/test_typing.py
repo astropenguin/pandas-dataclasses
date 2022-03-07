@@ -9,7 +9,16 @@ from typing_extensions import Literal
 
 
 # submodules
-from pandas_dataclasses.typing import Attr, Data, Index, Name, get_dtype, get_ftype
+from pandas_dataclasses.typing import (
+    Attr,
+    Data,
+    Index,
+    Name,
+    Named,
+    get_dtype,
+    get_ftype,
+    get_name,
+)
 
 
 # test datasets
@@ -31,6 +40,17 @@ testdata_ftype = [
     (Name[Any], "name"),
 ]
 
+testdata_name = [
+    (Attr[Any], None),
+    (Data[Any], None),
+    (Index[Any], None),
+    (Name[Any], None),
+    (Named[Attr[Any], "attr"], "attr"),
+    (Named[Data[Any], "data"], "data"),
+    (Named[Index[Any], "index"], "index"),
+    (Named[Name[Any], "name"], "name"),
+]
+
 # test functions
 @mark.parametrize("type_, dtype", testdata_dtype)
 def test_get_dtype(type_: Any, dtype: Any) -> None:
@@ -40,3 +60,8 @@ def test_get_dtype(type_: Any, dtype: Any) -> None:
 @mark.parametrize("type_, ftype", testdata_ftype)
 def test_get_ftype(type_: Any, ftype: Any) -> None:
     assert get_ftype(type_).value == ftype
+
+
+@mark.parametrize("type_, name", testdata_name)
+def test_get_name(type_: Any, name: Any) -> None:
+    assert get_name(type_) == name

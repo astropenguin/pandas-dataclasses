@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Data", "Index", "Name"]
+__all__ = ["Attr", "Data", "Index", "Name", "Named"]
 
 
 # standard library
@@ -56,6 +56,9 @@ Index = Annotated[Union[Collection[TDtype], TDtype], FieldType.INDEX]
 Name = Annotated[TName, FieldType.NAME]
 """Type hint for name fields (``Name[TName]``)."""
 
+Named = Annotated
+"""Type hint for named fields (alias of Annotated)."""
+
 
 # runtime functions
 def get_dtype(type_: Any) -> Optional[np.dtype[Any]]:
@@ -92,6 +95,19 @@ def get_ftype(type_: Any) -> FieldType:
         return FieldType.NAME
 
     raise ValueError(f"Could not convert {type_!r} to ftype.")
+
+
+def get_name(type_: Any) -> Optional[Hashable]:
+    """Parse a type and return a name."""
+    if get_origin(type_) is not Annotated:
+        return
+
+    for arg in reversed(get_args(type_)[1:]):
+        if isinstance(arg, FieldType):
+            continue
+
+        if isinstance(arg, Hashable):
+            return arg
 
 
 def unannotate(type_: Any) -> Any:
