@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Data", "Index", "Name", "NamedData", "NamedIndex"]
+__all__ = ["Attr", "Data", "Index", "Name", "Named"]
 
 
 # standard library
@@ -7,10 +7,10 @@ from typing import Any, Collection, Hashable, Optional, TypeVar, Union
 
 
 # dependencies
+import numpy as np
 from typing_extensions import (
     Annotated,
     Literal,
-    Protocol,
     get_args,
     get_origin,
     get_type_hints,
@@ -21,18 +21,6 @@ from typing_extensions import (
 TAttr = TypeVar("TAttr", covariant=True)
 TDtype = TypeVar("TDtype", covariant=True)
 TName = TypeVar("TName", bound=Hashable, covariant=True)
-
-
-class Named(Protocol[TName]):
-    """Type hint for named objects."""
-
-    pass
-
-
-class Collection(Named[TName], Collection[TDtype], Protocol):
-    """Type hint for named collection objects."""
-
-    pass
 
 
 # type hints (public)
@@ -59,39 +47,35 @@ class FieldType(Enum):
 Attr = Annotated[TAttr, FieldType.ATTR]
 """Type hint for attribute fields (``Attr[TAttr]``)."""
 
-Data = Annotated[Union[Collection[None, TDtype], TDtype], FieldType.DATA]
+Data = Annotated[Union[Collection[TDtype], TDtype], FieldType.DATA]
 """Type hint for data fields (``Data[TDtype]``)."""
 
-Index = Annotated[Union[Collection[None, TDtype], TDtype], FieldType.INDEX]
+Index = Annotated[Union[Collection[TDtype], TDtype], FieldType.INDEX]
 """Type hint for index fields (``Index[TDtype]``)."""
 
 Name = Annotated[TName, FieldType.NAME]
 """Type hint for name fields (``Name[TName]``)."""
 
-NamedData = Annotated[Union[Collection[TName, TDtype], TDtype], FieldType.DATA]
-"""Type hint for named data fields (``NamedData[TName, TDtype]``)."""
-
-NamedIndex = Annotated[Union[Collection[TName, TDtype], TDtype], FieldType.INDEX]
-"""Type hint for named index fields (``NamedIndex[TName, TDtype]``)."""
+Named = Annotated
+"""Type hint for named fields (alias of Annotated)."""
 
 
 # runtime functions
-def get_dtype(type_: Any) -> Optional[str]:
-    """Parse a type and return a dtype."""
-    args = get_args(type_)
-    origin = get_origin(type_)
+def get_dtype(type_: Any) -> Optional["np.dtype[Any]"]:
+    """Parse a type and return a data type (dtype)."""
+    try:
+        t_dtype = get_args(unannotate(type_))[1]
+    except (IndexError, NameError):
+        raise ValueError(f"Could not convert {type_!r} to dtype.")
 
-    if origin is Collection:
-        return get_dtype(args[1])
-
-    if origin is Literal:
-        return args[0]
-
-    if type_ is Any or type_ is type(None):
+    if t_dtype is Any or t_dtype is type(None):
         return None
 
-    if isinstance(type_, type):
-        return type_.__name__
+    if isinstance(t_dtype, type):
+        return np.dtype(t_dtype)
+
+    if get_origin(t_dtype) is Literal:
+        return np.dtype(get_args(t_dtype)[0])
 
     raise ValueError(f"Could not convert {type_!r} to dtype.")
 
@@ -115,33 +99,21 @@ def get_ftype(type_: Any) -> FieldType:
 
 def get_name(type_: Any) -> Optional[Hashable]:
     """Parse a type and return a name."""
-    args = get_args(type_)
-    origin = get_origin(type_)
+    if get_origin(type_) is not Annotated:
+        return
 
-    if origin is Collection:
-        return get_dtype(args[0])
+    for arg in reversed(get_args(type_)[1:]):
+        if isinstance(arg, FieldType):
+            continue
 
-    if origin is Literal:
-        return args[0]
-
-    if type_ is type(None):
-        return None
-
-    raise ValueError(f"Could not convert {type_!r} to name.")
+        if isinstance(arg, Hashable):
+            return arg
 
 
-def get_rtype(type_: Any) -> Any:
-    """Parse a type and return a representative type (rtype)."""
+def unannotate(type_: Any) -> Any:
+    """Recursively remove annotations from a type."""
 
     class Temporary:
         __annotations__ = dict(type=type_)
 
-    try:
-        unannotated = get_type_hints(Temporary)["type"]
-    except NameError:
-        raise ValueError(f"Could not convert {type_!r} to rtype.")
-
-    if get_origin(unannotated) is Union:
-        return get_args(unannotated)[0]
-    else:
-        return unannotated
+    return get_type_hints(Temporary)["type"]
