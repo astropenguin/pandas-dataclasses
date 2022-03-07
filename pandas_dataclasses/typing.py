@@ -2,12 +2,12 @@ __all__ = ["Attr", "Data", "Index", "Name"]
 
 
 # standard library
-from collections import abc
 from enum import Enum
 from typing import Any, Collection, Hashable, Optional, TypeVar, Union
 
 
 # dependencies
+import numpy as np
 from typing_extensions import (
     Annotated,
     Literal,
@@ -58,22 +58,21 @@ Name = Annotated[TName, FieldType.NAME]
 
 
 # runtime functions
-def get_dtype(type_: Any) -> Optional[str]:
-    """Parse a type and return a dtype."""
-    args = get_args(type_)
-    origin = get_origin(type_)
+def get_dtype(type_: Any) -> Optional[np.dtype[Any]]:
+    """Parse a type and return a data type (dtype)."""
+    try:
+        t_dtype = get_args(unannotate(type_))[1]
+    except (IndexError, NameError):
+        raise ValueError(f"Could not convert {type_!r} to dtype.")
 
-    if origin is Collection or origin is abc.Collection:
-        return get_dtype(args[0])
-
-    if origin is Literal:
-        return args[0]
-
-    if type_ is Any or type_ is type(None):
+    if t_dtype is Any or t_dtype is type(None):
         return None
 
-    if isinstance(type_, type):
-        return type_.__name__
+    if isinstance(t_dtype, type):
+        return np.dtype(t_dtype)
+
+    if get_origin(t_dtype) is Literal:
+        return np.dtype(get_args(t_dtype)[0])
 
     raise ValueError(f"Could not convert {type_!r} to dtype.")
 
@@ -95,18 +94,10 @@ def get_ftype(type_: Any) -> FieldType:
     raise ValueError(f"Could not convert {type_!r} to ftype.")
 
 
-def get_rtype(type_: Any) -> Any:
-    """Parse a type and return a representative type (rtype)."""
+def unannotate(type_: Any) -> Any:
+    """Recursively remove annotations from a type."""
 
     class Temporary:
         __annotations__ = dict(type=type_)
 
-    try:
-        unannotated = get_type_hints(Temporary)["type"]
-    except NameError:
-        raise ValueError(f"Could not convert {type_!r} to rtype.")
-
-    if get_origin(unannotated) is Union:
-        return get_args(unannotated)[0]
-    else:
-        return unannotated
+    return get_type_hints(Temporary)["type"]

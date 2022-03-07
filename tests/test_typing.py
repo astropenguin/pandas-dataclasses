@@ -1,39 +1,27 @@
 # standard library
-from typing import Any, Collection, Optional, Union
+from typing import Any
 
 
 # dependencies
+import numpy as np
 from pytest import mark
-from typing_extensions import Annotated, Literal
+from typing_extensions import Literal
 
 
 # submodules
-from pandas_dataclasses.typing import (
-    Attr,
-    Data,
-    Index,
-    Name,
-    get_dtype,
-    get_ftype,
-    get_rtype,
-)
-
-
-# type hints
-Int64 = Literal["int64"]
-NoneType = type(None)
+from pandas_dataclasses.typing import Attr, Data, Index, Name, get_dtype, get_ftype
 
 
 # test datasets
 testdata_dtype = [
-    (Any, None),
-    (NoneType, None),
-    (Int64, "int64"),
-    (int, "int"),
-    (Collection[Any], None),
-    (Collection[None], None),
-    (Collection[Int64], "int64"),
-    (Collection[int], "int"),
+    (Data[Any], None),
+    (Data[None], None),
+    (Data[int], np.dtype("int64")),
+    (Data[Literal["i8"]], np.dtype("int64")),
+    (Index[Any], None),
+    (Index[None], None),
+    (Index[int], np.dtype("int64")),
+    (Index[Literal["i8"]], np.dtype("int64")),
 ]
 
 testdata_ftype = [
@@ -43,14 +31,6 @@ testdata_ftype = [
     (Name[Any], "name"),
 ]
 
-testdata_rtype = [
-    (int, int),
-    (Annotated[int, "annotation"], int),
-    (Union[int, float], int),
-    (Optional[int], int),
-]
-
-
 # test functions
 @mark.parametrize("type_, dtype", testdata_dtype)
 def test_get_dtype(type_: Any, dtype: Any) -> None:
@@ -58,10 +38,5 @@ def test_get_dtype(type_: Any, dtype: Any) -> None:
 
 
 @mark.parametrize("type_, ftype", testdata_ftype)
-def test_get_field_type(type_: Any, ftype: Any) -> None:
+def test_get_ftype(type_: Any, ftype: Any) -> None:
     assert get_ftype(type_).value == ftype
-
-
-@mark.parametrize("type_, rtype", testdata_rtype)
-def test_get_rtype(type_: Any, rtype: Any) -> None:
-    assert get_rtype(type_) == rtype
