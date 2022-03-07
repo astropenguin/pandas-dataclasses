@@ -1,5 +1,5 @@
 # standard library
-from typing import Any, Optional, Union
+from typing import Any, Collection, Optional, Union
 
 
 # dependencies
@@ -9,21 +9,18 @@ from typing_extensions import Annotated, Literal
 
 # submodules
 from pandas_dataclasses.typing import (
-    Collection,
     Attr,
     Data,
     Index,
     Name,
     get_dtype,
     get_ftype,
-    get_name,
     get_rtype,
 )
 
 
 # type hints
 Int64 = Literal["int64"]
-Label = Literal["label"]
 NoneType = type(None)
 
 
@@ -33,10 +30,10 @@ testdata_dtype = [
     (NoneType, None),
     (Int64, "int64"),
     (int, "int"),
-    (Collection[Any, Any], None),
-    (Collection[Any, None], None),
-    (Collection[Any, Int64], "int64"),
-    (Collection[Any, int], "int"),
+    (Collection[Any], None),
+    (Collection[None], None),
+    (Collection[Int64], "int64"),
+    (Collection[int], "int"),
 ]
 
 testdata_ftype = [
@@ -44,13 +41,6 @@ testdata_ftype = [
     (Data[Any], "data"),
     (Index[Any], "index"),
     (Name[Any], "name"),
-]
-
-testdata_name = [
-    (NoneType, None),
-    (Label, "label"),
-    (Collection[None, Any], None),
-    (Collection[Label, Any], "label"),
 ]
 
 testdata_rtype = [
@@ -70,11 +60,6 @@ def test_get_dtype(type_: Any, dtype: Any) -> None:
 @mark.parametrize("type_, ftype", testdata_ftype)
 def test_get_field_type(type_: Any, ftype: Any) -> None:
     assert get_ftype(type_).value == ftype
-
-
-@mark.parametrize("type_, name", testdata_name)
-def test_get_name(type_: Any, name: Any) -> None:
-    assert get_name(type_) == name
 
 
 @mark.parametrize("type_, rtype", testdata_rtype)

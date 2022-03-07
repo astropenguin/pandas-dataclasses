@@ -1,7 +1,8 @@
-__all__ = ["Attr", "Data", "Index", "Name", "NamedData", "NamedIndex"]
+__all__ = ["Attr", "Data", "Index", "Name"]
 
 
 # standard library
+from collections import abc
 from enum import Enum
 from typing import Any, Collection, Hashable, Optional, TypeVar, Union
 
@@ -10,7 +11,6 @@ from typing import Any, Collection, Hashable, Optional, TypeVar, Union
 from typing_extensions import (
     Annotated,
     Literal,
-    Protocol,
     get_args,
     get_origin,
     get_type_hints,
@@ -21,18 +21,6 @@ from typing_extensions import (
 TAttr = TypeVar("TAttr", covariant=True)
 TDtype = TypeVar("TDtype", covariant=True)
 TName = TypeVar("TName", bound=Hashable, covariant=True)
-
-
-class Named(Protocol[TName]):
-    """Type hint for named objects."""
-
-    pass
-
-
-class Collection(Named[TName], Collection[TDtype], Protocol):
-    """Type hint for named collection objects."""
-
-    pass
 
 
 # type hints (public)
@@ -59,20 +47,14 @@ class FieldType(Enum):
 Attr = Annotated[TAttr, FieldType.ATTR]
 """Type hint for attribute fields (``Attr[TAttr]``)."""
 
-Data = Annotated[Union[Collection[None, TDtype], TDtype], FieldType.DATA]
+Data = Annotated[Union[Collection[TDtype], TDtype], FieldType.DATA]
 """Type hint for data fields (``Data[TDtype]``)."""
 
-Index = Annotated[Union[Collection[None, TDtype], TDtype], FieldType.INDEX]
+Index = Annotated[Union[Collection[TDtype], TDtype], FieldType.INDEX]
 """Type hint for index fields (``Index[TDtype]``)."""
 
 Name = Annotated[TName, FieldType.NAME]
 """Type hint for name fields (``Name[TName]``)."""
-
-NamedData = Annotated[Union[Collection[TName, TDtype], TDtype], FieldType.DATA]
-"""Type hint for named data fields (``NamedData[TName, TDtype]``)."""
-
-NamedIndex = Annotated[Union[Collection[TName, TDtype], TDtype], FieldType.INDEX]
-"""Type hint for named index fields (``NamedIndex[TName, TDtype]``)."""
 
 
 # runtime functions
@@ -81,8 +63,8 @@ def get_dtype(type_: Any) -> Optional[str]:
     args = get_args(type_)
     origin = get_origin(type_)
 
-    if origin is Collection:
-        return get_dtype(args[1])
+    if origin is Collection or origin is abc.Collection:
+        return get_dtype(args[0])
 
     if origin is Literal:
         return args[0]
@@ -111,23 +93,6 @@ def get_ftype(type_: Any) -> FieldType:
         return FieldType.NAME
 
     raise ValueError(f"Could not convert {type_!r} to ftype.")
-
-
-def get_name(type_: Any) -> Optional[Hashable]:
-    """Parse a type and return a name."""
-    args = get_args(type_)
-    origin = get_origin(type_)
-
-    if origin is Collection:
-        return get_dtype(args[0])
-
-    if origin is Literal:
-        return args[0]
-
-    if type_ is type(None):
-        return None
-
-    raise ValueError(f"Could not convert {type_!r} to name.")
 
 
 def get_rtype(type_: Any) -> Any:
