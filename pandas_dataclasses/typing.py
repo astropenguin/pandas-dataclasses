@@ -8,13 +8,7 @@ from typing import Any, Collection, Hashable, Optional, TypeVar, Union
 
 # dependencies
 import numpy as np
-from typing_extensions import (
-    Annotated,
-    Literal,
-    get_args,
-    get_origin,
-    get_type_hints,
-)
+from typing_extensions import Annotated, Literal, get_args, get_origin, get_type_hints
 
 
 # type hints (private)
@@ -100,10 +94,10 @@ def get_ftype(type_: Any) -> FieldType:
     return FieldType.OTHER
 
 
-def get_name(type_: Any) -> Optional[Hashable]:
+def get_name(type_: Any, default: Hashable = None) -> Hashable:
     """Parse a type and return a name."""
     if get_origin(type_) is not Annotated:
-        return
+        return default
 
     for arg in reversed(get_args(type_)[1:]):
         if isinstance(arg, FieldType):
@@ -111,6 +105,8 @@ def get_name(type_: Any) -> Optional[Hashable]:
 
         if isinstance(arg, Hashable):
             return arg
+
+    return default
 
 
 def unannotate(type_: Any) -> Any:
