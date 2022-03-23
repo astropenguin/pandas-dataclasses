@@ -58,10 +58,19 @@ Named = Annotated
 
 
 # runtime functions
+def deannotate(type_: Any) -> Any:
+    """Recursively remove annotations from a type."""
+
+    class Temporary:
+        __annotations__ = dict(type=type_)
+
+    return get_type_hints(Temporary)["type"]
+
+
 def get_dtype(type_: Any) -> Optional["np.dtype[Any]"]:
     """Parse a type and return a data type (dtype)."""
     try:
-        t_dtype = get_args(unannotate(type_))[1]
+        t_dtype = get_args(deannotate(type_))[1]
     except (IndexError, NameError):
         raise ValueError(f"Could not convert {type_!r} to dtype.")
 
@@ -107,12 +116,3 @@ def get_name(type_: Any, default: Hashable = None) -> Hashable:
             return arg
 
     return default
-
-
-def unannotate(type_: Any) -> Any:
-    """Recursively remove annotations from a type."""
-
-    class Temporary:
-        __annotations__ = dict(type=type_)
-
-    return get_type_hints(Temporary)["type"]
