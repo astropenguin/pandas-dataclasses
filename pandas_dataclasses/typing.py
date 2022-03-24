@@ -2,19 +2,38 @@ __all__ = ["Attr", "Data", "Index", "Name", "Named"]
 
 
 # standard library
+from dataclasses import Field
 from enum import Enum
-from typing import Any, Collection, Hashable, Optional, TypeVar, Union
+from typing import Any, ClassVar, Collection, Dict, Hashable, Optional, TypeVar, Union
 
 
 # dependencies
 import numpy as np
-from typing_extensions import Annotated, Literal, get_args, get_origin, get_type_hints
+from typing_extensions import (
+    Annotated,
+    Literal,
+    ParamSpec,
+    Protocol,
+    get_args,
+    get_origin,
+    get_type_hints,
+)
 
 
 # type hints (private)
+PInit = ParamSpec("PInit")
 TAttr = TypeVar("TAttr", covariant=True)
 TDtype = TypeVar("TDtype", covariant=True)
 TName = TypeVar("TName", bound=Hashable, covariant=True)
+
+
+class DataClass(Protocol[PInit]):
+    """Type hint for dataclass objects."""
+
+    __dataclass_fields__: ClassVar[Dict[str, "Field[Any]"]]
+
+    def __init__(self, *args: PInit.args, **kwargs: PInit.kwargs) -> None:
+        ...
 
 
 # type hints (public)
