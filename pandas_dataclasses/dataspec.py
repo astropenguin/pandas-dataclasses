@@ -1,10 +1,11 @@
 # standard library
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any, Hashable, Optional
 
 
 # dependencies
 import numpy as np
+from typing_extensions import Literal
 
 
 # runtime classes
@@ -37,7 +38,7 @@ class Array:
 
 
 @dataclass(frozen=True)
-class Metadata:
+class Meta:
     """Specifications for metadata."""
 
     type: Any
@@ -52,3 +53,31 @@ class Metadata:
             obj = self.default
 
         return obj
+
+
+@dataclass(frozen=True)
+class ArrayField:
+    """Specifications for array fields."""
+
+    type: Literal["attr", "name"]
+    """Type of the field."""
+
+    name: Hashable
+    """Name of the field."""
+
+    data: Array
+    """Data specifications of the field."""
+
+
+@dataclass(frozen=True)
+class MetaField:
+    """Specifications for metadata fields."""
+
+    type: Literal["attr", "name"]
+    """Type of the field."""
+
+    name: Hashable
+    """Name of the field."""
+
+    data: Meta
+    """Data specifications of the field."""
