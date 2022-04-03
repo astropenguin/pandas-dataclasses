@@ -3,7 +3,7 @@ __all__ = ["DataSpec"]
 
 # standard library
 from dataclasses import MISSING, Field, dataclass, field, fields
-from typing import Any, Dict, Hashable, Optional, Type, Union
+from typing import Any, Dict, Hashable, List, Optional, Type, Union
 
 
 # dependencies
@@ -96,7 +96,27 @@ class DataSpec:
     """Specification for pandas dataclasses."""
 
     fields: Dict[str, FieldSpec] = field(default_factory=dict)
-    """Field specifications of the dataclass."""
+    """Specifications of the dataclass fields."""
+
+    @property
+    def attrs(self) -> List[MetaFieldSpec]:
+        """Return specifications of the attribute fields."""
+        return [v for v in self.fields.values() if v.type == "attr"]
+
+    @property
+    def data(self) -> List[ArrayFieldSpec]:
+        """Return specifications of the data fields."""
+        return [v for v in self.fields.values() if v.type == "data"]
+
+    @property
+    def indexes(self) -> List[ArrayFieldSpec]:
+        """Return specifications of the index fields."""
+        return [v for v in self.fields.values() if v.type == "index"]
+
+    @property
+    def names(self) -> List[MetaFieldSpec]:
+        """Return specifications of the name fields."""
+        return [v for v in self.fields.values() if v.type == "name"]
 
     @classmethod
     def from_dataclass(
