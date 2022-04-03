@@ -1,11 +1,18 @@
+__all__ = ["DataSpec"]
+
+
 # standard library
-from dataclasses import dataclass
-from typing import Any, Hashable, Optional
+from dataclasses import dataclass, field
+from typing import Any, Dict, Hashable, Optional, Union
 
 
 # dependencies
 import numpy as np
 from typing_extensions import Literal
+
+
+# type hints
+AnyField = Union["ArrayField", "MetaField"]
 
 
 # runtime classes
@@ -81,3 +88,11 @@ class MetaField:
 
     data: Meta
     """Data specifications of the field."""
+
+
+@dataclass(frozen=True)
+class DataSpec:
+    """Specifications for pandas dataclasses."""
+
+    fields: Dict[str, AnyField] = field(default_factory=dict)
+    """Field specifications of the dataclass."""
