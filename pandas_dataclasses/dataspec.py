@@ -2,13 +2,17 @@ __all__ = ["DataSpec"]
 
 
 # standard library
-from dataclasses import dataclass, field
+from dataclasses import Field, dataclass, field
 from typing import Any, Dict, Hashable, Optional, Union
 
 
 # dependencies
 import numpy as np
 from typing_extensions import Literal
+
+
+# submodules
+from .typing import FieldType, deannotate, get_dtype, get_ftype, get_name
 
 
 # type hints
@@ -96,3 +100,24 @@ class DataSpec:
 
     fields: Dict[str, FieldSpec] = field(default_factory=dict)
     """Field specifications of the dataclass."""
+
+
+# runtime functions
+def get_fieldspec(field: "Field[Any]") -> Optional[FieldSpec]:
+    """Parse a dataclass field and return a field specification."""
+    ftype = get_ftype(field.type)
+    name = get_name(field.type, field.name)
+
+    if ftype is FieldType.DATA or ftype is FieldType.INDEX:
+        return ArrayFieldSpec(
+            type=ftype.value,
+            name=name,
+            data=ArraySpec(get_dtype(field.type), field.default),
+        )
+
+    if ftype is FieldType.ATTR or ftype is FieldType.NAME:
+        return MetaFieldSpec(
+            type=ftype.value,
+            name=name,
+            data=MetaSpec(deannotate(field.type), field.default),
+        )
