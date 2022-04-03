@@ -12,7 +12,7 @@ from typing_extensions import Literal
 
 
 # type hints
-AnyField = Union["ArrayField", "MetaField"]
+FieldSpec = Union["ArrayFieldSpec", "MetaFieldSpec"]
 
 
 # runtime classes
@@ -27,7 +27,7 @@ MISSING = MissingType()
 
 
 @dataclass(frozen=True)
-class Array:
+class ArraySpec:
     """Specification for arrays."""
 
     type: Optional["np.dtype[Any]"]
@@ -45,7 +45,7 @@ class Array:
 
 
 @dataclass(frozen=True)
-class Meta:
+class MetaSpec:
     """Specification for metadata."""
 
     type: Any
@@ -63,7 +63,7 @@ class Meta:
 
 
 @dataclass(frozen=True)
-class ArrayField:
+class ArrayFieldSpec:
     """Specification for array fields."""
 
     type: Literal["attr", "name"]
@@ -72,12 +72,12 @@ class ArrayField:
     name: Hashable
     """Name of the field."""
 
-    data: Array
+    data: ArraySpec
     """Data specification of the field."""
 
 
 @dataclass(frozen=True)
-class MetaField:
+class MetaFieldSpec:
     """Specification for metadata fields."""
 
     type: Literal["attr", "name"]
@@ -86,7 +86,7 @@ class MetaField:
     name: Hashable
     """Name of the field."""
 
-    data: Meta
+    data: MetaSpec
     """Data specification of the field."""
 
 
@@ -94,5 +94,5 @@ class MetaField:
 class DataSpec:
     """Specification for pandas dataclasses."""
 
-    fields: Dict[str, AnyField] = field(default_factory=dict)
-    """Field specification of the dataclass."""
+    fields: Dict[str, FieldSpec] = field(default_factory=dict)
+    """Field specifications of the dataclass."""
