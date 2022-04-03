@@ -2,7 +2,7 @@ __all__ = ["DataSpec"]
 
 
 # standard library
-from dataclasses import Field, dataclass, field, fields
+from dataclasses import MISSING, Field, dataclass, field, fields
 from typing import Any, Dict, Hashable, Optional, Type, Union
 
 
@@ -21,16 +21,6 @@ PInit = ParamSpec("PInit")
 
 
 # runtime classes
-class MissingType:
-    """Singleton that indicates missing data."""
-
-    def __repr__(self) -> str:
-        return "<MISSING>"
-
-
-MISSING = MissingType()
-
-
 @dataclass(frozen=True)
 class ArraySpec:
     """Specification for arrays."""
@@ -45,6 +35,9 @@ class ArraySpec:
         """Convert an object be spec-compliant."""
         if obj is MISSING:
             obj = self.default
+
+        if obj is MISSING:
+            raise ValueError("Value is missing.")
 
         return np.asarray(obj, dtype=self.type)
 
@@ -63,6 +56,9 @@ class MetaSpec:
         """Convert an object be spec-compliant."""
         if obj is MISSING:
             obj = self.default
+
+        if obj is MISSING:
+            raise ValueError("Value is missing.")
 
         return obj
 
