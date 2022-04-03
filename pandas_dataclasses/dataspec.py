@@ -66,7 +66,7 @@ class MetaSpec:
 class ArrayFieldSpec:
     """Specification for array fields."""
 
-    type: Literal["attr", "name"]
+    type: Literal["data", "index"]
     """Type of the field."""
 
     name: Hashable
