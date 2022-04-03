@@ -28,7 +28,7 @@ MISSING = MissingType()
 
 @dataclass(frozen=True)
 class Array:
-    """Specifications for arrays."""
+    """Specification for arrays."""
 
     type: Optional["np.dtype[Any]"]
     """Data type of the array."""
@@ -46,7 +46,7 @@ class Array:
 
 @dataclass(frozen=True)
 class Meta:
-    """Specifications for metadata."""
+    """Specification for metadata."""
 
     type: Any
     """Type of the metadata."""
@@ -64,7 +64,7 @@ class Meta:
 
 @dataclass(frozen=True)
 class ArrayField:
-    """Specifications for array fields."""
+    """Specification for array fields."""
 
     type: Literal["attr", "name"]
     """Type of the field."""
@@ -73,12 +73,12 @@ class ArrayField:
     """Name of the field."""
 
     data: Array
-    """Data specifications of the field."""
+    """Data specification of the field."""
 
 
 @dataclass(frozen=True)
 class MetaField:
-    """Specifications for metadata fields."""
+    """Specification for metadata fields."""
 
     type: Literal["attr", "name"]
     """Type of the field."""
@@ -87,12 +87,12 @@ class MetaField:
     """Name of the field."""
 
     data: Meta
-    """Data specifications of the field."""
+    """Data specification of the field."""
 
 
 @dataclass(frozen=True)
 class DataSpec:
-    """Specifications for pandas dataclasses."""
+    """Specification for pandas dataclasses."""
 
     fields: Dict[str, AnyField] = field(default_factory=dict)
-    """Field specifications of the dataclass."""
+    """Field specification of the dataclass."""
