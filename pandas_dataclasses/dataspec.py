@@ -1,6 +1,10 @@
 # standard library
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Optional
+
+
+# dependencies
+import numpy as np
 
 
 # runtime classes
@@ -12,6 +16,24 @@ class MissingType:
 
 
 MISSING = MissingType()
+
+
+@dataclass(frozen=True)
+class Array:
+    """Specifications for arrays."""
+
+    type: Optional["np.dtype[Any]"]
+    """Data type of the array."""
+
+    default: Any
+    """Default value of the array."""
+
+    def __call__(self, obj: Any = MISSING) -> "np.ndarray[Any, Any]":
+        """Convert an object be spec-compliant."""
+        if obj is MISSING:
+            obj = self.default
+
+        return np.asarray(obj, dtype=self.type)
 
 
 @dataclass(frozen=True)
