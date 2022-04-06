@@ -2,8 +2,9 @@ __all__ = ["Attr", "Data", "Index", "Name", "Named"]
 
 
 # standard library
+from dataclasses import Field
 from enum import Enum
-from typing import Any, Collection, Hashable, Optional, TypeVar, Union
+from typing import Any, ClassVar, Collection, Dict, Hashable, Optional, TypeVar, Union
 
 
 # dependencies
@@ -11,6 +12,7 @@ import numpy as np
 from typing_extensions import (
     Annotated,
     Literal,
+    Protocol,
     get_args,
     get_origin,
     get_type_hints,
@@ -21,6 +23,12 @@ from typing_extensions import (
 TAttr = TypeVar("TAttr", covariant=True)
 TDtype = TypeVar("TDtype", covariant=True)
 TName = TypeVar("TName", bound=Hashable, covariant=True)
+
+
+class DataClass(Protocol):
+    """Type hint for dataclass objects."""
+
+    __dataclass_fields__: ClassVar[Dict[str, "Field[Any]"]]
 
 
 # type hints (public)
@@ -38,6 +46,9 @@ class FieldType(Enum):
 
     NAME = "name"
     """Annotation for name fields."""
+
+    OTHER = "other"
+    """Annotation for other fields."""
 
     def annotates(self, type_: Any) -> bool:
         """Check if a type is annotated by the annotation."""
@@ -61,10 +72,19 @@ Named = Annotated
 
 
 # runtime functions
+def deannotate(type_: Any) -> Any:
+    """Recursively remove annotations from a type."""
+
+    class Temporary:
+        __annotations__ = dict(type=type_)
+
+    return get_type_hints(Temporary)["type"]
+
+
 def get_dtype(type_: Any) -> Optional["np.dtype[Any]"]:
     """Parse a type and return a data type (dtype)."""
     try:
-        t_dtype = get_args(unannotate(type_))[1]
+        t_dtype = get_args(deannotate(type_))[1]
     except (IndexError, NameError):
         raise ValueError(f"Could not convert {type_!r} to dtype.")
 
@@ -94,13 +114,13 @@ def get_ftype(type_: Any) -> FieldType:
     if FieldType.NAME.annotates(type_):
         return FieldType.NAME
 
-    raise ValueError(f"Could not convert {type_!r} to ftype.")
+    return FieldType.OTHER
 
 
-def get_name(type_: Any) -> Optional[Hashable]:
+def get_name(type_: Any, default: Hashable = None) -> Hashable:
     """Parse a type and return a name."""
     if get_origin(type_) is not Annotated:
-        return
+        return default
 
     for arg in reversed(get_args(type_)[1:]):
         if isinstance(arg, FieldType):
@@ -109,11 +129,4 @@ def get_name(type_: Any) -> Optional[Hashable]:
         if isinstance(arg, Hashable):
             return arg
 
-
-def unannotate(type_: Any) -> Any:
-    """Recursively remove annotations from a type."""
-
-    class Temporary:
-        __annotations__ = dict(type=type_)
-
-    return get_type_hints(Temporary)["type"]
+    return default

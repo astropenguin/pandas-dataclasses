@@ -6,9 +6,6 @@ from typing import Any
 import numpy as np
 from pytest import mark
 from typing_extensions import Literal
-
-
-# submodules
 from pandas_dataclasses.typing import (
     Attr,
     Data,
@@ -38,6 +35,7 @@ testdata_ftype = [
     (Data[Any], "data"),
     (Index[Any], "index"),
     (Name[Any], "name"),
+    (Any, "other"),
 ]
 
 testdata_name = [
@@ -50,6 +48,7 @@ testdata_name = [
     (Named[Index[Any], "index"], "index"),
     (Named[Name[Any], "name"], "name"),
 ]
+
 
 # test functions
 @mark.parametrize("type_, dtype", testdata_dtype)
