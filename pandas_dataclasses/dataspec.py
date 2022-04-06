@@ -3,12 +3,13 @@ __all__ = ["DataSpec"]
 
 # standard library
 from dataclasses import MISSING, Field, dataclass, field, fields
-from typing import Any, Dict, Hashable, List, Optional, Type, Union
+from functools import lru_cache
+from typing import Any, Dict, Hashable, List, Optional, Type, TypeVar, Union
 
 
 # dependencies
 import numpy as np
-from typing_extensions import Literal, ParamSpec, get_type_hints
+from typing_extensions import Literal, get_type_hints
 
 
 # submodules
@@ -17,7 +18,7 @@ from .typing import DataClass, FieldType, deannotate, get_dtype, get_ftype, get_
 
 # type hints
 FieldSpec = Union["ArrayFieldSpec", "MetaFieldSpec"]
-PInit = ParamSpec("PInit")
+TDataClass = TypeVar("TDataClass", bound=DataClass)
 
 
 # runtime classes
@@ -119,37 +120,32 @@ class DataSpec:
         return [v for v in self.fields.values() if v.type == "name"]
 
     @classmethod
-    def from_dataclass(
-        cls,
-        dataclass: Type[DataClass[PInit]],
-        cache: bool = True,
-    ) -> "DataSpec":
+    def from_dataclass(cls, dataclass: Type[DataClass]) -> "DataSpec":
         """Create a specification from a dataclass."""
-        if cache and hasattr(dataclass, "__dataspec__"):
-            return dataclass.__dataspec__  # type: ignore
-
         dataspec = cls()
-        eval_fields(dataclass)
 
-        for field in fields(dataclass):
+        for field in fields(eval_fields(dataclass)):
             fieldspec = get_fieldspec(field)
 
             if fieldspec is not None:
                 dataspec.fields[field.name] = fieldspec
 
-        dataclass.__dataspec__ = dataspec  # type: ignore
         return dataspec
 
 
 # runtime functions
-def eval_fields(dataclass: Type[DataClass[PInit]]) -> None:
+@lru_cache(maxsize=None)
+def eval_fields(dataclass: Type[TDataClass]) -> Type[TDataClass]:
     """Evaluate types of dataclass fields."""
     types = get_type_hints(dataclass, include_extras=True)
 
     for field in fields(dataclass):
         field.type = types[field.name]
 
+    return dataclass
 
+
+@lru_cache(maxsize=None)
 def get_fieldspec(field: "Field[Any]") -> Optional[FieldSpec]:
     """Parse a dataclass field and return a field specification."""
     ftype = get_ftype(field.type)

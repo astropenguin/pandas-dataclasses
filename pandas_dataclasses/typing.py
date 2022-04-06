@@ -12,7 +12,6 @@ import numpy as np
 from typing_extensions import (
     Annotated,
     Literal,
-    ParamSpec,
     Protocol,
     get_args,
     get_origin,
@@ -21,19 +20,15 @@ from typing_extensions import (
 
 
 # type hints (private)
-PInit = ParamSpec("PInit")
 TAttr = TypeVar("TAttr", covariant=True)
 TDtype = TypeVar("TDtype", covariant=True)
 TName = TypeVar("TName", bound=Hashable, covariant=True)
 
 
-class DataClass(Protocol[PInit]):
+class DataClass(Protocol):
     """Type hint for dataclass objects."""
 
     __dataclass_fields__: ClassVar[Dict[str, "Field[Any]"]]
-
-    def __init__(self, *args: PInit.args, **kwargs: PInit.kwargs) -> None:
-        ...
 
 
 # type hints (public)
