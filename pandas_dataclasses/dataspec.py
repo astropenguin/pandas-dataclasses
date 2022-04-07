@@ -17,14 +17,14 @@ from .typing import DataClass, FieldType, deannotate, get_dtype, get_ftype, get_
 
 
 # type hints
-FieldSpec = Union["ArrayFieldSpec", "MetaFieldSpec"]
+FieldSpec = Union["ArrayFieldSpec", "ScalarFieldSpec"]
 TDataClass = TypeVar("TDataClass", bound=DataClass)
 
 
 # runtime classes
 @dataclass(frozen=True)
 class ArraySpec:
-    """Specification for arrays."""
+    """Specification of arrays."""
 
     type: Optional["np.dtype[Any]"]
     """Data type of the array."""
@@ -44,14 +44,14 @@ class ArraySpec:
 
 
 @dataclass(frozen=True)
-class MetaSpec:
-    """Specification for metadata."""
+class ScalarSpec:
+    """Specification of scalars."""
 
     type: Any
-    """Type of the metadata."""
+    """Type of the scalar."""
 
     default: Any
-    """Default value of the metadata."""
+    """Default value of the scalar."""
 
     def __call__(self, obj: Any = MISSING) -> Any:
         """Convert an object be spec-compliant."""
@@ -66,7 +66,7 @@ class MetaSpec:
 
 @dataclass(frozen=True)
 class ArrayFieldSpec:
-    """Specification for array fields."""
+    """Specification of array fields."""
 
     type: Literal["data", "index"]
     """Type of the field."""
@@ -79,8 +79,8 @@ class ArrayFieldSpec:
 
 
 @dataclass(frozen=True)
-class MetaFieldSpec:
-    """Specification for metadata fields."""
+class ScalarFieldSpec:
+    """Specification of scalar fields."""
 
     type: Literal["attr", "name"]
     """Type of the field."""
@@ -88,19 +88,19 @@ class MetaFieldSpec:
     name: Hashable
     """Name of the field."""
 
-    data: MetaSpec
+    data: ScalarSpec
     """Data specification of the field."""
 
 
 @dataclass(frozen=True)
 class DataSpec:
-    """Specification for pandas dataclasses."""
+    """Specification of pandas dataclasses."""
 
     fields: Dict[str, FieldSpec] = field(default_factory=dict)
     """Specifications of the dataclass fields."""
 
     @property
-    def attrs(self) -> List[MetaFieldSpec]:
+    def attrs(self) -> List[ScalarFieldSpec]:
         """Return specifications of the attribute fields."""
         return [v for v in self.fields.values() if v.type == "attr"]
 
@@ -115,7 +115,7 @@ class DataSpec:
         return [v for v in self.fields.values() if v.type == "index"]
 
     @property
-    def names(self) -> List[MetaFieldSpec]:
+    def names(self) -> List[ScalarFieldSpec]:
         """Return specifications of the name fields."""
         return [v for v in self.fields.values() if v.type == "name"]
 
@@ -159,8 +159,8 @@ def get_fieldspec(field: "Field[Any]") -> Optional[FieldSpec]:
         )
 
     if ftype is FieldType.ATTR or ftype is FieldType.NAME:
-        return MetaFieldSpec(
+        return ScalarFieldSpec(
             type=ftype.value,
             name=name,
-            data=MetaSpec(deannotate(field.type), field.default),
+            data=ScalarSpec(deannotate(field.type), field.default),
         )
