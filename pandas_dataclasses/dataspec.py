@@ -4,7 +4,7 @@ __all__ = ["DataSpec"]
 # standard library
 from dataclasses import MISSING, Field, dataclass, field, fields
 from functools import lru_cache
-from typing import Any, Dict, Hashable, List, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Hashable, Optional, Type, TypeVar, Union
 
 
 # dependencies
@@ -92,32 +92,36 @@ class ScalarFieldSpec:
     """Data specification of the field."""
 
 
+class FieldSpecs(Dict[str, FieldSpec]):
+    """Specifications of the dataclass fields."""
+
+    @property
+    def attr(self) -> Dict[str, ScalarFieldSpec]:
+        """Select specifications of the attribute fields."""
+        return {k: v for k, v in self.items() if v.type == "attr"}
+
+    @property
+    def data(self) -> Dict[str, ArrayFieldSpec]:
+        """Select specifications of the data fields."""
+        return {k: v for k, v in self.items() if v.type == "data"}
+
+    @property
+    def index(self) -> Dict[str, ArrayFieldSpec]:
+        """Select specifications of the index fields."""
+        return {k: v for k, v in self.items() if v.type == "index"}
+
+    @property
+    def name(self) -> Dict[str, ScalarFieldSpec]:
+        """Select specifications of the name fields."""
+        return {k: v for k, v in self.items() if v.type == "name"}
+
+
 @dataclass(frozen=True)
 class DataSpec:
     """Specification of pandas dataclasses."""
 
-    fields: Dict[str, FieldSpec] = field(default_factory=dict)
+    fields: FieldSpecs = field(default_factory=FieldSpecs)
     """Specifications of the dataclass fields."""
-
-    @property
-    def attrs(self) -> List[ScalarFieldSpec]:
-        """Return specifications of the attribute fields."""
-        return [v for v in self.fields.values() if v.type == "attr"]
-
-    @property
-    def data(self) -> List[ArrayFieldSpec]:
-        """Return specifications of the data fields."""
-        return [v for v in self.fields.values() if v.type == "data"]
-
-    @property
-    def indexes(self) -> List[ArrayFieldSpec]:
-        """Return specifications of the index fields."""
-        return [v for v in self.fields.values() if v.type == "index"]
-
-    @property
-    def names(self) -> List[ScalarFieldSpec]:
-        """Return specifications of the name fields."""
-        return [v for v in self.fields.values() if v.type == "name"]
 
     @classmethod
     def from_dataclass(cls, dataclass: Type[DataClass]) -> "DataSpec":
