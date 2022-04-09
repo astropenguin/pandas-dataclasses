@@ -2,7 +2,7 @@ __all__ = ["DataSpec"]
 
 
 # standard library
-from dataclasses import MISSING, Field, dataclass, field, fields
+from dataclasses import Field, dataclass, field, fields
 from functools import lru_cache
 from typing import Any, Dict, Hashable, Optional, Type, TypeVar, Union
 
@@ -32,16 +32,6 @@ class ArraySpec:
     default: Any
     """Default value of the array."""
 
-    def __call__(self, obj: Any = MISSING) -> "np.ndarray[Any, Any]":
-        """Convert an object be spec-compliant."""
-        if obj is MISSING:
-            obj = self.default
-
-        if obj is MISSING:
-            raise ValueError("Value is missing.")
-
-        return np.asarray(obj, dtype=self.type)
-
 
 @dataclass(frozen=True)
 class ScalarSpec:
@@ -52,16 +42,6 @@ class ScalarSpec:
 
     default: Any
     """Default value of the scalar."""
-
-    def __call__(self, obj: Any = MISSING) -> Any:
-        """Convert an object be spec-compliant."""
-        if obj is MISSING:
-            obj = self.default
-
-        if obj is MISSING:
-            raise ValueError("Value is missing.")
-
-        return obj
 
 
 @dataclass(frozen=True)
