@@ -1,13 +1,16 @@
-__all__ = ["asseries"]
+__all__ = ["AsSeries", "asseries"]
 
 
 # standard library
-from typing import Any, Dict, Hashable, List, Optional, Union
+from functools import wraps
+from types import MethodType
+from typing import Any, Callable, Dict, Hashable, List, Optional, Type, Union
 
 
 # dependencies
 import numpy as np
 import pandas as pd
+from morecopy import copy
 from typing_extensions import ParamSpec, Protocol
 
 
@@ -28,9 +31,45 @@ class DataClass(DataClass, Protocol[PInit]):
         ...
 
 
+# runtime classes
+class classproperty:
+    """Class property only for AsSeries.new().
+
+    As a classmethod and a property can be chained together since Python 3.9,
+    this class will be removed when the support for Python 3.7 and 3.8 ends.
+
+    """
+
+    def __init__(self, func: Any) -> None:
+        self.__func__ = func
+
+    def __get__(
+        self,
+        obj: Any,
+        cls: Type[DataClass[PInit]],
+    ) -> Callable[PInit, "pd.Series[Any]"]:
+        return self.__func__(cls)
+
+
+class AsSeries:
+    """Mix-in class that provides shorthand methods."""
+
+    @classproperty
+    def new(cls: Any) -> Any:
+        """Create a Series object from dataclass parameters."""
+        init = copy(cls.__init__)
+        init.__annotations__["return"] = "pd.Series[Any]"
+
+        @wraps(init)
+        def new(cls: Any, *args: Any, **kwargs: Any) -> Any:
+            return asseries(cls(*args, **kwargs))
+
+        return MethodType(new, cls)
+
+
 # runtime functions
 def asseries(obj: DataClass[PInit]) -> "pd.Series[Any]":
-    """Create a Series object from a pandas dataclass."""
+    """Create a Series object from a dataclass object."""
     series = pd.Series(
         data=get_data(obj),
         dtype=get_dtype(obj),
