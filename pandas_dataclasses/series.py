@@ -11,15 +11,16 @@ from typing import Any, Callable, Dict, Hashable, List, Optional, Type, Union
 import numpy as np
 import pandas as pd
 from morecopy import copy
-from typing_extensions import ParamSpec, Protocol
+from typing_extensions import ParamSpec, Protocol, TypeAlias
 
 
 # submodules
 from .dataspec import DataSpec
-from .typing import DataClass
+from .typing import AnyDType, DataClass
 
 
 # type hints
+AnySeries: TypeAlias = "pd.Series[Any]"
 IndexLike = Union[List[pd.Index], pd.Index]
 PInit = ParamSpec("PInit")
 
@@ -47,7 +48,7 @@ class classproperty:
         self,
         obj: Any,
         cls: Type[DataClass[PInit]],
-    ) -> Callable[PInit, "pd.Series[Any]"]:
+    ) -> Callable[PInit, AnySeries]:
         return self.__func__(cls)
 
 
@@ -55,10 +56,10 @@ class AsSeries:
     """Mix-in class that provides shorthand methods."""
 
     @classproperty
-    def new(cls: Any) -> Any:
+    def new(cls) -> Any:
         """Create a Series object from dataclass parameters."""
         init = copy(cls.__init__)
-        init.__annotations__["return"] = "pd.Series[Any]"
+        init.__annotations__["return"] = AnySeries
 
         @wraps(init)
         def new(cls: Any, *args: Any, **kwargs: Any) -> Any:
@@ -68,7 +69,7 @@ class AsSeries:
 
 
 # runtime functions
-def asseries(obj: DataClass[PInit]) -> "pd.Series[Any]":
+def asseries(obj: DataClass[PInit]) -> AnySeries:
     """Create a Series object from a dataclass object."""
     series = pd.Series(
         data=get_data(obj),
@@ -100,7 +101,7 @@ def get_data(obj: DataClass[PInit]) -> Optional[Any]:
         return getattr(obj, key)
 
 
-def get_dtype(obj: DataClass[PInit]) -> Optional["np.dtype[Any]"]:
+def get_dtype(obj: DataClass[PInit]) -> Optional[AnyDType]:
     """Return the data type (dtype) for a Series object."""
     dataspec = DataSpec.from_dataclass(type(obj))
 

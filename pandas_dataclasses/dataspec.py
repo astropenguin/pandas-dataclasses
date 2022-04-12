@@ -2,22 +2,30 @@ __all__ = ["DataSpec"]
 
 
 # standard library
-from dataclasses import Field, dataclass, field, fields
+from dataclasses import dataclass, field, fields
 from functools import lru_cache
 from typing import Any, Dict, Hashable, Optional, Type, TypeVar, Union
 
 
 # dependencies
-import numpy as np
 from typing_extensions import Literal, get_type_hints
 
 
 # submodules
-from .typing import DataClass, FieldType, deannotate, get_dtype, get_ftype, get_name
+from .typing import (
+    AnyDType,
+    AnyField,
+    DataClass,
+    FieldType,
+    deannotate,
+    get_dtype,
+    get_ftype,
+    get_name,
+)
 
 
 # type hints
-FieldSpec = Union["ArrayFieldSpec", "ScalarFieldSpec"]
+AnyFieldSpec = Union["ArrayFieldSpec", "ScalarFieldSpec"]
 TDataClass = TypeVar("TDataClass", bound=DataClass)
 
 
@@ -26,7 +34,7 @@ TDataClass = TypeVar("TDataClass", bound=DataClass)
 class ArraySpec:
     """Specification of arrays."""
 
-    type: Optional["np.dtype[Any]"]
+    type: Optional[AnyDType]
     """Data type of the array."""
 
     default: Any
@@ -72,7 +80,7 @@ class ScalarFieldSpec:
     """Data specification of the field."""
 
 
-class FieldSpecs(Dict[str, FieldSpec]):
+class FieldSpecs(Dict[str, AnyFieldSpec]):
     """Specifications of the dataclass fields."""
 
     @property
@@ -130,7 +138,7 @@ def eval_fields(dataclass: Type[TDataClass]) -> Type[TDataClass]:
 
 
 @lru_cache(maxsize=None)
-def get_fieldspec(field: "Field[Any]") -> Optional[FieldSpec]:
+def get_fieldspec(field: AnyField) -> Optional[AnyFieldSpec]:
     """Parse a dataclass field and return a field specification."""
     ftype = get_ftype(field.type)
     name = get_name(field.type, field.name)
