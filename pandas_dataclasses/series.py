@@ -4,7 +4,7 @@ __all__ = ["AsSeries", "asseries"]
 # standard library
 from functools import wraps
 from types import MethodType
-from typing import Any, Callable, Dict, Hashable, List, Optional, Type, Union
+from typing import Any, Callable, Dict, Hashable, List, Optional, Type
 
 
 # dependencies
@@ -21,7 +21,6 @@ from .typing import AnyDType, DataClass
 
 # type hints
 AnySeries: TypeAlias = "pd.Series[Any]"
-IndexLike = Union[List[pd.Index], pd.Index]
 PInit = ParamSpec("PInit")
 
 
@@ -109,22 +108,26 @@ def get_dtype(obj: DataClass[PInit]) -> Optional[AnyDType]:
         return spec.data.type
 
 
-def get_index(obj: DataClass[PInit]) -> Optional[IndexLike]:
-    """Return the index(es) for a Series object."""
+def get_index(obj: DataClass[PInit]) -> Optional[pd.Index]:
+    """Return the (multi-level) index for a Series object."""
     dataspec = DataSpec.from_dataclass(type(obj))
+    datasize = np.size(get_data(obj))
     indexes: List[pd.Index] = []
 
     for key, spec in dataspec.fields.index.items():
-        indexes.append(
-            pd.Index(
-                np.atleast_1d(getattr(obj, key)),
-                dtype=spec.data.type,
-                name=spec.name,
-            )
+        index = pd.Index(
+            np.atleast_1d(getattr(obj, key)),
+            dtype=spec.data.type,
+            name=spec.name,
         )
 
+        if datasize > 1 and index.size == 1:
+            index = index.repeat(datasize)
+
+        indexes.append(index)
+
     if len(indexes) > 1:
-        return indexes
+        return pd.MultiIndex.from_arrays(indexes)
 
     if len(indexes) == 1:
         return indexes[0]
