@@ -35,8 +35,8 @@ class DataClass(DataClass, Protocol[PInit]):
 class classproperty:
     """Class property only for AsSeries.new().
 
-    As a classmethod and a property can be chained together since Python 3.9,
-    this class will be removed when the support for Python 3.7 and 3.8 ends.
+    As ``classmethod`` and ``property`` can be chained since Python 3.9,
+    this will be removed when the support for Python 3.7 and 3.8 ends.
 
     """
 
