@@ -8,11 +8,12 @@ from typing import Any, ClassVar, Collection, Dict, Hashable, Optional, TypeVar,
 
 
 # dependencies
-import numpy as np
+from numpy import dtype, ndarray
 from typing_extensions import (
     Annotated,
     Literal,
     Protocol,
+    TypeAlias,
     get_args,
     get_origin,
     get_type_hints,
@@ -20,15 +21,18 @@ from typing_extensions import (
 
 
 # type hints (private)
+AnyArray: TypeAlias = "ndarray[Any, Any]"
+AnyDType: TypeAlias = "dtype[Any]"
+AnyField: TypeAlias = "Field[Any]"
 TAttr = TypeVar("TAttr", covariant=True)
-TDtype = TypeVar("TDtype", covariant=True)
+TDType = TypeVar("TDType", covariant=True)
 TName = TypeVar("TName", bound=Hashable, covariant=True)
 
 
 class DataClass(Protocol):
     """Type hint for dataclass objects."""
 
-    __dataclass_fields__: ClassVar[Dict[str, "Field[Any]"]]
+    __dataclass_fields__: ClassVar[Dict[str, AnyField]]
 
 
 # type hints (public)
@@ -58,11 +62,11 @@ class FieldType(Enum):
 Attr = Annotated[TAttr, FieldType.ATTR]
 """Type hint for attribute fields (``Attr[TAttr]``)."""
 
-Data = Annotated[Union[Collection[TDtype], TDtype], FieldType.DATA]
-"""Type hint for data fields (``Data[TDtype]``)."""
+Data = Annotated[Union[Collection[TDType], TDType], FieldType.DATA]
+"""Type hint for data fields (``Data[TDType]``)."""
 
-Index = Annotated[Union[Collection[TDtype], TDtype], FieldType.INDEX]
-"""Type hint for index fields (``Index[TDtype]``)."""
+Index = Annotated[Union[Collection[TDType], TDType], FieldType.INDEX]
+"""Type hint for index fields (``Index[TDType]``)."""
 
 Name = Annotated[TName, FieldType.NAME]
 """Type hint for name fields (``Name[TName]``)."""
@@ -81,7 +85,7 @@ def deannotate(type_: Any) -> Any:
     return get_type_hints(Temporary)["type"]
 
 
-def get_dtype(type_: Any) -> Optional["np.dtype[Any]"]:
+def get_dtype(type_: Any) -> Optional[AnyDType]:
     """Parse a type and return a data type (dtype)."""
     try:
         t_dtype = get_args(deannotate(type_))[1]
@@ -92,10 +96,10 @@ def get_dtype(type_: Any) -> Optional["np.dtype[Any]"]:
         return None
 
     if isinstance(t_dtype, type):
-        return np.dtype(t_dtype)
+        return dtype(t_dtype)
 
     if get_origin(t_dtype) is Literal:
-        return np.dtype(get_args(t_dtype)[0])
+        return dtype(get_args(t_dtype)[0])
 
     raise ValueError(f"Could not convert {type_!r} to dtype.")
 
