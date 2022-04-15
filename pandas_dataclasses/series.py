@@ -85,7 +85,7 @@ def get_attrs(obj: DataClass[PInit]) -> Dict[Hashable, Any]:
     dataspec = DataSpec.from_dataclass(type(obj))
     attrs: Dict[Hashable, Any] = {}
 
-    for key, spec in dataspec.fields.attr.items():
+    for key, spec in dataspec.fields.of_attr.items():
         attrs[spec.name] = getattr(obj, key)
 
     return attrs
@@ -95,7 +95,7 @@ def get_data(obj: DataClass[PInit]) -> Optional[Any]:
     """Return the data for a Series object."""
     dataspec = DataSpec.from_dataclass(type(obj))
 
-    for key in dataspec.fields.data:
+    for key in dataspec.fields.of_data:
         return getattr(obj, key)
 
 
@@ -103,7 +103,7 @@ def get_dtype(obj: DataClass[PInit]) -> Optional[AnyDType]:
     """Return the data type (dtype) for a Series object."""
     dataspec = DataSpec.from_dataclass(type(obj))
 
-    for spec in dataspec.fields.data.values():
+    for spec in dataspec.fields.of_data.values():
         return spec.data.type
 
 
@@ -113,7 +113,7 @@ def get_index(obj: DataClass[PInit]) -> Optional[pd.Index]:
     datasize = np.size(get_data(obj))
     indexes: List[pd.Index] = []
 
-    for key, spec in dataspec.fields.index.items():
+    for key, spec in dataspec.fields.of_index.items():
         index = pd.Index(
             np.atleast_1d(getattr(obj, key)),
             dtype=spec.data.type,
@@ -136,8 +136,8 @@ def get_name(obj: DataClass[PInit]) -> Optional[Hashable]:
     """Return the name for a Series object."""
     dataspec = DataSpec.from_dataclass(type(obj))
 
-    for key in dataspec.fields.name:
+    for key in dataspec.fields.of_name:
         return getattr(obj, key)
 
-    for spec in dataspec.fields.data.values():
+    for spec in dataspec.fields.of_data.values():
         return spec.name

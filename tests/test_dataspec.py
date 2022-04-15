@@ -31,7 +31,7 @@ class Weather:
 
 # test functions
 def test_time() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.index["time"]
+    spec = DataSpec.from_dataclass(Weather).fields.of_index["time"]
 
     assert spec.type == "index"
     assert spec.name == "Time in UTC"
@@ -40,7 +40,7 @@ def test_time() -> None:
 
 
 def test_temperature() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.data["temperature"]
+    spec = DataSpec.from_dataclass(Weather).fields.of_data["temperature"]
 
     assert spec.type == "data"
     assert spec.name == "Temperature (degC)"
@@ -49,7 +49,7 @@ def test_temperature() -> None:
 
 
 def test_humidity() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.data["humidity"]
+    spec = DataSpec.from_dataclass(Weather).fields.of_data["humidity"]
 
     assert spec.type == "data"
     assert spec.name == "Humidity (percent)"
@@ -58,7 +58,7 @@ def test_humidity() -> None:
 
 
 def test_wind_speed() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.data["wind_speed"]
+    spec = DataSpec.from_dataclass(Weather).fields.of_data["wind_speed"]
 
     assert spec.type == "data"
     assert spec.name == "Speed (m/s)"
@@ -67,7 +67,7 @@ def test_wind_speed() -> None:
 
 
 def test_wind_direction() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.data["wind_direction"]
+    spec = DataSpec.from_dataclass(Weather).fields.of_data["wind_direction"]
 
     assert spec.type == "data"
     assert spec.name == "Direction (deg)"
@@ -76,7 +76,7 @@ def test_wind_direction() -> None:
 
 
 def test_location() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.attr["location"]
+    spec = DataSpec.from_dataclass(Weather).fields.of_attr["location"]
 
     assert spec.type == "attr"
     assert spec.name == "location"
@@ -85,7 +85,7 @@ def test_location() -> None:
 
 
 def test_longitude() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.attr["longitude"]
+    spec = DataSpec.from_dataclass(Weather).fields.of_attr["longitude"]
 
     assert spec.type == "attr"
     assert spec.name == "longitude"
@@ -94,7 +94,7 @@ def test_longitude() -> None:
 
 
 def test_latitude() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.attr["latitude"]
+    spec = DataSpec.from_dataclass(Weather).fields.of_attr["latitude"]
 
     assert spec.type == "attr"
     assert spec.name == "latitude"
@@ -103,7 +103,7 @@ def test_latitude() -> None:
 
 
 def test_name() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.name["name"]
+    spec = DataSpec.from_dataclass(Weather).fields.of_name["name"]
 
     assert spec.type == "name"
     assert spec.name == "name"

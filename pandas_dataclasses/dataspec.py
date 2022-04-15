@@ -84,22 +84,22 @@ class FieldSpecs(Dict[str, AnyFieldSpec]):
     """Specifications of the dataclass fields."""
 
     @property
-    def attr(self) -> Dict[str, ScalarFieldSpec]:
+    def of_attr(self) -> Dict[str, ScalarFieldSpec]:
         """Select specifications of the attribute fields."""
         return {k: v for k, v in self.items() if v.type == "attr"}
 
     @property
-    def data(self) -> Dict[str, ArrayFieldSpec]:
+    def of_data(self) -> Dict[str, ArrayFieldSpec]:
         """Select specifications of the data fields."""
         return {k: v for k, v in self.items() if v.type == "data"}
 
     @property
-    def index(self) -> Dict[str, ArrayFieldSpec]:
+    def of_index(self) -> Dict[str, ArrayFieldSpec]:
         """Select specifications of the index fields."""
         return {k: v for k, v in self.items() if v.type == "index"}
 
     @property
-    def name(self) -> Dict[str, ScalarFieldSpec]:
+    def of_name(self) -> Dict[str, ScalarFieldSpec]:
         """Select specifications of the name fields."""
         return {k: v for k, v in self.items() if v.type == "name"}
 
