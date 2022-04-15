@@ -6,6 +6,11 @@ from dataclasses import MISSING, dataclass
 import numpy as np
 from pandas_dataclasses.dataspec import DataSpec
 from pandas_dataclasses.typing import Attr, Data, Index, Name, Named
+from typing_extensions import Literal
+
+
+# type hints
+datetime = Literal["M8[ns]"]
 
 
 # test datasets
@@ -13,14 +18,14 @@ from pandas_dataclasses.typing import Attr, Data, Index, Name, Named
 class Weather:
     """Time-series weather information at a location."""
 
-    time: Named[Index[np.datetime64], "Time in UTC"]
+    time: Named[Index[datetime], "Time in UTC"]
     temperature: Named[Data[float], "Temperature (degC)"]
     humidity: Named[Data[float], "Humidity (percent)"]
     wind_speed: Named[Data[float], "Speed (m/s)"]
     wind_direction: Named[Data[float], "Direction (deg)"]
     location: Attr[str] = "Tokyo"
-    longitude: Attr[float] = 0.0
-    latitude: Attr[float] = 0.0
+    longitude: Attr[float] = 139.69167
+    latitude: Attr[float] = 35.68944
     name: Name[str] = "weather"
 
 
@@ -30,7 +35,7 @@ def test_time() -> None:
 
     assert spec.type == "index"
     assert spec.name == "Time in UTC"
-    assert spec.data.type == np.datetime64
+    assert spec.data.type == np.dtype("M8[ns]")
     assert spec.data.default is MISSING
 
 
@@ -85,7 +90,7 @@ def test_longitude() -> None:
     assert spec.type == "attr"
     assert spec.name == "longitude"
     assert spec.data.type is float
-    assert spec.data.default == 0.0
+    assert spec.data.default == 139.69167
 
 
 def test_latitude() -> None:
@@ -94,7 +99,7 @@ def test_latitude() -> None:
     assert spec.type == "attr"
     assert spec.name == "latitude"
     assert spec.data.type is float
-    assert spec.data.default == 0.0
+    assert spec.data.default == 35.68944
 
 
 def test_name() -> None:
