@@ -11,7 +11,7 @@ from typing import Any, Callable, Dict, Hashable, List, Optional, Type
 import numpy as np
 import pandas as pd
 from morecopy import copy
-from typing_extensions import ParamSpec, Protocol, TypeAlias
+from typing_extensions import ParamSpec, Protocol
 
 
 # submodules
@@ -20,7 +20,6 @@ from .typing import AnyDType, DataClass
 
 
 # type hints
-AnySeries: TypeAlias = "pd.Series[Any]"
 PInit = ParamSpec("PInit")
 
 
@@ -47,7 +46,7 @@ class classproperty:
         self,
         obj: Any,
         cls: Type[DataClass[PInit]],
-    ) -> Callable[PInit, AnySeries]:
+    ) -> Callable[PInit, pd.Series]:
         return self.__func__(cls)
 
 
@@ -58,7 +57,7 @@ class AsSeries:
     def new(cls) -> Any:
         """Create a Series object from dataclass parameters."""
         init = copy(cls.__init__)
-        init.__annotations__["return"] = AnySeries
+        init.__annotations__["return"] = pd.Series
 
         @wraps(init)
         def new(cls: Any, *args: Any, **kwargs: Any) -> Any:
@@ -68,12 +67,12 @@ class AsSeries:
 
 
 # runtime functions
-def asseries(obj: DataClass[PInit]) -> AnySeries:
+def asseries(obj: DataClass[PInit]) -> pd.Series:
     """Create a Series object from a dataclass object."""
     series = pd.Series(
         data=get_data(obj),
         dtype=get_dtype(obj),
-        index=get_index(obj),  # type: ignore
+        index=get_index(obj),
         name=get_name(obj),
     )
 
