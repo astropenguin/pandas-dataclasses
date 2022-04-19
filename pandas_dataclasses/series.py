@@ -110,26 +110,30 @@ def get_dtype(obj: DataClass[PInit]) -> Optional[AnyDType]:
 def get_index(obj: DataClass[PInit]) -> Optional[pd.Index]:
     """Return the (multi-level) index for a Series object."""
     dataspec = DataSpec.from_dataclass(type(obj))
-    datasize = np.size(get_data(obj))
     indexes: List[pd.Index] = []
 
     for key, spec in dataspec.fields.of_index.items():
-        index = pd.Index(
-            np.atleast_1d(getattr(obj, key)),
-            dtype=spec.data.type,
-            name=spec.name,
+        indexes.append(
+            pd.Index(
+                np.atleast_1d(getattr(obj, key)),
+                dtype=spec.data.type,
+                name=spec.name,
+            )
         )
 
-        if datasize > 1 and index.size == 1:
-            index = index.repeat(datasize)
-
-        indexes.append(index)
-
-    if len(indexes) > 1:
-        return pd.MultiIndex.from_arrays(indexes)
+    if len(indexes) == 0:
+        return
 
     if len(indexes) == 1:
         return indexes[0]
+
+    repeats = max(map(len, indexes))
+
+    for i, index in enumerate(indexes):
+        if len(index) == 1:
+            indexes[i] = index.repeat(repeats)
+
+    return pd.MultiIndex.from_arrays(indexes)
 
 
 def get_name(obj: DataClass[PInit]) -> Optional[Hashable]:
