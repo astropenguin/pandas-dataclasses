@@ -80,6 +80,11 @@ def asseries(obj: DataClass[PInit]) -> pd.Series:
     return series
 
 
+def atleast_1d(data: Any) -> Any:
+    """Convert data to be at least one dimensional."""
+    return data if np.ndim(data) else [data]
+
+
 def get_attrs(obj: DataClass[PInit]) -> Dict[Hashable, Any]:
     """Return the attributes for a Series object."""
     dataspec = DataSpec.from_dataclass(type(obj))
@@ -96,7 +101,7 @@ def get_data(obj: DataClass[PInit]) -> Optional[Any]:
     dataspec = DataSpec.from_dataclass(type(obj))
 
     for key in dataspec.fields.of_data:
-        return getattr(obj, key)
+        return atleast_1d(getattr(obj, key))
 
 
 def get_dtype(obj: DataClass[PInit]) -> Optional[AnyDType]:
@@ -115,7 +120,7 @@ def get_index(obj: DataClass[PInit]) -> Optional[pd.Index]:
     for key, spec in dataspec.fields.of_index.items():
         indexes.append(
             pd.Index(
-                np.atleast_1d(getattr(obj, key)),
+                atleast_1d(getattr(obj, key)),
                 dtype=spec.data.type,
                 name=spec.name,
             )
