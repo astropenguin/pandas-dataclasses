@@ -107,7 +107,7 @@ def get_data(obj: DataClass[PInit]) -> Optional[Any]:
     """Return the data for a Series object."""
     dataspec = DataSpec.from_dataclass(type(obj))
 
-    for key in dataspec.fields.of_data:
+    for key in dataspec.fields.of_data.keys():
         return atleast_1d(getattr(obj, key))
 
 
@@ -152,7 +152,7 @@ def get_name(obj: DataClass[PInit]) -> Optional[Hashable]:
     """Return the name for a Series object."""
     dataspec = DataSpec.from_dataclass(type(obj))
 
-    for key in dataspec.fields.of_name:
+    for key in dataspec.fields.of_name.keys():
         return getattr(obj, key)
 
     for spec in dataspec.fields.of_data.values():
