@@ -69,13 +69,20 @@ class AsSeries:
 # runtime functions
 def asseries(obj: DataClass[PInit]) -> pd.Series:
     """Create a Series object from a dataclass object."""
-    series = pd.Series(
-        data=get_data(obj),
-        dtype=get_dtype(obj),
-        index=get_index(obj),
-        name=get_name(obj),
-    )
+    data = get_data(obj)
+    dtype = get_dtype(obj)
+    index = get_index(obj)
+    name = get_name(obj)
 
+    if (
+        data is not None
+        and not isinstance(data, pd.Series)
+        and index is not None
+        and len(index) == 1
+    ):
+        index = index.repeat(len(data))
+
+    series = pd.Series(data, index, dtype, name)
     series.attrs.update(get_attrs(obj))
     return series
 
