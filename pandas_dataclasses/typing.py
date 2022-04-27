@@ -24,9 +24,9 @@ from typing_extensions import (
 AnyArray: TypeAlias = "ndarray[Any, Any]"
 AnyDType: TypeAlias = "dtype[Any]"
 AnyField: TypeAlias = "Field[Any]"
-TAttr = TypeVar("TAttr", covariant=True)
-TDType = TypeVar("TDType", covariant=True)
-TName = TypeVar("TName", bound=Hashable, covariant=True)
+TAttr = TypeVar("TAttr")
+TDType = TypeVar("TDType")
+TName = TypeVar("TName", bound=Hashable)
 
 
 class DataClass(Protocol):
