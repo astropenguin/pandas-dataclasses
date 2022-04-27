@@ -54,10 +54,6 @@ class FieldType(Enum):
     OTHER = "other"
     """Annotation for other fields."""
 
-    def annotates(self, type_: Any) -> bool:
-        """Check if a type is annotated by the annotation."""
-        return self in get_args(type_)[1:]
-
 
 Attr = Annotated[TAttr, FieldType.ATTR]
 """Type hint for attribute fields (``Attr[TAttr]``)."""
@@ -106,17 +102,12 @@ def get_dtype(type_: Any) -> Optional[AnyDType]:
 
 def get_ftype(type_: Any) -> FieldType:
     """Parse a type and return a field type (ftype)."""
-    if FieldType.ATTR.annotates(type_):
-        return FieldType.ATTR
+    if get_origin(type_) is not Annotated:
+        return FieldType.OTHER
 
-    if FieldType.DATA.annotates(type_):
-        return FieldType.DATA
-
-    if FieldType.INDEX.annotates(type_):
-        return FieldType.INDEX
-
-    if FieldType.NAME.annotates(type_):
-        return FieldType.NAME
+    for arg in reversed(get_args(type_)[1:]):
+        if isinstance(arg, FieldType):
+            return arg
 
     return FieldType.OTHER
 
