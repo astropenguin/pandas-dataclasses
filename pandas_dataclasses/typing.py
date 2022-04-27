@@ -91,11 +91,11 @@ def get_dtype(type_: Any) -> Optional[AnyDType]:
     if t_dtype is Any or t_dtype is type(None):
         return None
 
-    if isinstance(t_dtype, type):
-        return dtype(t_dtype)
-
     if get_origin(t_dtype) is Literal:
         return dtype(get_args(t_dtype)[0])
+
+    if isinstance(t_dtype, type):
+        return dtype(t_dtype)
 
     raise ValueError(f"Could not convert {type_!r} to dtype.")
 
