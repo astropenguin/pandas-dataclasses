@@ -37,7 +37,7 @@ class DataClass(Protocol):
 
 
 class FType(Enum):
-    """Annotations for pandas-related type hints."""
+    """Annotations for typing dataclass fields."""
 
     ATTR = "attr"
     """Annotation for attribute fields."""
@@ -74,7 +74,7 @@ Other = Annotated[T, FType.OTHER]
 
 # runtime functions
 def deannotate(tp: Any) -> Any:
-    """Recursively remove annotations from a type."""
+    """Recursively remove annotations from a type hint."""
 
     class Temporary:
         __annotations__ = dict(type=tp)
@@ -83,7 +83,7 @@ def deannotate(tp: Any) -> Any:
 
 
 def get_dtype(tp: Any) -> Optional[AnyDType]:
-    """Parse a type and return a data type (dtype)."""
+    """Extract a dtype (NumPy data type) from a type hint."""
     tp = deannotate(tp)
 
     if get_origin(tp) is not Union:
@@ -107,7 +107,7 @@ def get_dtype(tp: Any) -> Optional[AnyDType]:
 
 
 def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
-    """Parse a type and return a field type (ftype)."""
+    """Extract an ftype (most outer FType) from a type hint."""
     if get_origin(tp) is not Annotated:
         return default
 
@@ -119,7 +119,7 @@ def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
 
 
 def get_name(tp: Any, default: Hashable = None) -> Hashable:
-    """Parse a type and return a name."""
+    """Extract a name (most outer hashable) from a type hint."""
     if get_origin(tp) is not Annotated:
         return default
 
