@@ -6,8 +6,8 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 from pandas_dataclasses.series import AsSeries
-from pandas_dataclasses.typing import Attr, Data, Index, Named
-from typing_extensions import Literal
+from pandas_dataclasses.typing import Attr, Data, Index
+from typing_extensions import Annotated, Literal
 
 
 # type hints
@@ -19,8 +19,8 @@ datetime = Literal["M8[ns]"]
 class Temperature(AsSeries):
     """Time-series temperature information at a location."""
 
-    time: Named[Index[datetime], "Time in UTC"]
-    temperature: Named[Data[float], "Temperature (degC)"]
+    time: Annotated[Index[datetime], "Time in UTC"]
+    temperature: Annotated[Data[float], "Temperature (degC)"]
     location: Attr[str] = "Tokyo"
     longitude: Attr[float] = 139.69167
     latitude: Attr[float] = 35.68944

@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Data", "Index", "Name", "Named"]
+__all__ = ["Attr", "Data", "Index", "Name", "Other"]
 
 
 # standard library
@@ -8,7 +8,7 @@ from typing import Any, ClassVar, Collection, Dict, Hashable, Optional, TypeVar,
 
 
 # dependencies
-from numpy import dtype, ndarray
+import numpy as np
 from typing_extensions import (
     Annotated,
     Literal,
@@ -21,12 +21,10 @@ from typing_extensions import (
 
 
 # type hints (private)
-AnyArray: TypeAlias = "ndarray[Any, Any]"
-AnyDType: TypeAlias = "dtype[Any]"
+AnyDType: TypeAlias = "np.dtype[Any]"
 AnyField: TypeAlias = "Field[Any]"
-TAttr = TypeVar("TAttr", covariant=True)
-TDType = TypeVar("TDType", covariant=True)
-TName = TypeVar("TName", bound=Hashable, covariant=True)
+T = TypeVar("T")
+THashable = TypeVar("THashable", bound=Hashable)
 
 
 class DataClass(Protocol):
@@ -35,9 +33,8 @@ class DataClass(Protocol):
     __dataclass_fields__: ClassVar[Dict[str, AnyField]]
 
 
-# type hints (public)
-class FieldType(Enum):
-    """Annotations for pandas-related type hints."""
+class FType(Enum):
+    """Annotations for typing dataclass fields."""
 
     ATTR = "attr"
     """Annotation for attribute fields."""
@@ -54,83 +51,80 @@ class FieldType(Enum):
     OTHER = "other"
     """Annotation for other fields."""
 
-    def annotates(self, type_: Any) -> bool:
-        """Check if a type is annotated by the annotation."""
-        return self in get_args(type_)[1:]
 
+# type hints (public)
+Attr = Annotated[T, FType.ATTR]
+"""Type hint for attribute fields (``Attr[T]``)."""
 
-Attr = Annotated[TAttr, FieldType.ATTR]
-"""Type hint for attribute fields (``Attr[TAttr]``)."""
+Data = Annotated[Union[Collection[T], T], FType.DATA]
+"""Type hint for data fields (``Data[T]``)."""
 
-Data = Annotated[Union[Collection[TDType], TDType], FieldType.DATA]
-"""Type hint for data fields (``Data[TDType]``)."""
+Index = Annotated[Union[Collection[T], T], FType.INDEX]
+"""Type hint for index fields (``Index[T]``)."""
 
-Index = Annotated[Union[Collection[TDType], TDType], FieldType.INDEX]
-"""Type hint for index fields (``Index[TDType]``)."""
+Name = Annotated[THashable, FType.NAME]
+"""Type hint for name fields (``Name[T]``)."""
 
-Name = Annotated[TName, FieldType.NAME]
-"""Type hint for name fields (``Name[TName]``)."""
-
-Named = Annotated
-"""Type hint for named fields (alias of Annotated)."""
+Other = Annotated[T, FType.OTHER]
+"""Type hint for other fields (``Other[T]``)."""
 
 
 # runtime functions
-def deannotate(type_: Any) -> Any:
-    """Recursively remove annotations from a type."""
+def deannotate(tp: Any) -> Any:
+    """Recursively remove annotations from a type hint."""
 
     class Temporary:
-        __annotations__ = dict(type=type_)
+        __annotations__ = dict(type=tp)
 
     return get_type_hints(Temporary)["type"]
 
 
-def get_dtype(type_: Any) -> Optional[AnyDType]:
-    """Parse a type and return a data type (dtype)."""
-    try:
-        t_dtype = get_args(deannotate(type_))[1]
-    except (IndexError, NameError):
-        raise ValueError(f"Could not convert {type_!r} to dtype.")
+def get_dtype(tp: Any) -> Optional[AnyDType]:
+    """Extract a dtype (NumPy data type) from a type hint."""
+    tp = deannotate(tp)
 
-    if t_dtype is Any or t_dtype is type(None):
+    if get_origin(tp) is not Union:
+        raise TypeError(f"{tp!r} is not arrayable.")
+
+    try:
+        tp_array, tp_scalar = get_args(tp)
+    except ValueError:
+        raise TypeError(f"{tp!r} is not arrayable.")
+
+    if get_args(tp_array)[0] is not tp_scalar:
+        raise TypeError(f"{tp!r} is not arrayable.")
+
+    if tp_scalar is Any or tp_scalar is type(None):
         return None
 
-    if isinstance(t_dtype, type):
-        return dtype(t_dtype)
+    if get_origin(tp_scalar) is Literal:
+        tp_scalar = get_args(tp_scalar)[0]
 
-    if get_origin(t_dtype) is Literal:
-        return dtype(get_args(t_dtype)[0])
-
-    raise ValueError(f"Could not convert {type_!r} to dtype.")
+    return np.dtype(tp_scalar)
 
 
-def get_ftype(type_: Any) -> FieldType:
-    """Parse a type and return a field type (ftype)."""
-    if FieldType.ATTR.annotates(type_):
-        return FieldType.ATTR
-
-    if FieldType.DATA.annotates(type_):
-        return FieldType.DATA
-
-    if FieldType.INDEX.annotates(type_):
-        return FieldType.INDEX
-
-    if FieldType.NAME.annotates(type_):
-        return FieldType.NAME
-
-    return FieldType.OTHER
-
-
-def get_name(type_: Any, default: Hashable = None) -> Hashable:
-    """Parse a type and return a name."""
-    if get_origin(type_) is not Annotated:
+def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
+    """Extract an ftype (most outer FType) from a type hint."""
+    if get_origin(tp) is not Annotated:
         return default
 
-    for arg in reversed(get_args(type_)[1:]):
-        if isinstance(arg, FieldType):
+    for ann in reversed(get_args(tp)[1:]):
+        if isinstance(ann, FType):
+            return ann
+
+    return default
+
+
+def get_name(tp: Any, default: Hashable = None) -> Hashable:
+    """Extract a name (most outer hashable) from a type hint."""
+    if get_origin(tp) is not Annotated:
+        return default
+
+    for ann in reversed(get_args(tp)[1:]):
+        if isinstance(ann, FType):
             continue
 
-        if isinstance(arg, Hashable):
-            return arg
+        if isinstance(ann, Hashable):
+            return ann
 
     return default

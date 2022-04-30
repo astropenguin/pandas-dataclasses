@@ -5,8 +5,8 @@ from dataclasses import MISSING, dataclass
 # dependencies
 import numpy as np
 from pandas_dataclasses.dataspec import DataSpec
-from pandas_dataclasses.typing import Attr, Data, Index, Name, Named
-from typing_extensions import Literal
+from pandas_dataclasses.typing import Attr, Data, Index, Name
+from typing_extensions import Annotated, Literal
 
 
 # type hints
@@ -18,11 +18,11 @@ datetime = Literal["M8[ns]"]
 class Weather:
     """Time-series weather information at a location."""
 
-    time: Named[Index[datetime], "Time in UTC"]
-    temperature: Named[Data[float], "Temperature (degC)"]
-    humidity: Named[Data[float], "Humidity (percent)"]
-    wind_speed: Named[Data[float], "Speed (m/s)"]
-    wind_direction: Named[Data[float], "Direction (deg)"]
+    time: Annotated[Index[datetime], "Time in UTC"]
+    temperature: Annotated[Data[float], "Temperature (degC)"]
+    humidity: Annotated[Data[float], "Humidity (percent)"]
+    wind_speed: Annotated[Data[float], "Speed (m/s)"]
+    wind_direction: Annotated[Data[float], "Direction (deg)"]
     location: Attr[str] = "Tokyo"
     longitude: Attr[float] = 139.69167
     latitude: Attr[float] = 35.68944
