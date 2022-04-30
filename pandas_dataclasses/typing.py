@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Data", "Index", "Name", "Named"]
+__all__ = ["Attr", "Data", "Index", "Name"]
 
 
 # standard library
@@ -66,9 +66,6 @@ Index = Annotated[Union[Collection[TDType], TDType], FType.INDEX]
 
 Name = Annotated[TName, FType.NAME]
 """Type hint for name fields (``Name[TName]``)."""
-
-Named = Annotated
-"""Type hint for named fields (alias of Annotated)."""
 
 
 # runtime functions

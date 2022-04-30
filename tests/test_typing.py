@@ -5,13 +5,12 @@ from typing import Any
 # dependencies
 import numpy as np
 from pytest import mark
-from typing_extensions import Literal
+from typing_extensions import Annotated, Literal
 from pandas_dataclasses.typing import (
     Attr,
     Data,
     Index,
     Name,
-    Named,
     get_dtype,
     get_ftype,
     get_name,
@@ -43,10 +42,10 @@ testdata_name = [
     (Data[Any], None),
     (Index[Any], None),
     (Name[Any], None),
-    (Named[Attr[Any], "attr"], "attr"),
-    (Named[Data[Any], "data"], "data"),
-    (Named[Index[Any], "index"], "index"),
-    (Named[Name[Any], "name"], "name"),
+    (Annotated[Attr[Any], "attr"], "attr"),
+    (Annotated[Data[Any], "data"], "data"),
+    (Annotated[Index[Any], "index"], "index"),
+    (Annotated[Name[Any], "name"], "name"),
 ]
 
 
