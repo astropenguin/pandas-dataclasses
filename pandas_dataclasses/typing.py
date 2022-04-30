@@ -8,7 +8,7 @@ from typing import Any, ClassVar, Collection, Dict, Hashable, Optional, TypeVar,
 
 
 # dependencies
-from numpy import dtype, ndarray
+import numpy as np
 from typing_extensions import (
     Annotated,
     Literal,
@@ -20,12 +20,14 @@ from typing_extensions import (
 )
 
 
-# type hints (private)
-AnyArray: TypeAlias = "ndarray[Any, Any]"
-AnyDType: TypeAlias = "dtype[Any]"
-AnyField: TypeAlias = "Field[Any]"
+# type variables (private)
 T = TypeVar("T")
 THashable = TypeVar("THashable", bound=Hashable)
+
+
+# type hints (private)
+AnyDType: TypeAlias = "np.dtype[Any]"
+AnyField: TypeAlias = "Field[Any]"
 
 
 class DataClass(Protocol):
@@ -34,7 +36,6 @@ class DataClass(Protocol):
     __dataclass_fields__: ClassVar[Dict[str, AnyField]]
 
 
-# type hints (public)
 class FType(Enum):
     """Annotations for pandas-related type hints."""
 
@@ -54,6 +55,7 @@ class FType(Enum):
     """Annotation for other fields."""
 
 
+# type hints (public)
 Attr = Annotated[T, FType.ATTR]
 """Type hint for attribute fields (``Attr[T]``)."""
 
@@ -82,21 +84,26 @@ def deannotate(type_: Any) -> Any:
 
 def get_dtype(type_: Any) -> Optional[AnyDType]:
     """Parse a type and return a data type (dtype)."""
-    try:
-        t_dtype = get_args(deannotate(type_))[1]
-    except (IndexError, NameError):
-        raise ValueError(f"Could not convert {type_!r} to dtype.")
+    type_ = deannotate(type_)
 
-    if t_dtype is Any or t_dtype is type(None):
+    if get_origin(type_) is not Union:
+        raise TypeError(f"{type_!r} is not arrayable.")
+
+    try:
+        vector, scalar = get_args(type_)
+    except ValueError:
+        raise TypeError(f"{type_!r} is not arrayable.")
+
+    if get_args(vector)[0] is not scalar:
+        raise TypeError(f"{type_!r} is not arrayable.")
+
+    if scalar is Any or scalar is type(None):
         return None
 
-    if get_origin(t_dtype) is Literal:
-        return dtype(get_args(t_dtype)[0])
+    if get_origin(scalar) is Literal:
+        scalar = get_args(scalar)[0]
 
-    if isinstance(t_dtype, type):
-        return dtype(t_dtype)
-
-    raise ValueError(f"Could not convert {type_!r} to dtype.")
+    return np.dtype(scalar)
 
 
 def get_ftype(type_: Any, default: FType = FType.OTHER) -> FType:
