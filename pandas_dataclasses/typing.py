@@ -90,20 +90,20 @@ def get_dtype(tp: Any) -> Optional[AnyDType]:
         raise TypeError(f"{tp!r} is not arrayable.")
 
     try:
-        vector, scalar = get_args(tp)
+        tp_array, tp_scalar = get_args(tp)
     except ValueError:
         raise TypeError(f"{tp!r} is not arrayable.")
 
-    if get_args(vector)[0] is not scalar:
+    if get_args(tp_array)[0] is not tp_scalar:
         raise TypeError(f"{tp!r} is not arrayable.")
 
-    if scalar is Any or scalar is type(None):
+    if tp_scalar is Any or tp_scalar is type(None):
         return None
 
-    if get_origin(scalar) is Literal:
-        scalar = get_args(scalar)[0]
+    if get_origin(tp_scalar) is Literal:
+        tp_scalar = get_args(tp_scalar)[0]
 
-    return np.dtype(scalar)
+    return np.dtype(tp_scalar)
 
 
 def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
@@ -111,9 +111,9 @@ def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
     if get_origin(tp) is not Annotated:
         return default
 
-    for arg in reversed(get_args(tp)[1:]):
-        if isinstance(arg, FType):
-            return arg
+    for ann in reversed(get_args(tp)[1:]):
+        if isinstance(ann, FType):
+            return ann
 
     return default
 
@@ -123,11 +123,11 @@ def get_name(tp: Any, default: Hashable = None) -> Hashable:
     if get_origin(tp) is not Annotated:
         return default
 
-    for arg in reversed(get_args(tp)[1:]):
-        if isinstance(arg, FType):
+    for ann in reversed(get_args(tp)[1:]):
+        if isinstance(ann, FType):
             continue
 
-        if isinstance(arg, Hashable):
-            return arg
+        if isinstance(ann, Hashable):
+            return ann
 
     return default
