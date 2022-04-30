@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Data", "Index", "Name"]
+__all__ = ["Attr", "Data", "Index", "Name", "Other"]
 
 
 # standard library
@@ -24,9 +24,8 @@ from typing_extensions import (
 AnyArray: TypeAlias = "ndarray[Any, Any]"
 AnyDType: TypeAlias = "dtype[Any]"
 AnyField: TypeAlias = "Field[Any]"
-TAttr = TypeVar("TAttr")
-TDType = TypeVar("TDType")
-TName = TypeVar("TName", bound=Hashable)
+T = TypeVar("T")
+THashable = TypeVar("THashable", bound=Hashable)
 
 
 class DataClass(Protocol):
@@ -55,17 +54,20 @@ class FType(Enum):
     """Annotation for other fields."""
 
 
-Attr = Annotated[TAttr, FType.ATTR]
-"""Type hint for attribute fields (``Attr[TAttr]``)."""
+Attr = Annotated[T, FType.ATTR]
+"""Type hint for attribute fields (``Attr[T]``)."""
 
-Data = Annotated[Union[Collection[TDType], TDType], FType.DATA]
-"""Type hint for data fields (``Data[TDType]``)."""
+Data = Annotated[Union[Collection[T], T], FType.DATA]
+"""Type hint for data fields (``Data[T]``)."""
 
-Index = Annotated[Union[Collection[TDType], TDType], FType.INDEX]
-"""Type hint for index fields (``Index[TDType]``)."""
+Index = Annotated[Union[Collection[T], T], FType.INDEX]
+"""Type hint for index fields (``Index[T]``)."""
 
-Name = Annotated[TName, FType.NAME]
-"""Type hint for name fields (``Name[TName]``)."""
+Name = Annotated[THashable, FType.NAME]
+"""Type hint for name fields (``Name[T]``)."""
+
+Other = Annotated[T, FType.OTHER]
+"""Type hint for other fields (``Other[T]``)."""
 
 
 # runtime functions
