@@ -4,12 +4,12 @@ __version__ = "0.1.0"
 
 
 # submodules
-from . import series
 from . import specs
 from . import typing
+from . import pandas
 
 
 # aliases
-from .series import *
 from .specs import *
 from .typing import *
+from .pandas.series import *

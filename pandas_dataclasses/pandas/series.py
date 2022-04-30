@@ -15,8 +15,8 @@ from typing_extensions import ParamSpec, Protocol
 
 
 # submodules
-from .specs import DataSpec
-from .typing import AnyDType, DataClass
+from ..specs import DataSpec
+from ..typing import AnyDType, DataClass
 
 
 # type hints
