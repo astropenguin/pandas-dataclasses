@@ -5,7 +5,7 @@ from dataclasses import dataclass
 # dependencies
 import numpy as np
 import pandas as pd
-from pandas_dataclasses.series import AsSeries
+from pandas_dataclasses.pandas.series import AsSeries
 from pandas_dataclasses.typing import Attr, Data, Index
 from typing_extensions import Annotated, Literal
 
