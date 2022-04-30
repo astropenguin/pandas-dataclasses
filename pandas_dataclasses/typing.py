@@ -73,29 +73,29 @@ Other = Annotated[T, FType.OTHER]
 
 
 # runtime functions
-def deannotate(type_: Any) -> Any:
+def deannotate(tp: Any) -> Any:
     """Recursively remove annotations from a type."""
 
     class Temporary:
-        __annotations__ = dict(type=type_)
+        __annotations__ = dict(type=tp)
 
     return get_type_hints(Temporary)["type"]
 
 
-def get_dtype(type_: Any) -> Optional[AnyDType]:
+def get_dtype(tp: Any) -> Optional[AnyDType]:
     """Parse a type and return a data type (dtype)."""
-    type_ = deannotate(type_)
+    tp = deannotate(tp)
 
-    if get_origin(type_) is not Union:
-        raise TypeError(f"{type_!r} is not arrayable.")
+    if get_origin(tp) is not Union:
+        raise TypeError(f"{tp!r} is not arrayable.")
 
     try:
-        vector, scalar = get_args(type_)
+        vector, scalar = get_args(tp)
     except ValueError:
-        raise TypeError(f"{type_!r} is not arrayable.")
+        raise TypeError(f"{tp!r} is not arrayable.")
 
     if get_args(vector)[0] is not scalar:
-        raise TypeError(f"{type_!r} is not arrayable.")
+        raise TypeError(f"{tp!r} is not arrayable.")
 
     if scalar is Any or scalar is type(None):
         return None
@@ -106,24 +106,24 @@ def get_dtype(type_: Any) -> Optional[AnyDType]:
     return np.dtype(scalar)
 
 
-def get_ftype(type_: Any, default: FType = FType.OTHER) -> FType:
+def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
     """Parse a type and return a field type (ftype)."""
-    if get_origin(type_) is not Annotated:
+    if get_origin(tp) is not Annotated:
         return default
 
-    for arg in reversed(get_args(type_)[1:]):
+    for arg in reversed(get_args(tp)[1:]):
         if isinstance(arg, FType):
             return arg
 
     return default
 
 
-def get_name(type_: Any, default: Hashable = None) -> Hashable:
+def get_name(tp: Any, default: Hashable = None) -> Hashable:
     """Parse a type and return a name."""
-    if get_origin(type_) is not Annotated:
+    if get_origin(tp) is not Annotated:
         return default
 
-    for arg in reversed(get_args(type_)[1:]):
+    for arg in reversed(get_args(tp)[1:]):
         if isinstance(arg, FType):
             continue
 

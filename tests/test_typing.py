@@ -50,16 +50,16 @@ testdata_name = [
 
 
 # test functions
-@mark.parametrize("type_, dtype", testdata_dtype)
-def test_get_dtype(type_: Any, dtype: Any) -> None:
-    assert get_dtype(type_) == dtype
+@mark.parametrize("tp, dtype", testdata_dtype)
+def test_get_dtype(tp: Any, dtype: Any) -> None:
+    assert get_dtype(tp) == dtype
 
 
-@mark.parametrize("type_, ftype", testdata_ftype)
-def test_get_ftype(type_: Any, ftype: Any) -> None:
-    assert get_ftype(type_).value == ftype
+@mark.parametrize("tp, ftype", testdata_ftype)
+def test_get_ftype(tp: Any, ftype: Any) -> None:
+    assert get_ftype(tp).value == ftype
 
 
-@mark.parametrize("type_, name", testdata_name)
-def test_get_name(type_: Any, name: Any) -> None:
-    assert get_name(type_) == name
+@mark.parametrize("tp, name", testdata_name)
+def test_get_name(tp: Any, name: Any) -> None:
+    assert get_name(tp) == name
