@@ -20,14 +20,11 @@ from typing_extensions import (
 )
 
 
-# type variables (private)
-T = TypeVar("T")
-THashable = TypeVar("THashable", bound=Hashable)
-
-
 # type hints (private)
 AnyDType: TypeAlias = "np.dtype[Any]"
 AnyField: TypeAlias = "Field[Any]"
+T = TypeVar("T")
+THashable = TypeVar("THashable", bound=Hashable)
 
 
 class DataClass(Protocol):
