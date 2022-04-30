@@ -100,16 +100,16 @@ def get_dtype(type_: Any) -> Optional[AnyDType]:
     raise ValueError(f"Could not convert {type_!r} to dtype.")
 
 
-def get_ftype(type_: Any) -> FieldType:
+def get_ftype(type_: Any, default: FieldType = FieldType.OTHER) -> FieldType:
     """Parse a type and return a field type (ftype)."""
     if get_origin(type_) is not Annotated:
-        return FieldType.OTHER
+        return default
 
     for arg in reversed(get_args(type_)[1:]):
         if isinstance(arg, FieldType):
             return arg
 
-    return FieldType.OTHER
+    return default
 
 
 def get_name(type_: Any, default: Hashable = None) -> Hashable:
