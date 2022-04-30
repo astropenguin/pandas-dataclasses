@@ -4,7 +4,7 @@ from dataclasses import MISSING, dataclass
 
 # dependencies
 import numpy as np
-from pandas_dataclasses.dataspec import DataSpec
+from pandas_dataclasses.specs import DataSpec
 from pandas_dataclasses.typing import Attr, Data, Index, Name
 from typing_extensions import Annotated, Literal
 
