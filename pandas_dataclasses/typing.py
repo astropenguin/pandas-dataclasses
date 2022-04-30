@@ -36,7 +36,7 @@ class DataClass(Protocol):
 
 
 # type hints (public)
-class FieldType(Enum):
+class FType(Enum):
     """Annotations for pandas-related type hints."""
 
     ATTR = "attr"
@@ -55,16 +55,16 @@ class FieldType(Enum):
     """Annotation for other fields."""
 
 
-Attr = Annotated[TAttr, FieldType.ATTR]
+Attr = Annotated[TAttr, FType.ATTR]
 """Type hint for attribute fields (``Attr[TAttr]``)."""
 
-Data = Annotated[Union[Collection[TDType], TDType], FieldType.DATA]
+Data = Annotated[Union[Collection[TDType], TDType], FType.DATA]
 """Type hint for data fields (``Data[TDType]``)."""
 
-Index = Annotated[Union[Collection[TDType], TDType], FieldType.INDEX]
+Index = Annotated[Union[Collection[TDType], TDType], FType.INDEX]
 """Type hint for index fields (``Index[TDType]``)."""
 
-Name = Annotated[TName, FieldType.NAME]
+Name = Annotated[TName, FType.NAME]
 """Type hint for name fields (``Name[TName]``)."""
 
 Named = Annotated
@@ -100,13 +100,13 @@ def get_dtype(type_: Any) -> Optional[AnyDType]:
     raise ValueError(f"Could not convert {type_!r} to dtype.")
 
 
-def get_ftype(type_: Any, default: FieldType = FieldType.OTHER) -> FieldType:
+def get_ftype(type_: Any, default: FType = FType.OTHER) -> FType:
     """Parse a type and return a field type (ftype)."""
     if get_origin(type_) is not Annotated:
         return default
 
     for arg in reversed(get_args(type_)[1:]):
-        if isinstance(arg, FieldType):
+        if isinstance(arg, FType):
             return arg
 
     return default
@@ -118,7 +118,7 @@ def get_name(type_: Any, default: Hashable = None) -> Hashable:
         return default
 
     for arg in reversed(get_args(type_)[1:]):
-        if isinstance(arg, FieldType):
+        if isinstance(arg, FType):
             continue
 
         if isinstance(arg, Hashable):

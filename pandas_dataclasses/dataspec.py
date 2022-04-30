@@ -16,7 +16,7 @@ from .typing import (
     AnyDType,
     AnyField,
     DataClass,
-    FieldType,
+    FType,
     deannotate,
     get_dtype,
     get_ftype,
@@ -143,14 +143,14 @@ def get_fieldspec(field: AnyField) -> Optional[AnyFieldSpec]:
     ftype = get_ftype(field.type)
     name = get_name(field.type, field.name)
 
-    if ftype is FieldType.DATA or ftype is FieldType.INDEX:
+    if ftype is FType.DATA or ftype is FType.INDEX:
         return ArrayFieldSpec(
             type=ftype.value,
             name=name,
             data=ArraySpec(get_dtype(field.type), field.default),
         )
 
-    if ftype is FieldType.ATTR or ftype is FieldType.NAME:
+    if ftype is FType.ATTR or ftype is FType.NAME:
         return ScalarFieldSpec(
             type=ftype.value,
             name=name,
