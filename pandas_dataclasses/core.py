@@ -1,4 +1,4 @@
-__all__ = ["get_attrs"]
+__all__ = ["get_attrs", "get_name"]
 
 
 # standard library
@@ -20,3 +20,11 @@ def get_attrs(obj: DataClass) -> Dict[Hashable, Any]:
         attrs[spec.name] = getattr(obj, key)
 
     return attrs
+
+
+def get_name(obj: DataClass) -> Hashable:
+    """Derive name from a dataclass object."""
+    dataspec = DataSpec.from_dataclass(type(obj))
+
+    for key in dataspec.fields.of_name.keys():
+        return getattr(obj, key)
