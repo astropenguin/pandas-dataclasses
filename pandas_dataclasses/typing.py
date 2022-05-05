@@ -8,7 +8,9 @@ from typing import Any, ClassVar, Collection, Dict, Hashable, Optional, TypeVar,
 
 
 # dependencies
-import numpy as np
+from numpy import dtype
+from pandas.api.extensions import ExtensionDtype
+from pandas.api.types import pandas_dtype  # type: ignore
 from typing_extensions import (
     Annotated,
     Literal,
@@ -21,7 +23,7 @@ from typing_extensions import (
 
 
 # type hints (private)
-AnyDType: TypeAlias = "np.dtype[Any]"
+AnyDType: TypeAlias = Union["dtype[Any]", ExtensionDtype]
 AnyField: TypeAlias = "Field[Any]"
 T = TypeVar("T")
 THashable = TypeVar("THashable", bound=Hashable)
@@ -80,7 +82,7 @@ def deannotate(tp: Any) -> Any:
 
 
 def get_dtype(tp: Any) -> Optional[AnyDType]:
-    """Extract a dtype (NumPy data type) from a type hint."""
+    """Extract a dtype (NumPy/pandas data type) from a type hint."""
     tp = deannotate(tp)
 
     if get_origin(tp) is not Union:
@@ -100,7 +102,7 @@ def get_dtype(tp: Any) -> Optional[AnyDType]:
     if get_origin(tp_scalar) is Literal:
         tp_scalar = get_args(tp_scalar)[0]
 
-    return np.dtype(tp_scalar)
+    return pandas_dtype(tp_scalar)
 
 
 def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
