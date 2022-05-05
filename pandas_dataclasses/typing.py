@@ -105,6 +105,9 @@ def get_collection(tp: Any) -> Type[Collection[Any]]:
     if get_origin(tp) is not Union:
         raise TypeError(f"{tp!r} was not a union type.")
 
+    # flatten union type after deannotation
+    tp = Union[get_args(tp)]  # type: ignore
+
     for arg in get_args(tp):
         if get_origin(arg) is Collection:
             return arg
