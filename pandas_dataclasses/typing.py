@@ -4,11 +4,23 @@ __all__ = ["Attr", "Data", "Index", "Name", "Other"]
 # standard library
 from dataclasses import Field
 from enum import Enum
-from typing import Any, ClassVar, Collection, Dict, Hashable, Optional, TypeVar, Union
+from typing import (
+    Any,
+    ClassVar,
+    Collection,
+    Dict,
+    Hashable,
+    Optional,
+    Type,
+    TypeVar,
+    Union,
+)
 
 
 # dependencies
-import numpy as np
+from numpy import dtype
+from pandas.api.extensions import ExtensionDtype
+from pandas.api.types import pandas_dtype  # type: ignore
 from typing_extensions import (
     Annotated,
     Literal,
@@ -21,10 +33,17 @@ from typing_extensions import (
 
 
 # type hints (private)
-AnyDType: TypeAlias = "np.dtype[Any]"
+AnyDType: TypeAlias = Union["dtype[Any]", ExtensionDtype]
 AnyField: TypeAlias = "Field[Any]"
 T = TypeVar("T")
+TCovariant = TypeVar("TCovariant", covariant=True)
 THashable = TypeVar("THashable", bound=Hashable)
+
+
+class Collection(Collection[TCovariant], Protocol):
+    """Type hint equivalent to typing.Collection."""
+
+    pass
 
 
 class DataClass(Protocol):
@@ -79,28 +98,34 @@ def deannotate(tp: Any) -> Any:
     return get_type_hints(Temporary)["type"]
 
 
-def get_dtype(tp: Any) -> Optional[AnyDType]:
-    """Extract a dtype (NumPy data type) from a type hint."""
+def get_collection(tp: Any) -> Type[Collection[Any]]:
+    """Extract the first collection type from a type hint."""
     tp = deannotate(tp)
 
     if get_origin(tp) is not Union:
-        raise TypeError(f"{tp!r} is not arrayable.")
+        raise TypeError(f"{tp!r} was not a union type.")
 
-    try:
-        tp_array, tp_scalar = get_args(tp)
-    except ValueError:
-        raise TypeError(f"{tp!r} is not arrayable.")
+    # flatten union type after deannotation
+    tp = Union[get_args(tp)]  # type: ignore
 
-    if get_args(tp_array)[0] is not tp_scalar:
-        raise TypeError(f"{tp!r} is not arrayable.")
+    for arg in get_args(tp):
+        if get_origin(arg) is Collection:
+            return arg
 
-    if tp_scalar is Any or tp_scalar is type(None):
-        return None
+    raise TypeError(f"{tp!r} had no collection type.")
 
-    if get_origin(tp_scalar) is Literal:
-        tp_scalar = get_args(tp_scalar)[0]
 
-    return np.dtype(tp_scalar)
+def get_dtype(tp: Any) -> Optional[AnyDType]:
+    """Extract a dtype (the first data type) from a type hint."""
+    dtype = get_args(get_collection(tp))[0]
+
+    if dtype is Any or dtype is type(None):
+        return
+
+    if get_origin(dtype) is Literal:
+        dtype = get_args(dtype)[0]
+
+    return pandas_dtype(dtype)  # type: ignore
 
 
 def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
