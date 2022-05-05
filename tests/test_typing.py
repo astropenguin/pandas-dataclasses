@@ -1,9 +1,10 @@
 # standard library
-from typing import Any
+from typing import Any, Optional, Union
 
 
 # dependencies
 import numpy as np
+import pandas as pd
 from pytest import mark
 from typing_extensions import Annotated, Literal
 from pandas_dataclasses.typing import (
@@ -23,10 +24,16 @@ testdata_dtype = [
     (Data[None], None),
     (Data[int], np.dtype("int64")),
     (Data[Literal["i8"]], np.dtype("int64")),
+    (Data[Literal["boolean"]], pd.BooleanDtype()),
     (Index[Any], None),
     (Index[None], None),
     (Index[int], np.dtype("int64")),
     (Index[Literal["i8"]], np.dtype("int64")),
+    (Index[Literal["boolean"]], pd.BooleanDtype()),
+    (Optional[Data[float]], np.dtype("float64")),
+    (Optional[Index[float]], np.dtype("float64")),
+    (Union[Data[float], str], np.dtype("float64")),
+    (Union[Index[float], str], np.dtype("float64")),
 ]
 
 testdata_ftype = [
