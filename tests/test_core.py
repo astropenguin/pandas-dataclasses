@@ -3,8 +3,9 @@ from dataclasses import dataclass, field
 
 
 # dependencies
+import numpy as np
 import pandas as pd
-from pandas_dataclasses.core import get_attrs, get_index, get_name
+from pandas_dataclasses.core import get_attrs, get_data, get_index, get_name
 from pandas_dataclasses.typing import Attr, Data, Index, Name
 from typing_extensions import Annotated as Named
 
@@ -46,10 +47,23 @@ def test_attrs() -> None:
     }
 
 
+def test_data() -> None:
+    data = get_data(weather)
+    data_temp = data.get("Average temperature (deg C)")  # type: ignore
+    data_humid = data.get("Average humidity (%)")  # type: ignore
+    expected_temp = np.array(weather.temperature, float)
+    expected_humid = np.array(weather.humidity, float)
+
+    assert (data_temp == expected_temp).all()
+    assert (data_humid == expected_humid).all()
+    assert data_temp.dtype == expected_temp.dtype  # type: ignore
+    assert data_humid.dtype == expected_humid.dtype  # type: ignore
+
+
 def test_index() -> None:
     index = get_index(weather)
     expected = pd.MultiIndex.from_arrays(
-        [[2020, 2020, 2021, 2021, 2022], [1, 7, 1, 7, 1]],
+        [weather.year, weather.month],
         names=["Year", "Month"],
     )
 

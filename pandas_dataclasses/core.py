@@ -1,4 +1,4 @@
-__all__ = ["get_attrs", "get_index", "get_name"]
+__all__ = ["get_attrs", "get_data", "get_index", "get_name"]
 
 
 # standard library
@@ -38,6 +38,23 @@ def get_attrs(obj: DataClass) -> Dict[Hashable, Any]:
         attrs[spec.name] = getattr(obj, key)
 
     return attrs
+
+
+def get_data(obj: DataClass) -> Optional[Dict[Hashable, Any]]:
+    """Derive data from a dataclass object."""
+    dataspec = DataSpec.from_dataclass(type(obj))
+    dataset: Dict[Hashable, Any] = {}
+
+    for key, spec in dataspec.fields.of_data.items():
+        dataset[spec.name] = astype(
+            atleast_1d(getattr(obj, key)),
+            spec.data.type,
+        )
+
+    if len(dataset) == 0:
+        return
+
+    return dataset
 
 
 def get_index(obj: DataClass) -> Optional[pd.Index]:
