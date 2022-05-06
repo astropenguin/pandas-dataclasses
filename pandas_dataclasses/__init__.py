@@ -3,6 +3,7 @@ __version__ = "0.1.0"
 
 
 # submodules
+from . import core  # type: ignore
 from . import specs  # type: ignore
 from . import typing  # type: ignore
 
@@ -12,6 +13,7 @@ from . import pandas  # type: ignore
 
 
 # aliases
+from .core import *
 from .pandas import *
 from .specs import *
 from .typing import *
