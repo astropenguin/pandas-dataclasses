@@ -3,7 +3,8 @@ from dataclasses import dataclass, field
 
 
 # dependencies
-from pandas_dataclasses.core import get_attrs, get_name
+import pandas as pd
+from pandas_dataclasses.core import get_attrs, get_index, get_name
 from pandas_dataclasses.typing import Attr, Data, Index, Name
 from typing_extensions import Annotated as Named
 
@@ -43,6 +44,18 @@ def test_attrs() -> None:
         "Longitude (deg)": 139.69167,
         "Latitude (deg)": 35.68944,
     }
+
+
+def test_index() -> None:
+    index = get_index(weather)
+    expected = pd.MultiIndex.from_arrays(
+        [[2020, 2020, 2021, 2021, 2022], [1, 7, 1, 7, 1]],
+        names=["Year", "Month"],
+    )
+
+    assert (index == expected).all()
+    assert (index.dtypes == expected.dtypes).all()  # type: ignore
+    assert index.names == expected.names  # type: ignore
 
 
 def test_name() -> None:
