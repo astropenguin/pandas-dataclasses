@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 from pandas_dataclasses.pandas.series import AsSeries
-from pandas_dataclasses.typing import Attr, Data, Index
+from pandas_dataclasses.typing import Attr, Data, Index, Name
 from typing_extensions import Annotated, Literal
 
 
@@ -20,10 +20,11 @@ class Temperature(AsSeries):
     """Time-series temperature information at a location."""
 
     time: Annotated[Index[datetime], "Time in UTC"]
-    temperature: Annotated[Data[float], "Temperature (degC)"]
+    temperature: Data[float]
     location: Attr[str] = "Tokyo"
     longitude: Attr[float] = 139.69167
     latitude: Attr[float] = 35.68944
+    name: Name[str] = "Temperature (deg C)"
 
 
 time = pd.date_range("2020-01", "2020-06", freq="MS")
@@ -43,7 +44,7 @@ def test_data() -> None:
     data = Temperature.new(time, temp)
 
     assert data.to_numpy() is temp
-    assert data.name == "Temperature (degC)"
+    assert data.name == "Temperature (deg C)"
     assert data.dtype == np.float64
 
 

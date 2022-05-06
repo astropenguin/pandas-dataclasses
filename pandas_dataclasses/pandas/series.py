@@ -14,7 +14,7 @@ from typing_extensions import ParamSpec, Protocol
 
 
 # submodules
-from .common import get_attrs, get_data, get_dtype, get_index, get_name
+from ..core import get_attrs, get_data, get_index, get_name
 from ..typing import DataClass
 
 
@@ -68,10 +68,13 @@ class AsSeries:
 # runtime functions
 def asseries(obj: DataClass[PInit]) -> pd.Series:
     """Create a Series object from a dataclass object."""
+    attrs = get_attrs(obj)
     data = get_data(obj)
-    dtype = get_dtype(obj)
     index = get_index(obj)
     name = get_name(obj)
+
+    if data is not None:
+        data = next(iter(data.values()))
 
     if (
         data is not None
@@ -81,6 +84,6 @@ def asseries(obj: DataClass[PInit]) -> pd.Series:
     ):
         index = index.repeat(len(data))
 
-    series = pd.Series(data, index, dtype, name)
-    series.attrs.update(get_attrs(obj))
+    series = pd.Series(data, index, name=name)
+    series.attrs.update(attrs)
     return series
