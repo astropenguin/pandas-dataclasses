@@ -143,7 +143,7 @@ def get_dtype(tp: Any) -> Optional[AnyDType]:
 
 def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
     """Extract an ftype (most outer FType) from a type hint."""
-    for annotation in get_annotations(tp):
+    for annotation in reversed(list(get_annotations(tp))):
         if isinstance(annotation, FType):
             return annotation
 
@@ -152,7 +152,7 @@ def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
 
 def get_name(tp: Any, default: Hashable = None) -> Hashable:
     """Extract a name (most outer hashable) from a type hint."""
-    for annotation in get_annotations(tp):
+    for annotation in reversed(list(get_annotations(tp))):
         if isinstance(annotation, FType):
             continue
 
