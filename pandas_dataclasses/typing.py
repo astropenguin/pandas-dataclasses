@@ -10,6 +10,7 @@ from typing import (
     Collection,
     Dict,
     Hashable,
+    Iterable,
     Optional,
     Type,
     TypeVar,
@@ -18,6 +19,7 @@ from typing import (
 
 
 # dependencies
+from more_itertools import collapse
 from numpy import dtype
 from pandas.api.extensions import ExtensionDtype
 from pandas.api.types import pandas_dtype  # type: ignore
@@ -98,6 +100,17 @@ def deannotate(tp: Any) -> Any:
     return get_type_hints(Temporary)["type"]
 
 
+def get_annotations(tp: Any) -> Iterable[Any]:
+    """Extract all annotations from a type hint."""
+    args = get_args(tp)
+
+    if get_origin(tp) is Annotated:
+        yield from get_annotations(args[0])
+        yield from args[1:]
+    else:
+        yield from collapse(map(get_annotations, args))
+
+
 def get_collection(tp: Any) -> Type[Collection[Any]]:
     """Extract the first collection type from a type hint."""
     tp = deannotate(tp)
@@ -130,26 +143,20 @@ def get_dtype(tp: Any) -> Optional[AnyDType]:
 
 def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
     """Extract an ftype (most outer FType) from a type hint."""
-    if get_origin(tp) is not Annotated:
-        return default
-
-    for ann in reversed(get_args(tp)[1:]):
-        if isinstance(ann, FType):
-            return ann
+    for annotation in get_annotations(tp):
+        if isinstance(annotation, FType):
+            return annotation
 
     return default
 
 
 def get_name(tp: Any, default: Hashable = None) -> Hashable:
     """Extract a name (most outer hashable) from a type hint."""
-    if get_origin(tp) is not Annotated:
-        return default
-
-    for ann in reversed(get_args(tp)[1:]):
-        if isinstance(ann, FType):
+    for annotation in get_annotations(tp):
+        if isinstance(annotation, FType):
             continue
 
-        if isinstance(ann, Hashable):
-            return ann
+        if isinstance(annotation, Hashable):
+            return annotation
 
     return default
