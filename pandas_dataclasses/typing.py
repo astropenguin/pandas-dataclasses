@@ -4,6 +4,7 @@ __all__ = ["Attr", "Data", "Index", "Name", "Other"]
 # standard library
 from dataclasses import Field
 from enum import Enum
+from itertools import chain
 from typing import (
     Any,
     ClassVar,
@@ -19,7 +20,6 @@ from typing import (
 
 
 # dependencies
-from more_itertools import collapse
 from numpy import dtype
 from pandas.api.extensions import ExtensionDtype
 from pandas.api.types import pandas_dtype  # type: ignore
@@ -108,7 +108,7 @@ def get_annotations(tp: Any) -> Iterator[Any]:
         yield from get_annotations(args[0])
         yield from args[1:]
     else:
-        yield from collapse(map(get_annotations, args))
+        yield from chain(*map(get_annotations, args))
 
 
 def get_collections(tp: Any) -> Iterator[Type[Collection[Any]]]:
@@ -118,7 +118,7 @@ def get_collections(tp: Any) -> Iterator[Type[Collection[Any]]]:
     if get_origin(tp) is Collection:
         yield tp
     else:
-        yield from collapse(map(get_collections, args))
+        yield from chain(*map(get_collections, args))
 
 
 def get_dtype(tp: Any) -> Optional[AnyDType]:
