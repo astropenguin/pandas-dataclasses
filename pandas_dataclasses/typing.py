@@ -10,7 +10,7 @@ from typing import (
     Collection,
     Dict,
     Hashable,
-    Iterable,
+    Iterator,
     Optional,
     Type,
     TypeVar,
@@ -100,7 +100,7 @@ def deannotate(tp: Any) -> Any:
     return get_type_hints(Temporary)["type"]
 
 
-def get_annotations(tp: Any) -> Iterable[Any]:
+def get_annotations(tp: Any) -> Iterator[Any]:
     """Extract all annotations from a type hint."""
     args = get_args(tp)
 
@@ -111,26 +111,24 @@ def get_annotations(tp: Any) -> Iterable[Any]:
         yield from collapse(map(get_annotations, args))
 
 
-def get_collection(tp: Any) -> Type[Collection[Any]]:
-    """Extract the first collection type from a type hint."""
-    tp = deannotate(tp)
+def get_collections(tp: Any) -> Iterator[Type[Collection[Any]]]:
+    """Extract all collection types from a type hint."""
+    args = get_args(tp)
 
-    if get_origin(tp) is not Union:
-        raise TypeError(f"{tp!r} was not a union type.")
-
-    # flatten union type after deannotation
-    tp = Union[get_args(tp)]  # type: ignore
-
-    for arg in get_args(tp):
-        if get_origin(arg) is Collection:
-            return arg
-
-    raise TypeError(f"{tp!r} had no collection type.")
+    if get_origin(tp) is Collection:
+        yield tp
+    else:
+        yield from collapse(map(get_collections, args))
 
 
 def get_dtype(tp: Any) -> Optional[AnyDType]:
-    """Extract a dtype (the first data type) from a type hint."""
-    dtype = get_args(get_collection(tp))[0]
+    """Extract a dtype (most outer data type) from a type hint."""
+    try:
+        collection = list(get_collections(tp))[-1]
+    except IndexError:
+        raise TypeError(f"Could not find any dtype in {tp!r}.")
+
+    dtype = get_args(collection)[0]
 
     if dtype is Any or dtype is type(None):
         return
