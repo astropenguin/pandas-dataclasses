@@ -76,14 +76,6 @@ def asseries(obj: DataClass[PInit]) -> pd.Series:
     if data is not None:
         data = next(iter(data.values()))
 
-    if (
-        data is not None
-        and not isinstance(data, pd.Series)
-        and index is not None
-        and len(index) == 1
-    ):
-        index = index.repeat(len(data))
-
     series = pd.Series(data, index, name=name)
     series.attrs.update(attrs)
     return series
