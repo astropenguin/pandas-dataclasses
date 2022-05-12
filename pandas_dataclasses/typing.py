@@ -13,7 +13,6 @@ from typing import (
     Hashable,
     Iterator,
     Optional,
-    Type,
     TypeVar,
     Union,
 )
@@ -42,12 +41,6 @@ TCovariant = TypeVar("TCovariant", covariant=True)
 THashable = TypeVar("THashable", bound=Hashable)
 
 
-class Collection(Collection[TCovariant], Protocol):
-    """Type hint equivalent to typing.Collection."""
-
-    pass
-
-
 class DataClass(Protocol):
     """Type hint for dataclass objects."""
 
@@ -71,6 +64,18 @@ class FType(Enum):
 
     OTHER = "other"
     """Annotation for other fields."""
+
+    @classmethod
+    def annotates(cls, tp: Any) -> bool:
+        """Check if any ftype annotates a type hint."""
+        if get_origin(tp) is not Annotated:
+            return False
+
+        for annotation in get_args(tp)[1:]:
+            if isinstance(annotation, cls):
+                return True
+
+        return False
 
 
 # type hints (public)
@@ -100,35 +105,25 @@ def deannotate(tp: Any) -> Any:
     return get_type_hints(Temporary)["type"]
 
 
-def get_annotations(tp: Any) -> Iterator[Any]:
-    """Extract all annotations from a type hint."""
+def get_annotated(tp: Any) -> Iterator[Any]:
+    """Extract all annotated types from a type hint."""
     args = get_args(tp)
 
     if get_origin(tp) is Annotated:
-        yield from get_annotations(args[0])
-        yield from args[1:]
-    else:
-        yield from chain(*map(get_annotations, args))
-
-
-def get_collections(tp: Any) -> Iterator[Type[Collection[Any]]]:
-    """Extract all collection types from a type hint."""
-    args = get_args(tp)
-
-    if get_origin(tp) is Collection:
         yield tp
+        yield from get_annotated(args[0])
     else:
-        yield from chain(*map(get_collections, args))
+        yield from chain(*map(get_annotated, args))
 
 
 def get_dtype(tp: Any) -> Optional[AnyDType]:
     """Extract a dtype (most outer data type) from a type hint."""
-    try:
-        collection = list(get_collections(tp))[-1]
-    except IndexError:
+    tps = list(filter(FType.annotates, get_annotated(tp)))
+
+    if len(tps) == 0:
         raise TypeError(f"Could not find any dtype in {tp!r}.")
 
-    dtype = get_args(collection)[0]
+    dtype = get_args(get_args(tps[-1])[0])[1]
 
     if dtype is Any or dtype is type(None):
         return
@@ -141,7 +136,14 @@ def get_dtype(tp: Any) -> Optional[AnyDType]:
 
 def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
     """Extract an ftype (most outer FType) from a type hint."""
-    for annotation in reversed(list(get_annotations(tp))):
+    tps = list(filter(FType.annotates, get_annotated(tp)))
+
+    if len(tps) == 0:
+        return default
+
+    annotations = get_args(tps[-1])[1:]
+
+    for annotation in reversed(annotations):
         if isinstance(annotation, FType):
             return annotation
 
@@ -150,7 +152,14 @@ def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
 
 def get_name(tp: Any, default: Hashable = None) -> Hashable:
     """Extract a name (most outer hashable) from a type hint."""
-    for annotation in reversed(list(get_annotations(tp))):
+    tps = list(filter(FType.annotates, get_annotated(tp)))
+
+    if len(tps) == 0:
+        return default
+
+    annotations = get_args(tps[-1])[1:]
+
+    for annotation in reversed(annotations):
         if isinstance(annotation, FType):
             continue
 
