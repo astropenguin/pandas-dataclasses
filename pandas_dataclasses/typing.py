@@ -13,6 +13,7 @@ from typing import (
     Hashable,
     Iterator,
     Optional,
+    Tuple,
     TypeVar,
     Union,
 )
@@ -71,11 +72,7 @@ class FType(Enum):
         if get_origin(tp) is not Annotated:
             return False
 
-        for annotation in get_args(tp)[1:]:
-            if isinstance(annotation, cls):
-                return True
-
-        return False
+        return any(isinstance(arg, cls) for arg in get_args(tp))
 
 
 # type hints (public)
@@ -97,7 +94,7 @@ Other = Annotated[T, FType.OTHER]
 
 # runtime functions
 def deannotate(tp: Any) -> Any:
-    """Recursively remove annotations from a type hint."""
+    """Recursively remove annotations in a type hint."""
 
     class Temporary:
         __annotations__ = dict(type=tp)
@@ -105,25 +102,39 @@ def deannotate(tp: Any) -> Any:
     return get_type_hints(Temporary)["type"]
 
 
-def get_annotated(tp: Any) -> Iterator[Any]:
-    """Extract all annotated types from a type hint."""
+def find_annotated(tp: Any) -> Iterator[Any]:
+    """Generate all annotated types in a type hint."""
     args = get_args(tp)
 
     if get_origin(tp) is Annotated:
         yield tp
-        yield from get_annotated(args[0])
+        yield from find_annotated(args[0])
     else:
-        yield from chain(*map(get_annotated, args))
+        yield from chain(*map(find_annotated, args))
+
+
+def get_annotated(tp: Any) -> Any:
+    """Extract the first ftype-annotated type."""
+    for annotated in filter(FType.annotates, find_annotated(tp)):
+        return deannotate(annotated)
+
+    raise TypeError("Could not find any ftype-annotated type.")
+
+
+def get_annotations(tp: Any) -> Tuple[Any, ...]:
+    """Extract annotations of the first ftype-annotated type."""
+    for annotated in filter(FType.annotates, find_annotated(tp)):
+        return get_args(annotated)[1:]
+
+    raise TypeError("Could not find any ftype-annotated type.")
 
 
 def get_dtype(tp: Any) -> Optional[AnyDType]:
-    """Extract a dtype (most outer data type) from a type hint."""
-    tps = list(filter(FType.annotates, get_annotated(tp)))
-
-    if len(tps) == 0:
+    """Extract a NumPy or pandas data type."""
+    try:
+        dtype = get_args(get_annotated(tp))[1]
+    except TypeError:
         raise TypeError(f"Could not find any dtype in {tp!r}.")
-
-    dtype = get_args(get_args(tps[-1])[0])[1]
 
     if dtype is Any or dtype is type(None):
         return
@@ -135,35 +146,16 @@ def get_dtype(tp: Any) -> Optional[AnyDType]:
 
 
 def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
-    """Extract an ftype (most outer FType) from a type hint."""
-    tps = list(filter(FType.annotates, get_annotated(tp)))
-
-    if len(tps) == 0:
+    """Extract an ftype if found or return given default."""
+    try:
+        return get_annotations(tp)[0]
+    except (IndexError, TypeError):
         return default
-
-    annotations = get_args(tps[-1])[1:]
-
-    for annotation in reversed(annotations):
-        if isinstance(annotation, FType):
-            return annotation
-
-    return default
 
 
 def get_name(tp: Any, default: Hashable = None) -> Hashable:
-    """Extract a name (most outer hashable) from a type hint."""
-    tps = list(filter(FType.annotates, get_annotated(tp)))
-
-    if len(tps) == 0:
+    """Extract a name if found or return given default."""
+    try:
+        return get_annotations(tp)[1]
+    except (IndexError, TypeError):
         return default
-
-    annotations = get_args(tps[-1])[1:]
-
-    for annotation in reversed(annotations):
-        if isinstance(annotation, FType):
-            continue
-
-        if isinstance(annotation, Hashable):
-            return annotation
-
-    return default

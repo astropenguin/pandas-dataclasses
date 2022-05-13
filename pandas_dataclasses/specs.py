@@ -17,7 +17,7 @@ from .typing import (
     AnyField,
     DataClass,
     FType,
-    deannotate,
+    get_annotated,
     get_dtype,
     get_ftype,
     get_name,
@@ -154,5 +154,5 @@ def get_fieldspec(field: AnyField) -> Optional[AnyFieldSpec]:
         return ScalarFieldSpec(
             type=ftype.value,
             name=name,
-            data=ScalarSpec(deannotate(field.type), field.default),
+            data=ScalarSpec(get_annotated(field.type), field.default),
         )
