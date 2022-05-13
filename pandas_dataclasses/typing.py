@@ -13,7 +13,7 @@ from typing import (
     Hashable,
     Iterator,
     Optional,
-    Type,
+    Tuple,
     TypeVar,
     Union,
 )
@@ -42,12 +42,6 @@ TCovariant = TypeVar("TCovariant", covariant=True)
 THashable = TypeVar("THashable", bound=Hashable)
 
 
-class Collection(Collection[TCovariant], Protocol):
-    """Type hint equivalent to typing.Collection."""
-
-    pass
-
-
 class DataClass(Protocol):
     """Type hint for dataclass objects."""
 
@@ -72,6 +66,14 @@ class FType(Enum):
     OTHER = "other"
     """Annotation for other fields."""
 
+    @classmethod
+    def annotates(cls, tp: Any) -> bool:
+        """Check if any ftype annotates a type hint."""
+        if get_origin(tp) is not Annotated:
+            return False
+
+        return any(isinstance(arg, cls) for arg in get_args(tp))
+
 
 # type hints (public)
 Attr = Annotated[T, FType.ATTR]
@@ -92,7 +94,7 @@ Other = Annotated[T, FType.OTHER]
 
 # runtime functions
 def deannotate(tp: Any) -> Any:
-    """Recursively remove annotations from a type hint."""
+    """Recursively remove annotations in a type hint."""
 
     class Temporary:
         __annotations__ = dict(type=tp)
@@ -100,35 +102,39 @@ def deannotate(tp: Any) -> Any:
     return get_type_hints(Temporary)["type"]
 
 
-def get_annotations(tp: Any) -> Iterator[Any]:
-    """Extract all annotations from a type hint."""
+def find_annotated(tp: Any) -> Iterator[Any]:
+    """Generate all annotated types in a type hint."""
     args = get_args(tp)
 
     if get_origin(tp) is Annotated:
-        yield from get_annotations(args[0])
-        yield from args[1:]
-    else:
-        yield from chain(*map(get_annotations, args))
-
-
-def get_collections(tp: Any) -> Iterator[Type[Collection[Any]]]:
-    """Extract all collection types from a type hint."""
-    args = get_args(tp)
-
-    if get_origin(tp) is Collection:
         yield tp
+        yield from find_annotated(args[0])
     else:
-        yield from chain(*map(get_collections, args))
+        yield from chain(*map(find_annotated, args))
+
+
+def get_annotated(tp: Any) -> Any:
+    """Extract the first ftype-annotated type."""
+    for annotated in filter(FType.annotates, find_annotated(tp)):
+        return deannotate(annotated)
+
+    raise TypeError("Could not find any ftype-annotated type.")
+
+
+def get_annotations(tp: Any) -> Tuple[Any, ...]:
+    """Extract annotations of the first ftype-annotated type."""
+    for annotated in filter(FType.annotates, find_annotated(tp)):
+        return get_args(annotated)[1:]
+
+    raise TypeError("Could not find any ftype-annotated type.")
 
 
 def get_dtype(tp: Any) -> Optional[AnyDType]:
-    """Extract a dtype (most outer data type) from a type hint."""
+    """Extract a NumPy or pandas data type."""
     try:
-        collection = list(get_collections(tp))[-1]
-    except IndexError:
+        dtype = get_args(get_annotated(tp))[1]
+    except TypeError:
         raise TypeError(f"Could not find any dtype in {tp!r}.")
-
-    dtype = get_args(collection)[0]
 
     if dtype is Any or dtype is type(None):
         return
@@ -140,21 +146,16 @@ def get_dtype(tp: Any) -> Optional[AnyDType]:
 
 
 def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
-    """Extract an ftype (most outer FType) from a type hint."""
-    for annotation in reversed(list(get_annotations(tp))):
-        if isinstance(annotation, FType):
-            return annotation
-
-    return default
+    """Extract an ftype if found or return given default."""
+    try:
+        return get_annotations(tp)[0]
+    except (IndexError, TypeError):
+        return default
 
 
 def get_name(tp: Any, default: Hashable = None) -> Hashable:
-    """Extract a name (most outer hashable) from a type hint."""
-    for annotation in reversed(list(get_annotations(tp))):
-        if isinstance(annotation, FType):
-            continue
-
-        if isinstance(annotation, Hashable):
-            return annotation
-
-    return default
+    """Extract a name if found or return given default."""
+    try:
+        return get_annotations(tp)[1]
+    except (IndexError, TypeError):
+        return default
