@@ -93,3 +93,6 @@ def get_name(obj: DataClass) -> Hashable:
 
     for key in dataspec.fields.of_name.keys():
         return getattr(obj, key)
+
+    for spec in dataspec.fields.of_data.values():
+        return spec.name
