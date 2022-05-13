@@ -1,9 +1,10 @@
 # pandas-dataclasses
 
-[![PyPI](https://img.shields.io/pypi/v/pandas-dataclasses.svg?label=PyPI&style=flat-square)](https://pypi.org/project/pandas-dataclasses/)
-[![Python](https://img.shields.io/pypi/pyversions/pandas-dataclasses.svg?label=Python&color=yellow&style=flat-square)](https://pypi.org/project/pandas-dataclasses/)
-[![Test](https://img.shields.io/github/workflow/status/astropenguin/pandas-dataclasses/Tests?logo=github&label=Test&style=flat-square)](https://github.com/astropenguin/pandas-dataclasses/actions)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg?label=License&style=flat-square)](LICENSE)
+![Version](https://img.shields.io/pypi/v/pandas-dataclasses?label=Version&color=cornflowerblue&style=flat-square)
+![Python](https://img.shields.io/pypi/pyversions/pandas-dataclasses?label=Python&color=cornflowerblue&style=flat-square)
+![Downloads](https://img.shields.io/pypi/dm/pandas-dataclasses?label=Downloads&color=cornflowerblue&style=flat-square)
+![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.6127352-cornflowerblue?style=flat-square)
+![Tests](https://img.shields.io/github/workflow/status/astropenguin/pandas-dataclasses/Tests?label=Tests&style=flat-square)
 
 pandas extension for typed Series and DataFrame creation
 
