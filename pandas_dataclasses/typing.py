@@ -11,7 +11,7 @@ from typing import (
     Collection,
     Dict,
     Hashable,
-    Iterator,
+    Iterable,
     Optional,
     Tuple,
     TypeVar,
@@ -102,7 +102,7 @@ def deannotate(tp: Any) -> Any:
     return get_type_hints(Temporary)["type"]
 
 
-def find_annotated(tp: Any) -> Iterator[Any]:
+def find_annotated(tp: Any) -> Iterable[Any]:
     """Generate all annotated types in a type hint."""
     args = get_args(tp)
 
@@ -149,13 +149,19 @@ def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
     """Extract an ftype if found or return given default."""
     try:
         return get_annotations(tp)[0]
-    except (IndexError, TypeError):
+    except TypeError:
         return default
 
 
 def get_name(tp: Any, default: Hashable = None) -> Hashable:
     """Extract a name if found or return given default."""
     try:
-        return get_annotations(tp)[1]
-    except (IndexError, TypeError):
+        annotations = get_annotations(tp)[1:]
+    except TypeError:
         return default
+
+    for annotation in annotations:
+        if isinstance(annotation, Hashable):
+            return annotation
+
+    return default

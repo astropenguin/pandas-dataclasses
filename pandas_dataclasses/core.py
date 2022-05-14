@@ -12,6 +12,10 @@ from .specs import DataSpec
 from .typing import AnyDType, DataClass
 
 
+# type hints
+AnyDict = Dict[Hashable, Any]
+
+
 # runtime functions
 def astype(data: Any, dtype: Optional[AnyDType]) -> Any:
     """Convert data to have given data type."""
@@ -29,10 +33,10 @@ def atleast_1d(data: Any) -> Any:
         return np.atleast_1d(data)
 
 
-def get_attrs(obj: DataClass) -> Dict[Hashable, Any]:
+def get_attrs(obj: DataClass) -> AnyDict:
     """Derive attributes from a dataclass object."""
     dataspec = DataSpec.from_dataclass(type(obj))
-    attrs: Dict[Hashable, Any] = {}
+    attrs: AnyDict = {}
 
     for key, spec in dataspec.fields.of_attr.items():
         attrs[spec.name] = getattr(obj, key)
@@ -40,10 +44,10 @@ def get_attrs(obj: DataClass) -> Dict[Hashable, Any]:
     return attrs
 
 
-def get_data(obj: DataClass) -> Optional[Dict[Hashable, Any]]:
+def get_data(obj: DataClass) -> Optional[AnyDict]:
     """Derive data from a dataclass object."""
     dataspec = DataSpec.from_dataclass(type(obj))
-    dataset: Dict[Hashable, Any] = {}
+    dataset: AnyDict = {}
 
     for key, spec in dataspec.fields.of_data.items():
         dataset[spec.name] = astype(
@@ -60,7 +64,7 @@ def get_data(obj: DataClass) -> Optional[Dict[Hashable, Any]]:
 def get_index(obj: DataClass) -> Optional[pd.Index]:
     """Derive index from a dataclass object."""
     dataspec = DataSpec.from_dataclass(type(obj))
-    dataset: Dict[Hashable, Any] = {}
+    dataset: AnyDict = {}
 
     for key, spec in dataspec.fields.of_index.items():
         dataset[spec.name] = astype(
@@ -89,3 +93,6 @@ def get_name(obj: DataClass) -> Hashable:
 
     for key in dataspec.fields.of_name.keys():
         return getattr(obj, key)
+
+    for spec in dataspec.fields.of_data.values():
+        return spec.name
