@@ -52,9 +52,9 @@ year month
 
 ### Features
 
-- Type casting to NumPy and pandas data types
-- Hierarchial indexing (`MultiIndex`)
-- Metadata storing (`attrs`)
+- Type casting to [NumPy] and [pandas] data types
+- Easy hierarchial indexing (`MultiIndex`)
+- Metadata storing in attributes (`attrs`)
 - Support for dataclass features (`field`, `__post_init__`, ...)
 - Support for static type check ([Pylance], [Pyright], ...)
 
@@ -298,6 +298,7 @@ Type hint | Inferred name
 
 <!-- References -->
 [dataclass]: https://docs.python.org/3/library/dataclasses.html
+[NumPy]: https://numpy.org
 [pandas]: https://pandas.pydata.org
 [Pylance]: https://github.com/microsoft/pylance-release
 [Pyright]: https://github.com/microsoft/pyright
