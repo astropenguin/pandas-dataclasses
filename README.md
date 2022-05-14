@@ -53,7 +53,7 @@ year month
 - Support for dataclass features (`field`, `__post_init__`, ...)
 - Support for static type check ([Pylance], [Pyright], ...)
 
-## Installation
+### Installation
 
 ```bash
 pip install pandas-dataclasses
