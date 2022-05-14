@@ -12,11 +12,16 @@ pandas extension for typed Series and DataFrame creation
 
 pandas-dataclass makes it easy to create [pandas] Series and DataFrame objects that are "typed" (i.e. fixed data types, attributes, and names) using [dataclass]:
 
+<details>
+<summary>Click to see all imports</summary>
+
 ```python
 from dataclasses import dataclass
 from pandas_dataclasses import AsDataFrame, Data, Index
+```
+</details>
 
-
+```python
 @dataclass
 class Weather(AsDataFrame):
     """Weather information."""
@@ -66,7 +71,7 @@ pandas-dataclasses provides you the following features:
 - Type hints for dataclass fields (`Attr`, `Data`, `Index`, `Name`) for specifying field types and data types
 - Mix-in classes for dataclasses (`AsDataFrame`, `AsSeries`) for creating a Series or DataFrame object via a classmethod (`new`)
 
-When you call `new`, it will first create a dataclass object and then create a Series or DataFrame object by converting the dataclass object according the type hints and values in it.
+When you call `new`, it will first create a dataclass object and then create a Series or DataFrame object from the dataclass object according the type hints and values in it.
 In the example above, `df = Weather.new(...)` is thus equivalent to:
 
 ```python
@@ -76,6 +81,75 @@ df = asdataframe(obj)
 
 where `asdataframe` is a conversion function (you can actually use it).
 pandas-dataclasses does not touch the dataclass object creation itself; this allows you to fully customize your dataclass before conversion using the dataclass features (`field`, `__post_init__`, ...).
+
+## Basic usage
+
+### DataFrame creation
+
+As shown in the example above, a dataclass that has the `AsDataFrame` mix-in will create DataFrame objects:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+from dataclasses import dataclass
+from pandas_dataclasses import AsDataFrame, Data, Index
+```
+</details>
+
+```python
+@dataclass
+class Weather(AsDataFrame):
+    """Weather information."""
+
+    year: Index[int]
+    month: Index[int]
+    temp: Data[float]
+    humid: Data[float]
+
+
+df = Weather.new(...)
+```
+
+where fields typed by `Index` are "index fields" each value of which will become an index or a part of a hierarchial index of a DataFrame object.
+Fields typed by `Data` are "data fields" each value of which will become a data column of a DataFrame object.
+Fields typed by other types are just ignored in DataFrame creation.
+
+Each data or index will be cast to the data type specified in the type hint like `Index[int]`.
+Use `Any` or `None` if you do not want type casting.
+See "[data typing rules](#data-typing-rules)" for more examples.
+
+By default, field name (i.e. argument name) is used for the name of data or index.
+See "[custom data/index naming](#custom-data-index-naming)" if you want to customize it.
+
+### Series creation
+
+A dataclass that has the `AsSeries` mix-in will create Series objects:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+from dataclasses import dataclass
+from pandas_dataclasses import AsDataFrame, Data, Index
+```
+</details>
+
+```python
+@dataclass
+class Temperature(AsSeries):
+    """Temperature information."""
+
+    year: Index[int]
+    month: Index[int]
+    temp: Data[float]
+
+
+ser = Temperature.new(...)
+```
+
+Unlike `AsDataFrame`, the second and subsequent data fields are ignored in Series creation.
+Other rules are the same as for the DataFrame creation.
 
 ## Appendix
 
