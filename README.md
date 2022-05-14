@@ -120,7 +120,7 @@ Use `Any` or `None` if you do not want type casting.
 See "[data typing rules](#data-typing-rules)" for more examples.
 
 By default, field name (i.e. argument name) is used for the name of data or index.
-See "[custom data/index naming](#custom-data-index-naming)" if you want to customize it.
+See "[custom data/index naming](#custom-naming)" if you want to customize it.
 
 ### Series creation
 
@@ -186,9 +186,9 @@ In this example, `Weather.new(...).attrs` will become like:
 {"loc": "Tokyo", "lon": 139.69167, "lat": 35.68944}
 ```
 
-### Custom data/index naming
+### Custom naming
 
-The name of data or index can be explicitly specified by adding an annotation to the `Data`/`Index` type:
+The name of data, index, or attribute can be explicitly specified by adding an annotation to the `Data`/`Index`/`Attr` type:
 
 <details>
 <summary>Click to see all imports</summary>
