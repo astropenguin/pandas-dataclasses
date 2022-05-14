@@ -296,6 +296,14 @@ Type hint | Inferred name
 `Ann[Data[Any], "spam"] \| Ann[str, "ham"]` | `"spam"`
 `Ann[Data[Any], "spam"] \| Ann[Data[float], "ham"]` | `"spam"`
 
+### Development roadmap
+
+Release version | Features
+--- | ---
+v0.3.0 | Support for custom factory for DataArray or Dataset creation
+v0.4.0 | Support for hierarchial column
+v1.0.0 | Initial major release (freezing public features until v2.0.0)
+
 <!-- References -->
 [dataclass]: https://docs.python.org/3/library/dataclasses.html
 [NumPy]: https://numpy.org
