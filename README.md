@@ -151,6 +151,89 @@ ser = Temperature.new(...)
 Unlike `AsDataFrame`, the second and subsequent data fields are ignored in Series creation.
 Other rules are the same as for the DataFrame creation.
 
+## Advanced usage
+
+### Metadata storing
+
+Fields typed by `Attr` are "attribute fields" each value of which will become an item of attributes (`attrs`) of a DataFrame of Series object:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+from dataclasses import dataclass
+from pandas_dataclasses import AsDataFrame, Attr, Data, Index
+```
+</details>
+
+```python
+@dataclass
+class Weather(AsDataFrame):
+    """Weather information."""
+
+    year: Index[int]
+    month: Index[int]
+    temp: Data[float]
+    humid: Data[float]
+    loc: Attr[str] = "Tokyo"
+    lon: Attr[float] = 139.69167
+    lat: Attr[float] = 35.68944
+```
+
+In this example, `Weather.new(...).attrs` will become like:
+
+```python
+{"loc": "Tokyo", "lon": 139.69167, "lat": 35.68944}
+```
+
+### Custom data/index naming
+
+The name of data or index can be explicitly specified by adding an annotation to the `Data`/`Index` type:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+from dataclasses import dataclass
+from typing import Annotated as Ann
+from pandas_dataclasses import AsDataFrame, Attr, Data, Index
+```
+</details>
+
+```python
+@dataclass
+class Weather(AsDataFrame):
+    """Weather information."""
+
+    year: Ann[Index[int], "Year"]
+    month: Ann[Index[int], "Month"]
+    temp: Ann[Data[float], "Temperature (deg C)"]
+    humid: Ann[Data[float], "Humidity (%)"]
+    loc: Ann[Attr[str], "Location"] = "Tokyo"
+    lon: Ann[Attr[float], "Longitude (deg)"] = 139.69167
+    lat: Ann[Attr[float], "Latitude (deg)"] = 35.68944
+```
+
+In this example, `Weather.new(...)` and its attributes will become like:
+
+```plaintext
+            Temperature (deg C)  Humidity (%)
+Year Month
+2020 1                      7.1          65.0
+     7                     24.3          89.0
+2021 1                      5.4          57.0
+     7                     25.9          83.0
+2022 1                      4.9          52.0
+```
+
+```python
+{"Location": "Tokyo", "Longitude (deg)": 139.69167, "Latitude (deg)": 35.68944}
+```
+
+For the Series creation, a field typed by `Name` is a "name field" whose value will become the name of a Series object.
+This is useful for dynamic naming.
+See also [naming rules](#naming-rules) for more details and examples.
+
 ## Appendix
 
 ### Data typing rules
