@@ -131,7 +131,7 @@ A dataclass that has the `AsSeries` mix-in will create Series objects:
 
 ```python
 from dataclasses import dataclass
-from pandas_dataclasses import AsDataFrame, Data, Index
+from pandas_dataclasses import AsSeries, Data, Index
 ```
 </details>
 
