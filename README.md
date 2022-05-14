@@ -77,6 +77,68 @@ df = asdataframe(obj)
 where `asdataframe` is a conversion function (you can actually use it).
 pandas-dataclasses does not touch the dataclass object creation itself; this allows you to fully customize your dataclass before conversion using the dataclass features (`field`, `__post_init__`, ...).
 
+## Appendix
+
+### Data typing rules
+
+The data type (dtype) of data/index is inferred from the first `Data`/`Index` type of the corresponding field.
+The following table shows how the data type is inferred:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+from typing import Any
+from typing import Annotated as Ann
+from typing import Literal as L
+from pandas_dataclasses import Data
+```
+</details>
+
+Type hint | Inferred data type
+--- | ---
+`Data[Any]` | None (no type casting)
+`Data[None]` | None (no type casting)
+`Data[int]` | `numpy.dtype("i8")`
+`Data[numpy.int32]` | `numpy.dtype("i4")`
+`Data[L["datetime64[ns]"]]` | `numpy.dtype("<M8[ns]")`
+`Data[L["category"]]` | `pandas.CategoricalDtype()`
+`Data[int] \| str` | `numpy.dtype("i8")`
+`Data[int] \| Data[float]` | `numpy.dtype("i8")`
+`Ann[Data[int], "spam"]` | `numpy.dtype("i8")`
+`Data[Ann[int, "spam"]]` | `numpy.dtype("i8")`
+
+### Naming rules
+
+The name of data/index is determined by the following rules:
+
+1. If a name field exists, its value will be preferentially used (Series creation only)
+1. If a data/index field is annotated, the first hashable annotation in the first `Data`/`Index` type will be used
+1. Otherwise, the field name (i.e. argument name) will be used
+
+The following table shows how the name is inferred in the case of 2 and 3:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+from typing import Any
+from typing import Annotated as Ann
+from pandas_dataclasses import Data
+```
+</details>
+
+Type hint | Inferred name
+--- | ---
+`Data[Any]` | (field name)
+`Ann[Data[Any], {}]` | (field name)
+`Ann[Data[Any], "spam"]` | `"spam"`
+`Ann[Data[Any], "spam"]` | `"spam"`
+`Ann[Data[Any], "spam", "ham"]` | `"spam"`
+`Ann[Data[Any], {}, "spam"]` | `"spam"`
+`Ann[Data[Any], "spam"] \| Ann[str, "ham"]` | `"spam"`
+`Ann[Data[Any], "spam"] \| Ann[Data[float], "ham"]` | `"spam"`
+
 <!-- References -->
 [dataclass]: https://docs.python.org/3/library/dataclasses.html
 [pandas]: https://pandas.pydata.org
