@@ -59,6 +59,24 @@ year month
 pip install pandas-dataclasses
 ```
 
+## How it works
+
+pandas-dataclasses provides you the following features:
+
+- Type hints for dataclass fields (`Attr`, `Data`, `Index`, `Name`) for specifying field types and data types
+- Mix-in classes for dataclasses (`AsDataFrame`, `AsSeries`) for creating a Series or DataFrame object via a classmethod (`new`)
+
+When you call `new`, it will first create a dataclass object and then create a Series or DataFrame object by converting the dataclass object according the type hints and values in it.
+In the example above, `df = Weather.new(...)` is thus equivalent to:
+
+```python
+obj = Weather([2020, ...], [1, ...], [7.1, ...], [65, ...])
+df = asdataframe(obj)
+```
+
+where `asdataframe` is a conversion function (you can actually use it).
+pandas-dataclasses does not touch the dataclass object creation itself; this allows you to fully customize your dataclass before conversion using the dataclass features (`field`, `__post_init__`, ...).
+
 <!-- References -->
 [dataclass]: https://docs.python.org/3/library/dataclasses.html
 [pandas]: https://pandas.pydata.org
