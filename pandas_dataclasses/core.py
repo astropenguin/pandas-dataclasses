@@ -38,7 +38,7 @@ def get_attrs(obj: DataClass) -> AnyDict:
     dataspec = DataSpec.from_dataclass(type(obj))
     attrs: AnyDict = {}
 
-    for key, spec in dataspec.fields.of_attr.items():
+    for key, spec in dataspec.specs.of_attr.items():
         attrs[spec.name] = getattr(obj, key)
 
     return attrs
@@ -49,10 +49,10 @@ def get_data(obj: DataClass) -> Optional[AnyDict]:
     dataspec = DataSpec.from_dataclass(type(obj))
     dataset: AnyDict = {}
 
-    for key, spec in dataspec.fields.of_data.items():
+    for key, spec in dataspec.specs.of_data.items():
         dataset[spec.name] = astype(
             atleast_1d(getattr(obj, key)),
-            spec.data.type,
+            spec.type,
         )
 
     if len(dataset) == 0:
@@ -66,10 +66,10 @@ def get_index(obj: DataClass) -> Optional[pd.Index]:
     dataspec = DataSpec.from_dataclass(type(obj))
     dataset: AnyDict = {}
 
-    for key, spec in dataspec.fields.of_index.items():
+    for key, spec in dataspec.specs.of_index.items():
         dataset[spec.name] = astype(
             atleast_1d(getattr(obj, key)),
-            spec.data.type,
+            spec.type,
         )
 
     if len(dataset) == 0:
@@ -91,8 +91,8 @@ def get_name(obj: DataClass) -> Hashable:
     """Derive name from a dataclass object."""
     dataspec = DataSpec.from_dataclass(type(obj))
 
-    for key in dataspec.fields.of_name.keys():
+    for key in dataspec.specs.of_name.keys():
         return getattr(obj, key)
 
-    for spec in dataspec.fields.of_data.values():
+    for spec in dataspec.specs.of_data.values():
         return spec.name

@@ -31,81 +31,81 @@ class Weather:
 
 # test functions
 def test_time() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.of_index["time"]
+    spec = DataSpec.from_dataclass(Weather).specs.of_index["time"]
 
-    assert spec.role == "index"
     assert spec.name == "Time in UTC"
-    assert spec.data.type == np.dtype("M8[ns]")
-    assert spec.data.default is MISSING
+    assert spec.role == "index"
+    assert spec.type == np.dtype("M8[ns]")
+    assert spec.default is MISSING
 
 
 def test_temperature() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.of_data["temperature"]
+    spec = DataSpec.from_dataclass(Weather).specs.of_data["temperature"]
 
-    assert spec.role == "data"
     assert spec.name == "Temperature (degC)"
-    assert spec.data.type == np.float64
-    assert spec.data.default is MISSING
+    assert spec.role == "data"
+    assert spec.type == np.float64
+    assert spec.default is MISSING
 
 
 def test_humidity() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.of_data["humidity"]
+    spec = DataSpec.from_dataclass(Weather).specs.of_data["humidity"]
 
-    assert spec.role == "data"
     assert spec.name == "Humidity (percent)"
-    assert spec.data.type == np.float64
-    assert spec.data.default is MISSING
+    assert spec.role == "data"
+    assert spec.type == np.float64
+    assert spec.default is MISSING
 
 
 def test_wind_speed() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.of_data["wind_speed"]
+    spec = DataSpec.from_dataclass(Weather).specs.of_data["wind_speed"]
 
-    assert spec.role == "data"
     assert spec.name == "Speed (m/s)"
-    assert spec.data.type == np.float64
-    assert spec.data.default is MISSING
+    assert spec.role == "data"
+    assert spec.type == np.float64
+    assert spec.default is MISSING
 
 
 def test_wind_direction() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.of_data["wind_direction"]
+    spec = DataSpec.from_dataclass(Weather).specs.of_data["wind_direction"]
 
-    assert spec.role == "data"
     assert spec.name == "Direction (deg)"
-    assert spec.data.type == np.float64
-    assert spec.data.default is MISSING
+    assert spec.role == "data"
+    assert spec.type == np.float64
+    assert spec.default is MISSING
 
 
 def test_location() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.of_attr["location"]
+    spec = DataSpec.from_dataclass(Weather).specs.of_attr["location"]
 
-    assert spec.role == "attr"
     assert spec.name == "location"
-    assert spec.data.type is str
-    assert spec.data.default == "Tokyo"
+    assert spec.role == "attr"
+    assert spec.type is str
+    assert spec.default == "Tokyo"
 
 
 def test_longitude() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.of_attr["longitude"]
+    spec = DataSpec.from_dataclass(Weather).specs.of_attr["longitude"]
 
-    assert spec.role == "attr"
     assert spec.name == "longitude"
-    assert spec.data.type is float
-    assert spec.data.default == 139.69167
+    assert spec.role == "attr"
+    assert spec.type is float
+    assert spec.default == 139.69167
 
 
 def test_latitude() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.of_attr["latitude"]
+    spec = DataSpec.from_dataclass(Weather).specs.of_attr["latitude"]
 
-    assert spec.role == "attr"
     assert spec.name == "latitude"
-    assert spec.data.type is float
-    assert spec.data.default == 35.68944
+    assert spec.role == "attr"
+    assert spec.type is float
+    assert spec.default == 35.68944
 
 
 def test_name() -> None:
-    spec = DataSpec.from_dataclass(Weather).fields.of_name["name"]
+    spec = DataSpec.from_dataclass(Weather).specs.of_name["name"]
 
-    assert spec.role == "name"
     assert spec.name == "name"
-    assert spec.data.type is str
-    assert spec.data.default == "weather"
+    assert spec.role == "name"
+    assert spec.type is str
+    assert spec.default == "weather"
