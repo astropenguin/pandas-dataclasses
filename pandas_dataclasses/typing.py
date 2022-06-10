@@ -38,7 +38,6 @@ from typing_extensions import (
 AnyDType: TypeAlias = Union["dtype[Any]", ExtensionDtype]
 AnyField: TypeAlias = "Field[Any]"
 T = TypeVar("T")
-TCovariant = TypeVar("TCovariant", covariant=True)
 THashable = TypeVar("THashable", bound=Hashable)
 
 
