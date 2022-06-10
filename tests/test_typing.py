@@ -11,12 +11,12 @@ from typing_extensions import Literal as L
 from pandas_dataclasses.typing import (
     Attr,
     Data,
-    FType,
     Index,
     Name,
+    Role,
     get_dtype,
-    get_ftype,
     get_name,
+    get_role,
 )
 
 
@@ -40,24 +40,6 @@ testdata_dtype = [
     (Union[Ann[Index[float], "index"], Ann[Any, "any"]], np.dtype("f8")),
 ]
 
-testdata_ftype = [
-    (Attr[Any], FType.ATTR),
-    (Data[Any], FType.DATA),
-    (Index[Any], FType.INDEX),
-    (Name[Any], FType.NAME),
-    (Any, FType.OTHER),
-    (Ann[Attr[Any], "attr"], FType.ATTR),
-    (Ann[Data[Any], "data"], FType.DATA),
-    (Ann[Index[Any], "index"], FType.INDEX),
-    (Ann[Name[Any], "name"], FType.NAME),
-    (Ann[Any, "other"], FType.OTHER),
-    (Union[Ann[Attr[Any], "attr"], Ann[Any, "any"]], FType.ATTR),
-    (Union[Ann[Data[Any], "data"], Ann[Any, "any"]], FType.DATA),
-    (Union[Ann[Index[Any], "index"], Ann[Any, "any"]], FType.INDEX),
-    (Union[Ann[Name[Any], "name"], Ann[Any, "any"]], FType.NAME),
-    (Union[Ann[Any, "other"], Ann[Any, "any"]], FType.OTHER),
-]
-
 testdata_name = [
     (Attr[Any], None),
     (Data[Any], None),
@@ -76,6 +58,24 @@ testdata_name = [
     (Union[Ann[Any, "other"], Ann[Any, "any"]], None),
 ]
 
+testdata_role = [
+    (Attr[Any], Role.ATTR),
+    (Data[Any], Role.DATA),
+    (Index[Any], Role.INDEX),
+    (Name[Any], Role.NAME),
+    (Any, Role.OTHER),
+    (Ann[Attr[Any], "attr"], Role.ATTR),
+    (Ann[Data[Any], "data"], Role.DATA),
+    (Ann[Index[Any], "index"], Role.INDEX),
+    (Ann[Name[Any], "name"], Role.NAME),
+    (Ann[Any, "other"], Role.OTHER),
+    (Union[Ann[Attr[Any], "attr"], Ann[Any, "any"]], Role.ATTR),
+    (Union[Ann[Data[Any], "data"], Ann[Any, "any"]], Role.DATA),
+    (Union[Ann[Index[Any], "index"], Ann[Any, "any"]], Role.INDEX),
+    (Union[Ann[Name[Any], "name"], Ann[Any, "any"]], Role.NAME),
+    (Union[Ann[Any, "other"], Ann[Any, "any"]], Role.OTHER),
+]
+
 
 # test functions
 @mark.parametrize("tp, dtype", testdata_dtype)
@@ -83,11 +83,11 @@ def test_get_dtype(tp: Any, dtype: Any) -> None:
     assert get_dtype(tp) == dtype
 
 
-@mark.parametrize("tp, ftype", testdata_ftype)
-def test_get_ftype(tp: Any, ftype: Any) -> None:
-    assert get_ftype(tp) is ftype
-
-
 @mark.parametrize("tp, name", testdata_name)
 def test_get_name(tp: Any, name: Any) -> None:
     assert get_name(tp) == name
+
+
+@mark.parametrize("tp, role", testdata_role)
+def test_get_role(tp: Any, role: Any) -> None:
+    assert get_role(tp) is role

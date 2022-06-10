@@ -16,11 +16,11 @@ from .typing import (
     AnyDType,
     AnyField,
     DataClass,
-    FType,
+    Role,
     get_annotated,
     get_dtype,
-    get_ftype,
     get_name,
+    get_role,
 )
 
 
@@ -56,11 +56,11 @@ class ScalarSpec:
 class ArrayFieldSpec:
     """Specification of array fields."""
 
-    type: Literal["data", "index"]
-    """Type of the field."""
-
     name: Hashable
     """Name of the field."""
+
+    role: Literal["data", "index"]
+    """Role of the field."""
 
     data: ArraySpec
     """Data specification of the field."""
@@ -70,11 +70,11 @@ class ArrayFieldSpec:
 class ScalarFieldSpec:
     """Specification of scalar fields."""
 
-    type: Literal["attr", "name"]
-    """Type of the field."""
-
     name: Hashable
     """Name of the field."""
+
+    role: Literal["attr", "name"]
+    """Role of the field."""
 
     data: ScalarSpec
     """Data specification of the field."""
@@ -86,22 +86,22 @@ class FieldSpecs(Dict[str, AnyFieldSpec]):
     @property
     def of_attr(self) -> Dict[str, ScalarFieldSpec]:
         """Select specifications of the attribute fields."""
-        return {k: v for k, v in self.items() if v.type == "attr"}
+        return {k: v for k, v in self.items() if v.role == "attr"}
 
     @property
     def of_data(self) -> Dict[str, ArrayFieldSpec]:
         """Select specifications of the data fields."""
-        return {k: v for k, v in self.items() if v.type == "data"}
+        return {k: v for k, v in self.items() if v.role == "data"}
 
     @property
     def of_index(self) -> Dict[str, ArrayFieldSpec]:
         """Select specifications of the index fields."""
-        return {k: v for k, v in self.items() if v.type == "index"}
+        return {k: v for k, v in self.items() if v.role == "index"}
 
     @property
     def of_name(self) -> Dict[str, ScalarFieldSpec]:
         """Select specifications of the name fields."""
-        return {k: v for k, v in self.items() if v.type == "name"}
+        return {k: v for k, v in self.items() if v.role == "name"}
 
 
 @dataclass(frozen=True)
@@ -140,19 +140,19 @@ def eval_fields(dataclass: Type[TDataClass]) -> Type[TDataClass]:
 @lru_cache(maxsize=None)
 def get_fieldspec(field: AnyField) -> Optional[AnyFieldSpec]:
     """Parse a dataclass field and return a field specification."""
-    ftype = get_ftype(field.type)
     name = get_name(field.type, field.name)
+    role = get_role(field.type)
 
-    if ftype is FType.DATA or ftype is FType.INDEX:
+    if role is Role.DATA or role is Role.INDEX:
         return ArrayFieldSpec(
-            type=ftype.value,
             name=name,
+            role=role.value,
             data=ArraySpec(get_dtype(field.type), field.default),
         )
 
-    if ftype is FType.ATTR or ftype is FType.NAME:
+    if role is Role.ATTR or role is Role.NAME:
         return ScalarFieldSpec(
-            type=ftype.value,
             name=name,
+            role=role.value,
             data=ScalarSpec(get_annotated(field.type), field.default),
         )
