@@ -15,7 +15,6 @@ from typing import (
     Optional,
     Tuple,
     TypeVar,
-    Union,
 )
 
 
@@ -35,7 +34,7 @@ from typing_extensions import (
 
 
 # type hints (private)
-AnyDType: TypeAlias = Union["dtype[Any]", ExtensionDtype]
+AnyDType: TypeAlias = "dtype[Any] | ExtensionDtype"
 AnyField: TypeAlias = "Field[Any]"
 T = TypeVar("T")
 THashable = TypeVar("THashable", bound=Hashable)
