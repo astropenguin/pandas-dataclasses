@@ -79,10 +79,10 @@ class FType(Enum):
 Attr = Annotated[T, FType.ATTR]
 """Type hint for attribute fields (``Attr[T]``)."""
 
-Data = Annotated[Union[Collection[T], T], FType.DATA]
+Data = Annotated[Collection[T], FType.DATA]
 """Type hint for data fields (``Data[T]``)."""
 
-Index = Annotated[Union[Collection[T], T], FType.INDEX]
+Index = Annotated[Collection[T], FType.INDEX]
 """Type hint for index fields (``Index[T]``)."""
 
 Name = Annotated[THashable, FType.NAME]
@@ -132,7 +132,7 @@ def get_annotations(tp: Any) -> Tuple[Any, ...]:
 def get_dtype(tp: Any) -> Optional[AnyDType]:
     """Extract a NumPy or pandas data type."""
     try:
-        dtype = get_args(get_annotated(tp))[1]
+        dtype = get_args(get_annotated(tp))[0]
     except TypeError:
         raise TypeError(f"Could not find any dtype in {tp!r}.")
 
