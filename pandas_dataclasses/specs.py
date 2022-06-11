@@ -4,11 +4,11 @@ __all__ = ["DataSpec"]
 # standard library
 from dataclasses import dataclass, field, fields
 from functools import lru_cache
-from typing import Any, Dict, Hashable, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Hashable, Optional, Type, TypeVar
 
 
 # dependencies
-from typing_extensions import Literal, get_type_hints
+from typing_extensions import Literal, TypeAlias, get_type_hints
 
 
 # submodules
@@ -16,23 +16,29 @@ from .typing import (
     AnyDType,
     AnyField,
     DataClass,
-    FType,
+    Role,
     get_annotated,
     get_dtype,
-    get_ftype,
     get_name,
+    get_role,
 )
 
 
 # type hints
-AnyFieldSpec = Union["ArrayFieldSpec", "ScalarFieldSpec"]
+AnySpec: TypeAlias = "ArraySpec | ScalarSpec"
 TDataClass = TypeVar("TDataClass", bound=DataClass)
 
 
 # runtime classes
 @dataclass(frozen=True)
 class ArraySpec:
-    """Specification of arrays."""
+    """Specification of an array."""
+
+    name: Hashable
+    """Name of the array."""
+
+    role: Literal["data", "index"]
+    """Role of the array."""
 
     type: Optional[AnyDType]
     """Data type of the array."""
@@ -43,84 +49,62 @@ class ArraySpec:
 
 @dataclass(frozen=True)
 class ScalarSpec:
-    """Specification of scalars."""
+    """Specification of a scalar."""
+
+    name: Hashable
+    """Name of the scalar."""
+
+    role: Literal["attr", "name"]
+    """Role of the scalar."""
 
     type: Any
-    """Type of the scalar."""
+    """Data type of the scalar."""
 
     default: Any
     """Default value of the scalar."""
 
 
-@dataclass(frozen=True)
-class ArrayFieldSpec:
-    """Specification of array fields."""
-
-    type: Literal["data", "index"]
-    """Type of the field."""
-
-    name: Hashable
-    """Name of the field."""
-
-    data: ArraySpec
-    """Data specification of the field."""
-
-
-@dataclass(frozen=True)
-class ScalarFieldSpec:
-    """Specification of scalar fields."""
-
-    type: Literal["attr", "name"]
-    """Type of the field."""
-
-    name: Hashable
-    """Name of the field."""
-
-    data: ScalarSpec
-    """Data specification of the field."""
-
-
-class FieldSpecs(Dict[str, AnyFieldSpec]):
-    """Specifications of the dataclass fields."""
+class Specs(Dict[str, AnySpec]):
+    """Dictionary of any specifications."""
 
     @property
-    def of_attr(self) -> Dict[str, ScalarFieldSpec]:
-        """Select specifications of the attribute fields."""
-        return {k: v for k, v in self.items() if v.type == "attr"}
+    def of_attr(self) -> Dict[str, ScalarSpec]:
+        """Limit to attribute specifications."""
+        return {k: v for k, v in self.items() if v.role == "attr"}
 
     @property
-    def of_data(self) -> Dict[str, ArrayFieldSpec]:
-        """Select specifications of the data fields."""
-        return {k: v for k, v in self.items() if v.type == "data"}
+    def of_data(self) -> Dict[str, ArraySpec]:
+        """Limit to data specifications."""
+        return {k: v for k, v in self.items() if v.role == "data"}
 
     @property
-    def of_index(self) -> Dict[str, ArrayFieldSpec]:
-        """Select specifications of the index fields."""
-        return {k: v for k, v in self.items() if v.type == "index"}
+    def of_index(self) -> Dict[str, ArraySpec]:
+        """Limit to index specifications."""
+        return {k: v for k, v in self.items() if v.role == "index"}
 
     @property
-    def of_name(self) -> Dict[str, ScalarFieldSpec]:
-        """Select specifications of the name fields."""
-        return {k: v for k, v in self.items() if v.type == "name"}
+    def of_name(self) -> Dict[str, ScalarSpec]:
+        """Limit to name specifications."""
+        return {k: v for k, v in self.items() if v.role == "name"}
 
 
 @dataclass(frozen=True)
 class DataSpec:
-    """Specification of pandas dataclasses."""
+    """Data specification of a pandas dataclass."""
 
-    fields: FieldSpecs = field(default_factory=FieldSpecs)
-    """Specifications of the dataclass fields."""
+    specs: Specs = field(default_factory=Specs)
+    """Dictionary of any specifications."""
 
     @classmethod
     def from_dataclass(cls, dataclass: Type[DataClass]) -> "DataSpec":
-        """Create a specification from a dataclass."""
+        """Create a data specification from a dataclass."""
         dataspec = cls()
 
         for field in fields(eval_fields(dataclass)):
-            fieldspec = get_fieldspec(field)
+            spec = get_spec(field)
 
-            if fieldspec is not None:
-                dataspec.fields[field.name] = fieldspec
+            if spec is not None:
+                dataspec.specs[field.name] = spec
 
         return dataspec
 
@@ -128,7 +112,7 @@ class DataSpec:
 # runtime functions
 @lru_cache(maxsize=None)
 def eval_fields(dataclass: Type[TDataClass]) -> Type[TDataClass]:
-    """Evaluate types of dataclass fields."""
+    """Evaluate field types of a dataclass."""
     types = get_type_hints(dataclass, include_extras=True)
 
     for field in fields(dataclass):
@@ -138,21 +122,23 @@ def eval_fields(dataclass: Type[TDataClass]) -> Type[TDataClass]:
 
 
 @lru_cache(maxsize=None)
-def get_fieldspec(field: AnyField) -> Optional[AnyFieldSpec]:
-    """Parse a dataclass field and return a field specification."""
-    ftype = get_ftype(field.type)
+def get_spec(field: AnyField) -> Optional[AnySpec]:
+    """Convert a dataclass field to a specification."""
     name = get_name(field.type, field.name)
+    role = get_role(field.type)
 
-    if ftype is FType.DATA or ftype is FType.INDEX:
-        return ArrayFieldSpec(
-            type=ftype.value,
+    if role is Role.DATA or role is Role.INDEX:
+        return ArraySpec(
             name=name,
-            data=ArraySpec(get_dtype(field.type), field.default),
+            role=role.value,
+            type=get_dtype(field.type),
+            default=field.default,
         )
 
-    if ftype is FType.ATTR or ftype is FType.NAME:
-        return ScalarFieldSpec(
-            type=ftype.value,
+    if role is Role.ATTR or role is Role.NAME:
+        return ScalarSpec(
             name=name,
-            data=ScalarSpec(get_annotated(field.type), field.default),
+            role=role.value,
+            type=get_annotated(field.type),
+            default=field.default,
         )

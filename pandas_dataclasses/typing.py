@@ -15,7 +15,6 @@ from typing import (
     Optional,
     Tuple,
     TypeVar,
-    Union,
 )
 
 
@@ -35,10 +34,9 @@ from typing_extensions import (
 
 
 # type hints (private)
-AnyDType: TypeAlias = Union["dtype[Any]", ExtensionDtype]
+AnyDType: TypeAlias = "dtype[Any] | ExtensionDtype"
 AnyField: TypeAlias = "Field[Any]"
 T = TypeVar("T")
-TCovariant = TypeVar("TCovariant", covariant=True)
 THashable = TypeVar("THashable", bound=Hashable)
 
 
@@ -48,7 +46,7 @@ class DataClass(Protocol):
     __dataclass_fields__: ClassVar[Dict[str, AnyField]]
 
 
-class FType(Enum):
+class Role(Enum):
     """Annotations for typing dataclass fields."""
 
     ATTR = "attr"
@@ -68,7 +66,7 @@ class FType(Enum):
 
     @classmethod
     def annotates(cls, tp: Any) -> bool:
-        """Check if any ftype annotates a type hint."""
+        """Check if any role annotates a type hint."""
         if get_origin(tp) is not Annotated:
             return False
 
@@ -76,19 +74,19 @@ class FType(Enum):
 
 
 # type hints (public)
-Attr = Annotated[T, FType.ATTR]
+Attr = Annotated[T, Role.ATTR]
 """Type hint for attribute fields (``Attr[T]``)."""
 
-Data = Annotated[Union[Collection[T], T], FType.DATA]
+Data = Annotated[Collection[T], Role.DATA]
 """Type hint for data fields (``Data[T]``)."""
 
-Index = Annotated[Union[Collection[T], T], FType.INDEX]
+Index = Annotated[Collection[T], Role.INDEX]
 """Type hint for index fields (``Index[T]``)."""
 
-Name = Annotated[THashable, FType.NAME]
+Name = Annotated[THashable, Role.NAME]
 """Type hint for name fields (``Name[T]``)."""
 
-Other = Annotated[T, FType.OTHER]
+Other = Annotated[T, Role.OTHER]
 """Type hint for other fields (``Other[T]``)."""
 
 
@@ -114,25 +112,25 @@ def find_annotated(tp: Any) -> Iterable[Any]:
 
 
 def get_annotated(tp: Any) -> Any:
-    """Extract the first ftype-annotated type."""
-    for annotated in filter(FType.annotates, find_annotated(tp)):
+    """Extract the first role-annotated type."""
+    for annotated in filter(Role.annotates, find_annotated(tp)):
         return deannotate(annotated)
 
-    raise TypeError("Could not find any ftype-annotated type.")
+    raise TypeError("Could not find any role-annotated type.")
 
 
 def get_annotations(tp: Any) -> Tuple[Any, ...]:
-    """Extract annotations of the first ftype-annotated type."""
-    for annotated in filter(FType.annotates, find_annotated(tp)):
+    """Extract annotations of the first role-annotated type."""
+    for annotated in filter(Role.annotates, find_annotated(tp)):
         return get_args(annotated)[1:]
 
-    raise TypeError("Could not find any ftype-annotated type.")
+    raise TypeError("Could not find any role-annotated type.")
 
 
 def get_dtype(tp: Any) -> Optional[AnyDType]:
     """Extract a NumPy or pandas data type."""
     try:
-        dtype = get_args(get_annotated(tp))[1]
+        dtype = get_args(get_annotated(tp))[0]
     except TypeError:
         raise TypeError(f"Could not find any dtype in {tp!r}.")
 
@@ -143,14 +141,6 @@ def get_dtype(tp: Any) -> Optional[AnyDType]:
         dtype = get_args(dtype)[0]
 
     return pandas_dtype(dtype)  # type: ignore
-
-
-def get_ftype(tp: Any, default: FType = FType.OTHER) -> FType:
-    """Extract an ftype if found or return given default."""
-    try:
-        return get_annotations(tp)[0]
-    except TypeError:
-        return default
 
 
 def get_name(tp: Any, default: Hashable = None) -> Hashable:
@@ -165,3 +155,11 @@ def get_name(tp: Any, default: Hashable = None) -> Hashable:
             return annotation
 
     return default
+
+
+def get_role(tp: Any, default: Role = Role.OTHER) -> Role:
+    """Extract a role if found or return given default."""
+    try:
+        return get_annotations(tp)[0]
+    except TypeError:
+        return default
