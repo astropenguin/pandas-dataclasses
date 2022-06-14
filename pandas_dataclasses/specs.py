@@ -40,7 +40,7 @@ class ArraySpec:
     role: Literal["data", "index"]
     """Role of the array."""
 
-    type: Optional[AnyDType]
+    dtype: Optional[AnyDType]
     """Data type of the array."""
 
     default: Any
@@ -58,7 +58,7 @@ class ScalarSpec:
     """Role of the scalar."""
 
     type: Any
-    """Data type of the scalar."""
+    """Type (hint) of the scalar."""
 
     default: Any
     """Default value of the scalar."""
@@ -131,7 +131,7 @@ def get_spec(field: AnyField) -> Optional[AnySpec]:
         return ArraySpec(
             name=name,
             role=role.value,
-            type=get_dtype(field.type),
+            dtype=get_dtype(field.type),
             default=field.default,
         )
 

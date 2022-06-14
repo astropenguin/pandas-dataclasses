@@ -52,7 +52,7 @@ def get_data(obj: DataClass) -> Optional[AnyDict]:
     for key, spec in dataspec.specs.of_data.items():
         dataset[spec.name] = astype(
             atleast_1d(getattr(obj, key)),
-            spec.type,
+            spec.dtype,
         )
 
     if len(dataset) == 0:
@@ -69,7 +69,7 @@ def get_index(obj: DataClass) -> Optional[pd.Index]:
     for key, spec in dataspec.specs.of_index.items():
         dataset[spec.name] = astype(
             atleast_1d(getattr(obj, key)),
-            spec.type,
+            spec.dtype,
         )
 
     if len(dataset) == 0:
