@@ -35,7 +35,7 @@ def test_time() -> None:
 
     assert spec.name == "Time in UTC"
     assert spec.role == "index"
-    assert spec.type == np.dtype("M8[ns]")
+    assert spec.dtype == np.dtype("M8[ns]")
     assert spec.default is MISSING
 
 
@@ -44,7 +44,7 @@ def test_temperature() -> None:
 
     assert spec.name == "Temperature (degC)"
     assert spec.role == "data"
-    assert spec.type == np.float64
+    assert spec.dtype == np.float64
     assert spec.default is MISSING
 
 
@@ -53,7 +53,7 @@ def test_humidity() -> None:
 
     assert spec.name == "Humidity (percent)"
     assert spec.role == "data"
-    assert spec.type == np.float64
+    assert spec.dtype == np.float64
     assert spec.default is MISSING
 
 
@@ -62,7 +62,7 @@ def test_wind_speed() -> None:
 
     assert spec.name == "Speed (m/s)"
     assert spec.role == "data"
-    assert spec.type == np.float64
+    assert spec.dtype == np.float64
     assert spec.default is MISSING
 
 
@@ -71,7 +71,7 @@ def test_wind_direction() -> None:
 
     assert spec.name == "Direction (deg)"
     assert spec.role == "data"
-    assert spec.type == np.float64
+    assert spec.dtype == np.float64
     assert spec.default is MISSING
 
 
