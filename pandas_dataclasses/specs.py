@@ -100,7 +100,7 @@ class DataSpec:
         """Create a data specification from a dataclass."""
         dataspec = cls()
 
-        for field in fields(eval_fields(dataclass)):
+        for field in fields(eval_types(dataclass)):
             spec = get_spec(field)
 
             if spec is not None:
@@ -111,7 +111,7 @@ class DataSpec:
 
 # runtime functions
 @lru_cache(maxsize=None)
-def eval_fields(dataclass: Type[TDataClass]) -> Type[TDataClass]:
+def eval_types(dataclass: Type[TDataClass]) -> Type[TDataClass]:
     """Evaluate field types of a dataclass."""
     types = get_type_hints(dataclass, include_extras=True)
 
