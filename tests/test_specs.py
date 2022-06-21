@@ -6,23 +6,20 @@ from dataclasses import MISSING, dataclass
 import numpy as np
 from pandas_dataclasses.specs import DataSpec
 from pandas_dataclasses.typing import Attr, Data, Index, Name
-from typing_extensions import Annotated, Literal
-
-
-# type hints
-datetime = Literal["M8[ns]"]
+from typing_extensions import Annotated as Ann
+from typing_extensions import Literal as L
 
 
 # test datasets
 @dataclass
 class Weather:
-    """Time-series weather information at a location."""
+    """Weather information at a location."""
 
-    time: Annotated[Index[datetime], "Time in UTC"]
-    temperature: Annotated[Data[float], "Temperature (degC)"]
-    humidity: Annotated[Data[float], "Humidity (percent)"]
-    wind_speed: Annotated[Data[float], "Speed (m/s)"]
-    wind_direction: Annotated[Data[float], "Direction (deg)"]
+    time: Ann[Index[L["M8[ns]"]], "Time in UTC"]
+    temperature: Ann[Data[float], "Temperature (degC)"]
+    humidity: Ann[Data[float], "Humidity (percent)"]
+    wind_speed: Ann[Data[float], "Speed (m/s)"]
+    wind_direction: Ann[Data[float], "Direction (deg)"]
     location: Attr[str] = "Tokyo"
     longitude: Attr[float] = 139.69167
     latitude: Attr[float] = 35.68944
@@ -109,3 +106,7 @@ def test_name() -> None:
     assert spec.role == "name"
     assert spec.type is str
     assert spec.default == "weather"
+
+
+def test_factory() -> None:
+    assert DataSpec.from_dataclass(Weather).factory is None

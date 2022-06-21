@@ -5,9 +5,15 @@ from dataclasses import dataclass, field
 # dependencies
 import numpy as np
 import pandas as pd
-from pandas_dataclasses.core import get_attrs, get_data, get_index, get_name
+from pandas_dataclasses.core import (
+    get_attrs,
+    get_data,
+    get_factory,
+    get_index,
+    get_name,
+)
 from pandas_dataclasses.typing import Attr, Data, Index, Name
-from typing_extensions import Annotated as Named
+from typing_extensions import Annotated as Ann
 
 
 # test datasets
@@ -15,17 +21,17 @@ from typing_extensions import Annotated as Named
 class Weather:
     """Weather information at a location."""
 
-    year: Named[Index[int], "Year"]
-    month: Named[Index[int], "Month"]
-    temperature: Named[Data[float], "Average temperature (deg C)"]
-    humidity: Named[Data[float], "Average humidity (%)"]
-    location: Named[Attr[str], "Location"] = "Tokyo"
-    longitude: Named[Attr[float], "Longitude (deg)"] = 139.69167
-    latitude: Named[Attr[float], "Latitude (deg)"] = 35.68944
+    year: Ann[Index[int], "Year"]
+    month: Ann[Index[int], "Month"]
+    temp: Ann[Data[float], "Average temperature (deg C)"]
+    humid: Ann[Data[float], "Average humidity (%)"]
+    loc: Ann[Attr[str], "Location"] = "Tokyo"
+    lon: Ann[Attr[float], "Longitude (deg)"] = 139.69167
+    lat: Ann[Attr[float], "Latitude (deg)"] = 35.68944
     name: Name[str] = field(init=False)
 
     def __post_init__(self) -> None:
-        self.name = f"Weather at {self.location}"
+        self.name = f"Weather at {self.loc}"
 
 
 weather = Weather(
@@ -38,9 +44,7 @@ weather = Weather(
 
 # test functions
 def test_attrs() -> None:
-    attrs = get_attrs(weather)
-
-    assert attrs == {
+    assert get_attrs(weather) == {
         "Location": "Tokyo",
         "Longitude (deg)": 139.69167,
         "Latitude (deg)": 35.68944,
@@ -51,8 +55,8 @@ def test_data() -> None:
     data = get_data(weather)
     data_temp = data.get("Average temperature (deg C)")  # type: ignore
     data_humid = data.get("Average humidity (%)")  # type: ignore
-    expected_temp = np.array(weather.temperature, float)
-    expected_humid = np.array(weather.humidity, float)
+    expected_temp = np.array(weather.temp, float)
+    expected_humid = np.array(weather.humid, float)
 
     assert (data_temp == expected_temp).all()
     assert (data_humid == expected_humid).all()
@@ -73,6 +77,8 @@ def test_index() -> None:
 
 
 def test_name() -> None:
-    name = get_name(weather)
+    assert get_name(weather) == "Weather at Tokyo"
 
-    assert name == "Weather at Tokyo"
+
+def test_factory() -> None:
+    assert get_factory(weather) is None
