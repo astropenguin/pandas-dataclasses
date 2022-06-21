@@ -81,7 +81,7 @@ def asdataframe(obj: DataClass[P], factory: None = None) -> pd.DataFrame:
 
 
 @overload
-def asdataframe(obj: Any, factory: Type[pd.DataFrame] = pd.DataFrame) -> pd.DataFrame:
+def asdataframe(obj: Any, factory: Type[TDataFrame] = pd.DataFrame) -> TDataFrame:
     ...
 
 

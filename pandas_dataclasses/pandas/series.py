@@ -81,7 +81,7 @@ def asseries(obj: DataClass[P], factory: None = None) -> pd.Series:
 
 
 @overload
-def asseries(obj: Any, factory: Type[pd.Series] = pd.Series) -> pd.Series:
+def asseries(obj: Any, factory: Type[TSeries] = pd.Series) -> TSeries:
     ...
 
 
