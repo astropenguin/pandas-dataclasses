@@ -8,17 +8,15 @@ from typing import Any, Dict, Hashable, Optional
 # dependencies
 import numpy as np
 import pandas as pd
-from typing_extensions import ParamSpec
 
 
 # submodules
 from .specs import DataSpec
-from .typing import AnyDType, DataClass
+from .typing import AnyDType, DataClass, P
 
 
 # type hints
 AnyDict = Dict[Hashable, Any]
-P = ParamSpec("P")
 
 
 # runtime functions

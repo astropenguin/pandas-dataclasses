@@ -4,22 +4,21 @@ __all__ = ["AsDataFrame", "asdataframe"]
 # standard library
 from functools import wraps
 from types import MethodType
-from typing import Any, Callable, Type
+from typing import Any, Callable, Type, TypeVar, overload
 
 
 # dependencies
 import pandas as pd
 from morecopy import copy
-from typing_extensions import ParamSpec
 
 
 # submodules
 from ..core import get_attrs, get_data, get_index
-from ..typing import DataClass
+from ..typing import DataClass, P, PandasClass
 
 
 # type hints
-P = ParamSpec("P")
+TDataFrame = TypeVar("TDataFrame", bound=pd.DataFrame)
 
 
 # runtime classes
@@ -34,11 +33,23 @@ class classproperty:
     def __init__(self, func: Any) -> None:
         self.__func__ = func
 
+    @overload
+    def __get__(
+        self,
+        obj: Any,
+        cls: Type[PandasClass[P, TDataFrame]],
+    ) -> Callable[P, TDataFrame]:
+        ...
+
+    @overload
     def __get__(
         self,
         obj: Any,
         cls: Type[DataClass[P]],
     ) -> Callable[P, pd.DataFrame]:
+        ...
+
+    def __get__(self, obj: Any, cls: Any) -> Any:
         return self.__func__(cls)
 
 
@@ -59,7 +70,22 @@ class AsDataFrame:
 
 
 # runtime functions
-def asdataframe(obj: DataClass[P]) -> pd.DataFrame:
+@overload
+def asdataframe(obj: PandasClass[P, TDataFrame], factory: None = None) -> TDataFrame:
+    ...
+
+
+@overload
+def asdataframe(obj: DataClass[P], factory: None = None) -> pd.DataFrame:
+    ...
+
+
+@overload
+def asdataframe(obj: Any, factory: Type[pd.DataFrame] = pd.DataFrame) -> pd.DataFrame:
+    ...
+
+
+def asdataframe(obj: Any, factory: Any = None) -> Any:
     """Create a DataFrame object from a dataclass object."""
     attrs = get_attrs(obj)
     data = get_data(obj)

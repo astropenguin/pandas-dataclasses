@@ -8,14 +8,16 @@ from typing import Any, Dict, Hashable, Optional, Type
 
 
 # dependencies
-from typing_extensions import Literal, ParamSpec, TypeAlias, get_type_hints
+from typing_extensions import Literal, TypeAlias, get_type_hints
 
 
 # submodules
 from .typing import (
     AnyDType,
     AnyField,
+    AnyPandas,
     DataClass,
+    P,
     Role,
     get_annotated,
     get_dtype,
@@ -26,7 +28,6 @@ from .typing import (
 
 # type hints
 AnySpec: TypeAlias = "ArraySpec | ScalarSpec"
-P = ParamSpec("P")
 
 
 # runtime classes
@@ -92,21 +93,25 @@ class Specs(Dict[str, AnySpec]):
 class DataSpec:
     """Data specification of a pandas dataclass."""
 
+    factory: Optional[Type[AnyPandas]] = None
+    """Factory for pandas data creation."""
+
     specs: Specs = field(default_factory=Specs)
     """Dictionary of any specifications."""
 
     @classmethod
     def from_dataclass(cls, dataclass: Type[DataClass[P]]) -> "DataSpec":
         """Create a data specification from a dataclass."""
-        dataspec = cls()
+        specs = Specs()
 
         for field in fields(eval_types(dataclass)):
             spec = get_spec(field)
 
             if spec is not None:
-                dataspec.specs[field.name] = spec
+                specs[field.name] = spec
 
-        return dataspec
+        factory = getattr(dataclass, "__pandas_factory__", None)
+        return cls(factory, specs)
 
 
 # runtime functions

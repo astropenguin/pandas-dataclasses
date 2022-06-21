@@ -14,12 +14,14 @@ from typing import (
     Iterable,
     Optional,
     Tuple,
+    Type,
     TypeVar,
 )
 
 
 # dependencies
 from numpy import dtype
+from pandas import DataFrame, Series
 from pandas.api.extensions import ExtensionDtype
 from pandas.api.types import pandas_dtype  # type: ignore
 from typing_extensions import (
@@ -37,9 +39,11 @@ from typing_extensions import (
 # type hints (private)
 AnyDType: TypeAlias = "dtype[Any] | ExtensionDtype"
 AnyField: TypeAlias = "Field[Any]"
+AnyPandas: TypeAlias = "DataFrame | Series"
 P = ParamSpec("P")
 T = TypeVar("T")
 THashable = TypeVar("THashable", bound=Hashable)
+TPandas = TypeVar("TPandas", bound=AnyPandas)
 
 
 class DataClass(Protocol[P]):
@@ -49,6 +53,12 @@ class DataClass(Protocol[P]):
 
     def __init__(self, *args: P.args, **kwargs: P.kwargs) -> None:
         ...
+
+
+class PandasClass(DataClass[P], Protocol[P, TPandas]):
+    """Type hint for dataclass objects with a pandas factory."""
+
+    __pandas_factory__: Type[TPandas]
 
 
 class Role(Enum):
