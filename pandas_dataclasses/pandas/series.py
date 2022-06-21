@@ -71,21 +71,21 @@ class AsSeries:
 
 # runtime functions
 @overload
-def asseries(obj: PandasClass[P, TSeries], factory: None = None) -> TSeries:
+def asseries(obj: PandasClass[P, TSeries], *, factory: None = None) -> TSeries:
     ...
 
 
 @overload
-def asseries(obj: DataClass[P], factory: None = None) -> pd.Series:
+def asseries(obj: DataClass[P], *, factory: None = None) -> pd.Series:
     ...
 
 
 @overload
-def asseries(obj: Any, factory: Type[TSeries] = pd.Series) -> TSeries:
+def asseries(obj: Any, *, factory: Type[TSeries] = pd.Series) -> TSeries:
     ...
 
 
-def asseries(obj: Any, factory: Any = None) -> Any:
+def asseries(obj: Any, *, factory: Any = None) -> Any:
     """Create a Series object from a dataclass object."""
     attrs = get_attrs(obj)
     data = get_data(obj)

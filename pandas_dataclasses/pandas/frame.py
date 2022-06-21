@@ -71,21 +71,21 @@ class AsDataFrame:
 
 # runtime functions
 @overload
-def asdataframe(obj: PandasClass[P, TDataFrame], factory: None = None) -> TDataFrame:
+def asdataframe(obj: PandasClass[P, TDataFrame], *, factory: None = None) -> TDataFrame:
     ...
 
 
 @overload
-def asdataframe(obj: DataClass[P], factory: None = None) -> pd.DataFrame:
+def asdataframe(obj: DataClass[P], *, factory: None = None) -> pd.DataFrame:
     ...
 
 
 @overload
-def asdataframe(obj: Any, factory: Type[TDataFrame] = pd.DataFrame) -> TDataFrame:
+def asdataframe(obj: Any, *, factory: Type[TDataFrame] = pd.DataFrame) -> TDataFrame:
     ...
 
 
-def asdataframe(obj: Any, factory: Any = None) -> Any:
+def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     """Create a DataFrame object from a dataclass object."""
     attrs = get_attrs(obj)
     data = get_data(obj)
