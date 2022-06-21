@@ -13,7 +13,7 @@ from morecopy import copy
 
 
 # submodules
-from ..core import get_attrs, get_data, get_index, get_name
+from ..core import get_attrs, get_data, get_factory, get_index, get_name
 from ..typing import DataClass, P, PandasClass
 
 
@@ -95,6 +95,12 @@ def asseries(obj: Any, factory: Any = None) -> Any:
     if data is not None:
         data = next(iter(data.values()))
 
-    series = pd.Series(data, index, name=name)
+    if factory is None:
+        factory = get_factory(obj) or pd.Series
+
+    if not issubclass(factory, pd.Series):
+        raise TypeError("Factory was not a subclass of Series.")
+
+    series = factory(data, index, name=name)
     series.attrs.update(attrs)
     return series

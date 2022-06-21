@@ -1,8 +1,8 @@
-__all__ = ["get_attrs", "get_data", "get_index", "get_name"]
+__all__ = ["get_attrs", "get_data", "get_factory", "get_index", "get_name"]
 
 
 # standard library
-from typing import Any, Dict, Hashable, Optional
+from typing import Any, Dict, Hashable, Optional, Type
 
 
 # dependencies
@@ -12,7 +12,7 @@ import pandas as pd
 
 # submodules
 from .specs import DataSpec
-from .typing import AnyDType, DataClass, P
+from .typing import AnyDType, AnyPandas, DataClass, P
 
 
 # type hints
@@ -62,6 +62,11 @@ def get_data(obj: DataClass[P]) -> Optional[AnyDict]:
         return
 
     return dataset
+
+
+def get_factory(obj: DataClass[P]) -> Optional[Type[AnyPandas]]:
+    """Derive pandas factory from a dataclass object."""
+    return DataSpec.from_dataclass(type(obj)).factory
 
 
 def get_index(obj: DataClass[P]) -> Optional[pd.Index]:
