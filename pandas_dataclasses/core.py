@@ -5,15 +5,20 @@ __all__ = ["get_attrs", "get_data", "get_index", "get_name"]
 from typing import Any, Dict, Hashable, Optional
 
 
-# submodules
+# dependencies
 import numpy as np
 import pandas as pd
+from typing_extensions import ParamSpec
+
+
+# submodules
 from .specs import DataSpec
 from .typing import AnyDType, DataClass
 
 
 # type hints
 AnyDict = Dict[Hashable, Any]
+P = ParamSpec("P")
 
 
 # runtime functions
@@ -33,7 +38,7 @@ def atleast_1d(data: Any) -> Any:
         return np.atleast_1d(data)
 
 
-def get_attrs(obj: DataClass) -> AnyDict:
+def get_attrs(obj: DataClass[P]) -> AnyDict:
     """Derive attributes from a dataclass object."""
     dataspec = DataSpec.from_dataclass(type(obj))
     attrs: AnyDict = {}
@@ -44,7 +49,7 @@ def get_attrs(obj: DataClass) -> AnyDict:
     return attrs
 
 
-def get_data(obj: DataClass) -> Optional[AnyDict]:
+def get_data(obj: DataClass[P]) -> Optional[AnyDict]:
     """Derive data from a dataclass object."""
     dataspec = DataSpec.from_dataclass(type(obj))
     dataset: AnyDict = {}
@@ -61,7 +66,7 @@ def get_data(obj: DataClass) -> Optional[AnyDict]:
     return dataset
 
 
-def get_index(obj: DataClass) -> Optional[pd.Index]:
+def get_index(obj: DataClass[P]) -> Optional[pd.Index]:
     """Derive index from a dataclass object."""
     dataspec = DataSpec.from_dataclass(type(obj))
     dataset: AnyDict = {}
@@ -87,7 +92,7 @@ def get_index(obj: DataClass) -> Optional[pd.Index]:
         )
 
 
-def get_name(obj: DataClass) -> Hashable:
+def get_name(obj: DataClass[P]) -> Hashable:
     """Derive name from a dataclass object."""
     dataspec = DataSpec.from_dataclass(type(obj))
 

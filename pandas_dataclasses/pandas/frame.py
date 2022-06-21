@@ -10,7 +10,7 @@ from typing import Any, Callable, Type
 # dependencies
 import pandas as pd
 from morecopy import copy
-from typing_extensions import ParamSpec, Protocol
+from typing_extensions import ParamSpec
 
 
 # submodules
@@ -19,14 +19,7 @@ from ..typing import DataClass
 
 
 # type hints
-PInit = ParamSpec("PInit")
-
-
-class DataClass(DataClass, Protocol[PInit]):
-    """Type hint for dataclass objects (with parameter specification)."""
-
-    def __init__(self, *args: PInit.args, **kwargs: PInit.kwargs) -> None:
-        ...
+P = ParamSpec("P")
 
 
 # runtime classes
@@ -44,8 +37,8 @@ class classproperty:
     def __get__(
         self,
         obj: Any,
-        cls: Type[DataClass[PInit]],
-    ) -> Callable[PInit, pd.DataFrame]:
+        cls: Type[DataClass[P]],
+    ) -> Callable[P, pd.DataFrame]:
         return self.__func__(cls)
 
 
@@ -66,7 +59,7 @@ class AsDataFrame:
 
 
 # runtime functions
-def asdataframe(obj: DataClass[PInit]) -> pd.DataFrame:
+def asdataframe(obj: DataClass[P]) -> pd.DataFrame:
     """Create a DataFrame object from a dataclass object."""
     attrs = get_attrs(obj)
     data = get_data(obj)
