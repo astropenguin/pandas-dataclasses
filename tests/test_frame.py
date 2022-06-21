@@ -1,26 +1,36 @@
 # standard library
 from dataclasses import dataclass
+from typing import ClassVar
 
 
 # dependencies
 import numpy as np
+import pandas as pd
 from pandas_dataclasses.pandas.frame import AsDataFrame
 from pandas_dataclasses.typing import Attr, Data, Index
-from typing_extensions import Annotated as Named
+from typing_extensions import Annotated as Ann
 
 
 # test datasets
+class CustomFrame(pd.DataFrame):
+    """Custom pandas DataFrame."""
+
+    __slots__ = ()
+
+
 @dataclass
 class Weather(AsDataFrame):
     """Weather information at a location."""
 
-    year: Named[Index[int], "Year"]
-    month: Named[Index[int], "Month"]
-    temp: Named[Data[float], "Average temperature (deg C)"]
-    humid: Named[Data[float], "Average humidity (%)"]
-    loc: Named[Attr[str], "Location"] = "Tokyo"
-    lon: Named[Attr[float], "Longitude (deg)"] = 139.69167
-    lat: Named[Attr[float], "Latitude (deg)"] = 35.68944
+    year: Ann[Index[int], "Year"]
+    month: Ann[Index[int], "Month"]
+    temp: Ann[Data[float], "Average temperature (deg C)"]
+    humid: Ann[Data[float], "Average humidity (%)"]
+    loc: Ann[Attr[str], "Location"] = "Tokyo"
+    lon: Ann[Attr[float], "Longitude (deg)"] = 139.69167
+    lat: Ann[Attr[float], "Latitude (deg)"] = 35.68944
+
+    __pandas_factory__: ClassVar = CustomFrame
 
 
 year = np.array([2020, 2020, 2021, 2021, 2022])
@@ -61,3 +71,7 @@ def test_index() -> None:
     assert index_1.dtype == np.dtype("int64")
     assert index_0.name == "Year"
     assert index_1.name == "Month"
+
+
+def test_instance() -> None:
+    assert isinstance(weather, CustomFrame)

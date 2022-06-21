@@ -4,7 +4,7 @@ __all__ = ["DataSpec"]
 # standard library
 from dataclasses import dataclass, field, fields
 from functools import lru_cache
-from typing import Any, Dict, Hashable, Optional, Type, TypeVar
+from typing import Any, Dict, Hashable, Optional, Type
 
 
 # dependencies
@@ -15,7 +15,9 @@ from typing_extensions import Literal, TypeAlias, get_type_hints
 from .typing import (
     AnyDType,
     AnyField,
+    AnyPandas,
     DataClass,
+    P,
     Role,
     get_annotated,
     get_dtype,
@@ -26,7 +28,6 @@ from .typing import (
 
 # type hints
 AnySpec: TypeAlias = "ArraySpec | ScalarSpec"
-TDataClass = TypeVar("TDataClass", bound=DataClass)
 
 
 # runtime classes
@@ -92,26 +93,30 @@ class Specs(Dict[str, AnySpec]):
 class DataSpec:
     """Data specification of a pandas dataclass."""
 
+    factory: Optional[Type[AnyPandas]] = None
+    """Factory for pandas data creation."""
+
     specs: Specs = field(default_factory=Specs)
     """Dictionary of any specifications."""
 
     @classmethod
-    def from_dataclass(cls, dataclass: Type[DataClass]) -> "DataSpec":
+    def from_dataclass(cls, dataclass: Type[DataClass[P]]) -> "DataSpec":
         """Create a data specification from a dataclass."""
-        dataspec = cls()
+        specs = Specs()
 
         for field in fields(eval_types(dataclass)):
             spec = get_spec(field)
 
             if spec is not None:
-                dataspec.specs[field.name] = spec
+                specs[field.name] = spec
 
-        return dataspec
+        factory = getattr(dataclass, "__pandas_factory__", None)
+        return cls(factory, specs)
 
 
 # runtime functions
 @lru_cache(maxsize=None)
-def eval_types(dataclass: Type[TDataClass]) -> Type[TDataClass]:
+def eval_types(dataclass: Type[DataClass[P]]) -> Type[DataClass[P]]:
     """Evaluate field types of a dataclass."""
     types = get_type_hints(dataclass, include_extras=True)
 
