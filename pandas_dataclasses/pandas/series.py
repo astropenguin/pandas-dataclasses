@@ -23,12 +23,7 @@ TSeries = TypeVar("TSeries", bound=pd.Series)
 
 # runtime classes
 class classproperty:
-    """Class property only for AsSeries.new().
-
-    As ``classmethod`` and ``property`` can be chained since Python 3.9,
-    this will be removed when the support for Python 3.7 and 3.8 ends.
-
-    """
+    """Create a Series object from dataclass parameters."""
 
     def __init__(self, func: Any) -> None:
         self.__func__ = func

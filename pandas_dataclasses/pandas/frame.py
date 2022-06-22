@@ -23,12 +23,7 @@ TDataFrame = TypeVar("TDataFrame", bound=pd.DataFrame)
 
 # runtime classes
 class classproperty:
-    """Class property only for AsDataFrame.new().
-
-    As ``classmethod`` and ``property`` can be chained since Python 3.9,
-    this will be removed when the support for Python 3.7 and 3.8 ends.
-
-    """
+    """Create a DataFrame object from dataclass parameters."""
 
     def __init__(self, func: Any) -> None:
         self.__func__ = func
