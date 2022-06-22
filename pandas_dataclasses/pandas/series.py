@@ -59,8 +59,9 @@ class AsSeries:
     @classproperty
     def new(cls) -> Any:
         """Create a Series object from dataclass parameters."""
+        factory = getattr(cls, "__pandas_factory__", pd.Series)
         init = copy(cls.__init__)
-        init.__annotations__["return"] = pd.Series
+        init.__annotations__["return"] = factory
 
         @wraps(init)
         def new(cls: Any, *args: Any, **kwargs: Any) -> Any:
