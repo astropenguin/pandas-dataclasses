@@ -71,17 +71,17 @@ class AsDataFrame:
 
 # runtime functions
 @overload
+def asdataframe(obj: Any, *, factory: Type[TDataFrame]) -> TDataFrame:
+    ...
+
+
+@overload
 def asdataframe(obj: PandasClass[P, TDataFrame], *, factory: None = None) -> TDataFrame:
     ...
 
 
 @overload
 def asdataframe(obj: DataClass[P], *, factory: None = None) -> pd.DataFrame:
-    ...
-
-
-@overload
-def asdataframe(obj: Any, *, factory: Type[TDataFrame] = pd.DataFrame) -> TDataFrame:
     ...
 
 

@@ -71,17 +71,17 @@ class AsSeries:
 
 # runtime functions
 @overload
+def asseries(obj: Any, *, factory: Type[TSeries]) -> TSeries:
+    ...
+
+
+@overload
 def asseries(obj: PandasClass[P, TSeries], *, factory: None = None) -> TSeries:
     ...
 
 
 @overload
 def asseries(obj: DataClass[P], *, factory: None = None) -> pd.Series:
-    ...
-
-
-@overload
-def asseries(obj: Any, *, factory: Type[TSeries] = pd.Series) -> TSeries:
     ...
 
 
