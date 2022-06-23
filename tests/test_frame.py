@@ -15,7 +15,7 @@ from typing_extensions import Annotated as Ann
 class CustomFrame(pd.DataFrame):
     """Custom pandas DataFrame."""
 
-    __slots__ = ()
+    pass
 
 
 @dataclass

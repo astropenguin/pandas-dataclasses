@@ -16,7 +16,7 @@ from typing_extensions import Literal as L
 class CustomSeries(pd.Series):
     """Custom pandas Series."""
 
-    __slots__ = ()
+    pass
 
 
 @dataclass

@@ -1,10 +1,10 @@
 # pandas-dataclasses
 
-![Version](https://img.shields.io/pypi/v/pandas-dataclasses?label=Version&color=cornflowerblue&style=flat-square)
-![Python](https://img.shields.io/pypi/pyversions/pandas-dataclasses?label=Python&color=cornflowerblue&style=flat-square)
+[![Release](https://img.shields.io/pypi/v/pandas-dataclasses?label=Release&color=cornflowerblue&style=flat-square)](https://pypi.org/project/pandas-dataclasses/)
+[![Python](https://img.shields.io/pypi/pyversions/pandas-dataclasses?label=Python&color=cornflowerblue&style=flat-square)](https://pypi.org/project/pandas-dataclasses/)
 ![Downloads](https://img.shields.io/pypi/dm/pandas-dataclasses?label=Downloads&color=cornflowerblue&style=flat-square)
-![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.6127352-cornflowerblue?style=flat-square)
-![Tests](https://img.shields.io/github/workflow/status/astropenguin/pandas-dataclasses/Tests?label=Tests&style=flat-square)
+[![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.6127352-cornflowerblue?style=flat-square)](https://doi.org/10.5281/zenodo.6127352)
+[![Tests](https://img.shields.io/github/workflow/status/astropenguin/pandas-dataclasses/Tests?label=Tests&style=flat-square)](https://github.com/astropenguin/pandas-dataclasses/actions)
 
 pandas extension for typed Series and DataFrame creation
 
@@ -79,7 +79,7 @@ obj = Weather([2020, ...], [1, ...], [7.1, ...], [65, ...])
 df = asdataframe(obj)
 ```
 
-where `asdataframe` is a conversion function (you can actually use it).
+where `asdataframe` is a conversion function.
 pandas-dataclasses does not touch the dataclass object creation itself; this allows you to fully customize your dataclass before conversion using the dataclass features (`field`, `__post_init__`, ...).
 
 ## Basic usage
@@ -111,16 +111,16 @@ class Weather(AsDataFrame):
 df = Weather.new(...)
 ```
 
-where fields typed by `Index` are "index fields" each value of which will become an index or a part of a hierarchial index of a DataFrame object.
-Fields typed by `Data` are "data fields" each value of which will become a data column of a DataFrame object.
+where fields typed by `Index` are "index fields", each value of which will become an index or a part of a hierarchial index of a DataFrame object.
+Fields typed by `Data` are "data fields", each value of which will become a data column of a DataFrame object.
 Fields typed by other types are just ignored in DataFrame creation.
 
 Each data or index will be cast to the data type specified in the type hint like `Index[int]`.
 Use `Any` or `None` if you do not want type casting.
-See "[data typing rules](#data-typing-rules)" for more examples.
+See [data typing rules](#data-typing-rules) for more examples.
 
 By default, field name (i.e. argument name) is used for the name of data or index.
-See "[custom data/index naming](#custom-naming)" if you want to customize it.
+See [custom data/index naming](#custom-naming) if you want customization.
 
 ### Series creation
 
@@ -155,7 +155,7 @@ Other rules are the same as for the DataFrame creation.
 
 ### Metadata storing
 
-Fields typed by `Attr` are "attribute fields" each value of which will become an item of attributes (`attrs`) of a DataFrame of Series object:
+Fields typed by `Attr` are "attribute fields", each value of which will become an item of attributes (`attrs`) of a DataFrame of Series object:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -188,7 +188,7 @@ In this example, `Weather.new(...).attrs` will become like:
 
 ### Custom naming
 
-The name of data, index, or attribute can be explicitly specified by adding an annotation to the `Data`/`Index`/`Attr` type:
+The name of data, index, or attribute can be explicitly specified by adding an annotation to the corresponding type:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -230,9 +230,43 @@ Year Month
 {"Location": "Tokyo", "Longitude (deg)": 139.69167, "Latitude (deg)": 35.68944}
 ```
 
-For the Series creation, a field typed by `Name` is a "name field" whose value will become the name of a Series object.
+For the Series creation, a field typed by `Name` is a "name field", whose value will become the name of a Series object.
 This is useful for dynamic naming.
 See also [naming rules](#naming-rules) for more details and examples.
+
+### Custom pandas factory
+
+A custom class can be used as a factory of Series or DataFrame creation by `As`, the generic version of the mix-in classes:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+import pandas as pd
+from dataclasses import dataclass
+from pandas_dataclasses import As, Data, Index
+```
+</details>
+
+```python
+class CustomSeries(pd.Series):
+    """Custom pandas Series."""
+
+    pass
+
+
+@dataclass
+class Temperature(As[CustomSeries]):
+    """Temperature information."""
+
+    year: Index[int]
+    month: Index[int]
+    temp: Data[float]
+
+
+ser = Temperature.new(...)
+isinstance(ser, CustomSeries)  # True
+```
 
 ## Appendix
 
@@ -300,7 +334,6 @@ Type hint | Inferred name
 
 Release version | Features
 --- | ---
-v0.3.0 | Support for custom factory for DataArray or Dataset creation
 v0.4.0 | Support for hierarchial column
 v1.0.0 | Initial major release (freezing public features until v2.0.0)
 
