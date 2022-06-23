@@ -19,6 +19,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.viewcode",
 ]
+myst_heading_anchors = 3
 templates_path = ["_templates"]
 
 
