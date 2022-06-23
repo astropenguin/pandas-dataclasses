@@ -252,6 +252,8 @@ from pandas_dataclasses import As, Data, Index
 class CustomSeries(pd.Series):
     """Custom pandas Series."""
 
+    pass
+
 
 @dataclass
 class Temperature(As[CustomSeries]):
