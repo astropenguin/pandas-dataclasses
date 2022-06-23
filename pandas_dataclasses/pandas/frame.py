@@ -23,12 +23,7 @@ TDataFrame = TypeVar("TDataFrame", bound=pd.DataFrame)
 
 # runtime classes
 class classproperty:
-    """Class property only for AsDataFrame.new().
-
-    As ``classmethod`` and ``property`` can be chained since Python 3.9,
-    this will be removed when the support for Python 3.7 and 3.8 ends.
-
-    """
+    """Create a DataFrame object from dataclass parameters."""
 
     def __init__(self, func: Any) -> None:
         self.__func__ = func
@@ -59,8 +54,9 @@ class AsDataFrame:
     @classproperty
     def new(cls) -> Any:
         """Create a DataFrame object from dataclass parameters."""
+        factory = getattr(cls, "__pandas_factory__", pd.DataFrame)
         init = copy(cls.__init__)
-        init.__annotations__["return"] = pd.DataFrame
+        init.__annotations__["return"] = factory
 
         @wraps(init)
         def new(cls: Any, *args: Any, **kwargs: Any) -> Any:
@@ -71,17 +67,17 @@ class AsDataFrame:
 
 # runtime functions
 @overload
+def asdataframe(obj: Any, *, factory: Type[TDataFrame]) -> TDataFrame:
+    ...
+
+
+@overload
 def asdataframe(obj: PandasClass[P, TDataFrame], *, factory: None = None) -> TDataFrame:
     ...
 
 
 @overload
 def asdataframe(obj: DataClass[P], *, factory: None = None) -> pd.DataFrame:
-    ...
-
-
-@overload
-def asdataframe(obj: Any, *, factory: Type[TDataFrame] = pd.DataFrame) -> TDataFrame:
     ...
 
 

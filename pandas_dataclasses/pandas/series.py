@@ -23,12 +23,7 @@ TSeries = TypeVar("TSeries", bound=pd.Series)
 
 # runtime classes
 class classproperty:
-    """Class property only for AsSeries.new().
-
-    As ``classmethod`` and ``property`` can be chained since Python 3.9,
-    this will be removed when the support for Python 3.7 and 3.8 ends.
-
-    """
+    """Create a Series object from dataclass parameters."""
 
     def __init__(self, func: Any) -> None:
         self.__func__ = func
@@ -59,8 +54,9 @@ class AsSeries:
     @classproperty
     def new(cls) -> Any:
         """Create a Series object from dataclass parameters."""
+        factory = getattr(cls, "__pandas_factory__", pd.Series)
         init = copy(cls.__init__)
-        init.__annotations__["return"] = pd.Series
+        init.__annotations__["return"] = factory
 
         @wraps(init)
         def new(cls: Any, *args: Any, **kwargs: Any) -> Any:
@@ -71,17 +67,17 @@ class AsSeries:
 
 # runtime functions
 @overload
+def asseries(obj: Any, *, factory: Type[TSeries]) -> TSeries:
+    ...
+
+
+@overload
 def asseries(obj: PandasClass[P, TSeries], *, factory: None = None) -> TSeries:
     ...
 
 
 @overload
 def asseries(obj: DataClass[P], *, factory: None = None) -> pd.Series:
-    ...
-
-
-@overload
-def asseries(obj: Any, *, factory: Type[TSeries] = pd.Series) -> TSeries:
     ...
 
 
