@@ -1,5 +1,6 @@
 # standard library
 from dataclasses import MISSING, dataclass
+from typing import Dict
 
 
 # dependencies
@@ -11,15 +12,19 @@ from typing_extensions import Literal as L
 
 
 # test datasets
+def name(stat: str, cat: str) -> Dict[str, str]:
+    return {"Statistic": stat, "Category": cat}
+
+
 @dataclass
 class Weather:
     """Weather information at a location."""
 
     time: Ann[Index[L["M8[ns]"]], "Time in UTC"]
-    temperature: Ann[Data[float], "Temperature (degC)"]
-    humidity: Ann[Data[float], "Humidity (percent)"]
-    wind_speed: Ann[Data[float], "Speed (m/s)"]
-    wind_direction: Ann[Data[float], "Direction (deg)"]
+    temp_avg: Ann[Data[float], name("Temperature (degC)", "Average")]
+    temp_max: Ann[Data[float], name("Temperature (degC)", "Maximum")]
+    wind_avg: Ann[Data[float], name("Wind speed (m/s)", "Average")]
+    wind_max: Ann[Data[float], name("Wind speed (m/s)", "Maximum")]
     location: Attr[str] = "Tokyo"
     longitude: Attr[float] = 139.69167
     latitude: Attr[float] = 35.68944
@@ -36,37 +41,37 @@ def test_time() -> None:
     assert spec.default is MISSING
 
 
-def test_temperature() -> None:
-    spec = DataSpec.from_dataclass(Weather).specs.of_data["temperature"]
+def test_temp_avg() -> None:
+    spec = DataSpec.from_dataclass(Weather).specs.of_data["temp_avg"]
 
-    assert spec.name == "Temperature (degC)"
+    assert spec.name == name("Temperature (degC)", "Average")
     assert spec.role == "data"
     assert spec.dtype == np.float64
     assert spec.default is MISSING
 
 
-def test_humidity() -> None:
-    spec = DataSpec.from_dataclass(Weather).specs.of_data["humidity"]
+def test_temp_max() -> None:
+    spec = DataSpec.from_dataclass(Weather).specs.of_data["temp_max"]
 
-    assert spec.name == "Humidity (percent)"
+    assert spec.name == name("Temperature (degC)", "Maximum")
     assert spec.role == "data"
     assert spec.dtype == np.float64
     assert spec.default is MISSING
 
 
-def test_wind_speed() -> None:
-    spec = DataSpec.from_dataclass(Weather).specs.of_data["wind_speed"]
+def test_wind_avg() -> None:
+    spec = DataSpec.from_dataclass(Weather).specs.of_data["wind_avg"]
 
-    assert spec.name == "Speed (m/s)"
+    assert spec.name == name("Wind speed (m/s)", "Average")
     assert spec.role == "data"
     assert spec.dtype == np.float64
     assert spec.default is MISSING
 
 
-def test_wind_direction() -> None:
-    spec = DataSpec.from_dataclass(Weather).specs.of_data["wind_direction"]
+def test_wind_max() -> None:
+    spec = DataSpec.from_dataclass(Weather).specs.of_data["wind_max"]
 
-    assert spec.name == "Direction (deg)"
+    assert spec.name == name("Wind speed (m/s)", "Maximum")
     assert spec.role == "data"
     assert spec.dtype == np.float64
     assert spec.default is MISSING
