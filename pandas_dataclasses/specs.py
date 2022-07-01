@@ -4,7 +4,7 @@ __all__ = ["DataSpec"]
 # standard library
 from dataclasses import dataclass, field, fields
 from functools import lru_cache
-from typing import Any, Dict, Hashable, Optional, Type
+from typing import Any, Dict, Optional, Type
 
 
 # dependencies
@@ -15,6 +15,7 @@ from typing_extensions import Literal, TypeAlias, get_type_hints
 from .typing import (
     AnyDType,
     AnyField,
+    AnyName,
     AnyPandas,
     DataClass,
     P,
@@ -35,7 +36,7 @@ AnySpec: TypeAlias = "ArraySpec | ScalarSpec"
 class ArraySpec:
     """Specification of an array."""
 
-    name: Hashable
+    name: AnyName
     """Name of the array."""
 
     role: Literal["data", "index"]
@@ -52,7 +53,7 @@ class ArraySpec:
 class ScalarSpec:
     """Specification of a scalar."""
 
-    name: Hashable
+    name: AnyName
     """Name of the scalar."""
 
     role: Literal["attr", "name"]

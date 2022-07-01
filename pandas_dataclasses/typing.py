@@ -12,6 +12,7 @@ from typing import (
     Dict,
     Hashable,
     Iterable,
+    Mapping,
     Optional,
     Tuple,
     Type,
@@ -30,6 +31,7 @@ from typing_extensions import (
     ParamSpec,
     Protocol,
     TypeAlias,
+    TypeGuard,
     get_args,
     get_origin,
     get_type_hints,
@@ -39,7 +41,9 @@ from typing_extensions import (
 # type hints (private)
 AnyDType: TypeAlias = "dtype[Any] | ExtensionDtype"
 AnyField: TypeAlias = "Field[Any]"
+AnyName: TypeAlias = "HashableMapping | Hashable"
 AnyPandas: TypeAlias = "DataFrame | Series"
+HashableMapping = Mapping[Hashable, Hashable]
 P = ParamSpec("P")
 T = TypeVar("T")
 THashable = TypeVar("THashable", bound=Hashable)
@@ -158,7 +162,7 @@ def get_dtype(tp: Any) -> Optional[AnyDType]:
     return pandas_dtype(dtype)  # type: ignore
 
 
-def get_name(tp: Any, default: Hashable = None) -> Hashable:
+def get_name(tp: Any, default: AnyName = None) -> AnyName:
     """Extract a name if found or return given default."""
     try:
         annotations = get_annotations(tp)[1:]
@@ -167,6 +171,9 @@ def get_name(tp: Any, default: Hashable = None) -> Hashable:
 
     for annotation in annotations:
         if isinstance(annotation, Hashable):
+            return annotation
+
+        if is_hashable_mapping(annotation):
             return annotation
 
     return default
@@ -178,3 +185,17 @@ def get_role(tp: Any, default: Role = Role.OTHER) -> Role:
         return get_annotations(tp)[0]
     except TypeError:
         return default
+
+
+def is_hashable_mapping(obj: Any) -> TypeGuard[HashableMapping]:
+    """Check if an object is a mapping with only hashable values."""
+    if not isinstance(obj, Mapping):
+        return False
+
+    if any(not isinstance(key, Hashable) for key in obj.keys()):
+        return False
+
+    if any(not isinstance(val, Hashable) for val in obj.values()):
+        return False
+
+    return True
