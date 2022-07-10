@@ -13,7 +13,7 @@ from morecopy import copy
 
 
 # submodules
-from ..core import get_attrs, get_data, get_factory, get_index, get_name
+from ..parsers import get_attrs, get_data, get_factory, get_index, get_name
 from ..typing import DataClass, P, PandasClass
 
 

@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 # dependencies
 import numpy as np
 import pandas as pd
-from pandas_dataclasses.core import (
+from pandas_dataclasses.parsers import (
     get_attrs,
     get_data,
     get_factory,
