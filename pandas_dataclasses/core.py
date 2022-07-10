@@ -1,4 +1,11 @@
-__all__ = ["get_attrs", "get_data", "get_factory", "get_index", "get_name"]
+__all__ = [
+    "get_attrs",
+    "get_columns",
+    "get_data",
+    "get_factory",
+    "get_index",
+    "get_name",
+]
 
 
 # standard library
@@ -58,6 +65,26 @@ def get_attrs(obj: DataClass[P]) -> AnyDict:
         attrs[final(spec.name)] = getattr(obj, key)
 
     return attrs
+
+
+def get_columns(obj: DataClass[P]) -> Optional[pd.Index]:
+    """Derive columns from a dataclass object."""
+    specs = DataSpec.from_dataclass(type(obj)).specs
+    names: Any = [spec.name for spec in specs.of_data.values()]
+
+    if all(isinstance(name, Hashable) for name in names):
+        return
+
+    if (
+        all(isinstance(name, dict) for name in names)
+        and len(set(map(tuple, names))) == 1
+    ):
+        return pd.MultiIndex.from_tuples(
+            [tuple(name.values()) for name in names],
+            names=first(names).keys(),
+        )
+
+    raise ValueError("Could not create columns.")
 
 
 def get_data(obj: DataClass[P]) -> Optional[AnyDict]:
