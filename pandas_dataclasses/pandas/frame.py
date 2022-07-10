@@ -13,7 +13,7 @@ from morecopy import copy
 
 
 # submodules
-from ..core import get_attrs, get_data, get_factory, get_index
+from ..core import get_attrs, get_columns, get_data, get_factory, get_index
 from ..typing import DataClass, P, PandasClass
 
 
@@ -86,6 +86,7 @@ def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     attrs = get_attrs(obj)
     data = get_data(obj)
     index = get_index(obj)
+    columns = get_columns(obj)
 
     if factory is None:
         factory = get_factory(obj) or pd.DataFrame
@@ -93,6 +94,6 @@ def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     if not issubclass(factory, pd.DataFrame):
         raise TypeError("Factory was not a subclass of DataFrame.")
 
-    dataframe = factory(data, index)
+    dataframe = factory(data, index, columns)
     dataframe.attrs.update(attrs)
     return dataframe
