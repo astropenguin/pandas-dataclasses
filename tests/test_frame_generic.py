@@ -5,8 +5,8 @@ from dataclasses import dataclass
 # dependencies
 import numpy as np
 import pandas as pd
-from pandas_dataclasses.pandas.generic import As
-from pandas_dataclasses.typing import Attr, Data, Index
+from pandas_dataclasses.core.generic import As
+from pandas_dataclasses.core.typing import Attr, Data, Index
 from typing_extensions import Annotated as Ann
 
 

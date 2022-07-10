@@ -5,14 +5,14 @@ from dataclasses import dataclass, field
 # dependencies
 import numpy as np
 import pandas as pd
-from pandas_dataclasses.parsers import (
+from pandas_dataclasses.core.parsers import (
     get_attrs,
     get_data,
     get_factory,
     get_index,
     get_name,
 )
-from pandas_dataclasses.typing import Attr, Data, Index, Name
+from pandas_dataclasses.core.typing import Attr, Data, Index, Name
 from typing_extensions import Annotated as Ann
 
 

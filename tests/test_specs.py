@@ -5,8 +5,8 @@ from typing import Dict
 
 # dependencies
 import numpy as np
-from pandas_dataclasses.specs import DataSpec
-from pandas_dataclasses.typing import Attr, Data, Index, Name
+from pandas_dataclasses.core.specs import DataSpec
+from pandas_dataclasses.core.typing import Attr, Data, Index, Name
 from typing_extensions import Annotated as Ann
 from typing_extensions import Literal as L
 
