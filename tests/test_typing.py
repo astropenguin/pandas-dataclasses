@@ -8,7 +8,7 @@ import pandas as pd
 from pytest import mark
 from typing_extensions import Annotated as Ann
 from typing_extensions import Literal as L
-from pandas_dataclasses.typing import (
+from pandas_dataclasses.core.typing import (
     Attr,
     Data,
     Index,
