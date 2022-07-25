@@ -14,8 +14,7 @@ from typing_extensions import get_args, get_origin
 
 
 # submodules
-from .frame import asdataframe
-from .series import asseries
+from .parsers import asdataframe, asseries
 from .typing import AnyPandas, P, PandasClass
 
 

@@ -1,4 +1,4 @@
-__all__ = ["AsDataFrame", "asdataframe"]
+__all__ = ["AsDataFrame"]
 
 
 # standard library
@@ -13,8 +13,8 @@ from morecopy import copy
 
 
 # submodules
-from .parsers import get_attrs, get_columns, get_data, get_factory, get_index
-from .typing import DataClass, P, PandasClass
+from .parsers import asdataframe
+from .typing import P, DataClass, PandasClass
 
 
 # type hints
@@ -63,37 +63,3 @@ class AsDataFrame:
             return asdataframe(cls(*args, **kwargs))
 
         return MethodType(new, cls)
-
-
-# runtime functions
-@overload
-def asdataframe(obj: Any, *, factory: Type[TDataFrame]) -> TDataFrame:
-    ...
-
-
-@overload
-def asdataframe(obj: PandasClass[P, TDataFrame], *, factory: None = None) -> TDataFrame:
-    ...
-
-
-@overload
-def asdataframe(obj: DataClass[P], *, factory: None = None) -> pd.DataFrame:
-    ...
-
-
-def asdataframe(obj: Any, *, factory: Any = None) -> Any:
-    """Create a DataFrame object from a dataclass object."""
-    attrs = get_attrs(obj)
-    data = get_data(obj)
-    index = get_index(obj)
-    columns = get_columns(obj)
-
-    if factory is None:
-        factory = get_factory(obj) or pd.DataFrame
-
-    if not issubclass(factory, pd.DataFrame):
-        raise TypeError("Factory was not a subclass of DataFrame.")
-
-    dataframe = factory(data, index, columns)
-    dataframe.attrs.update(attrs)
-    return dataframe

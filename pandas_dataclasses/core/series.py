@@ -1,4 +1,4 @@
-__all__ = ["AsSeries", "asseries"]
+__all__ = ["AsSeries"]
 
 
 # standard library
@@ -13,8 +13,8 @@ from morecopy import copy
 
 
 # submodules
-from .parsers import get_attrs, get_data, get_factory, get_index, get_name
-from .typing import DataClass, P, PandasClass
+from .parsers import asseries
+from .typing import P, DataClass, PandasClass
 
 
 # type hints
@@ -63,40 +63,3 @@ class AsSeries:
             return asseries(cls(*args, **kwargs))
 
         return MethodType(new, cls)
-
-
-# runtime functions
-@overload
-def asseries(obj: Any, *, factory: Type[TSeries]) -> TSeries:
-    ...
-
-
-@overload
-def asseries(obj: PandasClass[P, TSeries], *, factory: None = None) -> TSeries:
-    ...
-
-
-@overload
-def asseries(obj: DataClass[P], *, factory: None = None) -> pd.Series:
-    ...
-
-
-def asseries(obj: Any, *, factory: Any = None) -> Any:
-    """Create a Series object from a dataclass object."""
-    attrs = get_attrs(obj)
-    data = get_data(obj)
-    index = get_index(obj)
-    name = get_name(obj)
-
-    if data is not None:
-        data = next(iter(data.values()))
-
-    if factory is None:
-        factory = get_factory(obj) or pd.Series
-
-    if not issubclass(factory, pd.Series):
-        raise TypeError("Factory was not a subclass of Series.")
-
-    series = factory(data, index, name=name)
-    series.attrs.update(attrs)
-    return series
