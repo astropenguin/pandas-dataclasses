@@ -1,12 +1,11 @@
 # standard library
 from dataclasses import dataclass
-from typing import ClassVar
 
 
 # dependencies
 import numpy as np
 import pandas as pd
-from pandas_dataclasses.core.series import AsSeries
+from pandas_dataclasses.core.generic import As
 from pandas_dataclasses.core.typing import Attr, Data, Index, Name
 from typing_extensions import Annotated as Ann
 from typing_extensions import Literal as L
@@ -20,7 +19,7 @@ class CustomSeries(pd.Series):
 
 
 @dataclass
-class Temperature(AsSeries):
+class Temperature(As[CustomSeries]):
     """Temperature information at a location."""
 
     time: Ann[Index[L["M8[ns]"]], "Time in UTC"]
@@ -29,8 +28,6 @@ class Temperature(AsSeries):
     lon: Ann[Attr[float], "Longitude (deg)"] = 139.69167
     lat: Ann[Attr[float], "Latitude (deg)"] = 35.68944
     name: Name[str] = "Temperature (deg C)"
-
-    __pandas_factory__: ClassVar = CustomSeries
 
 
 time = pd.date_range("2020-01", "2020-06", freq="MS")

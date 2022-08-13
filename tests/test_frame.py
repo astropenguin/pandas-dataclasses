@@ -1,12 +1,11 @@
 # standard library
 from dataclasses import dataclass
-from typing import ClassVar
 
 
 # dependencies
 import numpy as np
 import pandas as pd
-from pandas_dataclasses.core.frame import AsDataFrame
+from pandas_dataclasses.core.generic import As
 from pandas_dataclasses.core.typing import Attr, Data, Index
 from typing_extensions import Annotated as Ann
 
@@ -19,7 +18,7 @@ class CustomFrame(pd.DataFrame):
 
 
 @dataclass
-class Weather(AsDataFrame):
+class Weather(As[CustomFrame]):
     """Weather information at a location."""
 
     year: Ann[Index[int], "Year"]
@@ -29,8 +28,6 @@ class Weather(AsDataFrame):
     loc: Ann[Attr[str], "Location"] = "Tokyo"
     lon: Ann[Attr[float], "Longitude (deg)"] = 139.69167
     lat: Ann[Attr[float], "Latitude (deg)"] = 35.68944
-
-    __pandas_factory__: ClassVar = CustomFrame
 
 
 year = np.array([2020, 2020, 2021, 2021, 2022])

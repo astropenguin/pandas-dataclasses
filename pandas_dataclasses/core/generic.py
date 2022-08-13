@@ -1,4 +1,4 @@
-__all__ = ["As"]
+__all__ = ["As", "AsDataFrame", "AsSeries"]
 
 
 # standard library
@@ -64,6 +64,14 @@ class As(Generic[TPandas]):
             return aspandas(cls(*args, **kwargs))
 
         return MethodType(new, cls)
+
+
+AsDataFrame = As[pd.DataFrame]
+"""Alias of As[pandas.DataFrame]."""
+
+
+AsSeries = As[pd.Series]
+"""Alias of As[pandas.Series]."""
 
 
 # runtime functions
