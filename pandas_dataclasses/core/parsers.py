@@ -1,15 +1,8 @@
-__all__ = [
-    "get_attrs",
-    "get_columns",
-    "get_data",
-    "get_factory",
-    "get_index",
-    "get_name",
-]
+__all__ = ["asdataframe", "asseries"]
 
 
 # standard library
-from typing import Any, Dict, Hashable, Iterable, Optional, Type
+from typing import Any, Dict, Hashable, Iterable, Optional, Type, TypeVar, overload
 
 
 # dependencies
@@ -19,14 +12,85 @@ import pandas as pd
 
 # submodules
 from .specs import DataSpec
-from .typing import AnyDType, AnyName, AnyPandas, DataClass, P, T
+from .typing import P, T, AnyDType, AnyName, AnyPandas, DataClass, PandasClass
 
 
 # type hints
 AnyDict = Dict[Hashable, Any]
+TDataFrame = TypeVar("TDataFrame", bound=pd.DataFrame)
+TSeries = TypeVar("TSeries", bound=pd.Series)
 
 
 # runtime functions
+@overload
+def asdataframe(obj: Any, *, factory: Type[TDataFrame]) -> TDataFrame:
+    ...
+
+
+@overload
+def asdataframe(obj: PandasClass[P, TDataFrame], *, factory: None = None) -> TDataFrame:
+    ...
+
+
+@overload
+def asdataframe(obj: DataClass[P], *, factory: None = None) -> pd.DataFrame:
+    ...
+
+
+def asdataframe(obj: Any, *, factory: Any = None) -> Any:
+    """Create a DataFrame object from a dataclass object."""
+    attrs = get_attrs(obj)
+    data = get_data(obj)
+    index = get_index(obj)
+    columns = get_columns(obj)
+
+    if factory is None:
+        factory = get_factory(obj) or pd.DataFrame
+
+    if not issubclass(factory, pd.DataFrame):
+        raise TypeError("Factory was not a subclass of DataFrame.")
+
+    dataframe = factory(data, index, columns)
+    dataframe.attrs.update(attrs)
+    return dataframe
+
+
+@overload
+def asseries(obj: Any, *, factory: Type[TSeries]) -> TSeries:
+    ...
+
+
+@overload
+def asseries(obj: PandasClass[P, TSeries], *, factory: None = None) -> TSeries:
+    ...
+
+
+@overload
+def asseries(obj: DataClass[P], *, factory: None = None) -> pd.Series:
+    ...
+
+
+def asseries(obj: Any, *, factory: Any = None) -> Any:
+    """Create a Series object from a dataclass object."""
+    attrs = get_attrs(obj)
+    data = get_data(obj)
+    index = get_index(obj)
+    name = get_name(obj)
+
+    if data is not None:
+        data = next(iter(data.values()))
+
+    if factory is None:
+        factory = get_factory(obj) or pd.Series
+
+    if not issubclass(factory, pd.Series):
+        raise TypeError("Factory was not a subclass of Series.")
+
+    series = factory(data, index, name=name)
+    series.attrs.update(attrs)
+    return series
+
+
 def astype(data: Any, dtype: Optional[AnyDType]) -> Any:
     """Convert data to have given data type."""
     if dtype is None:

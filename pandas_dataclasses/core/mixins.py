@@ -1,4 +1,4 @@
-__all__ = ["As"]
+__all__ = ["As", "AsDataFrame", "AsSeries"]
 
 
 # standard library
@@ -14,8 +14,7 @@ from typing_extensions import get_args, get_origin
 
 
 # submodules
-from .frame import asdataframe
-from .series import asseries
+from .parsers import asdataframe, asseries
 from .typing import AnyPandas, P, PandasClass
 
 
@@ -65,6 +64,14 @@ class As(Generic[TPandas]):
             return aspandas(cls(*args, **kwargs))
 
         return MethodType(new, cls)
+
+
+AsDataFrame = As[pd.DataFrame]
+"""Alias of As[pandas.DataFrame]."""
+
+
+AsSeries = As[pd.Series]
+"""Alias of As[pandas.Series]."""
 
 
 # runtime functions
