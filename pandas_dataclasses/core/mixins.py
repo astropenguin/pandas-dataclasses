@@ -15,7 +15,7 @@ from typing_extensions import get_args, get_origin
 
 # submodules
 from .parsers import asdataframe, asseries
-from .typing import AnyPandas, P, PandasClass
+from .typing import P, AnyPandas, PandasClass
 
 
 # type hints
@@ -24,9 +24,10 @@ TPandas = TypeVar("TPandas", bound=AnyPandas)
 
 # runtime classes
 class classproperty:
-    """Create a pandas object from dataclass parameters."""
+    """Class property dedicated to ``As.new``."""
 
-    def __init__(self, func: Any) -> None:
+    def __init__(self, func: Callable[..., Any]) -> None:
+        self.__doc__ = func.__doc__
         self.__func__ = func
 
     def __get__(
@@ -41,49 +42,37 @@ class As(Generic[TPandas]):
     """Mix-in class that provides shorthand methods."""
 
     __pandas_factory__: Type[TPandas]
+    """Factory for pandas data creation."""
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         """Add a pandas factory to an inheriting class."""
-        cls.__pandas_factory__ = get_factory(cls)
-        return super().__init_subclass__(**kwargs)
+        super().__init_subclass__(**kwargs)
+
+        for base in cls.__orig_bases__:  # type: ignore
+            if get_origin(base) is As:
+                cls.__pandas_factory__ = get_args(base)[0]
 
     @classproperty
     def new(cls) -> Any:
         """Create a pandas object from dataclass parameters."""
-        factory = cls.__pandas_factory__
         init = copy(cls.__init__)
-        init.__annotations__["return"] = factory
-
-        if issubclass(factory, pd.DataFrame):
-            aspandas = asdataframe
-        else:
-            aspandas = asseries
+        init.__annotations__["return"] = cls.__pandas_factory__
 
         @wraps(init)
         def new(cls: Any, *args: Any, **kwargs: Any) -> Any:
-            return aspandas(cls(*args, **kwargs))
+            if issubclass(cls.__pandas_factory__, pd.DataFrame):
+                return asdataframe(cls(*args, **kwargs))
+            elif issubclass(cls.__pandas_factory__, pd.Series):
+                return asseries(cls(*args, **kwargs))
+            else:
+                raise TypeError("Not a valid pandas factory.")
 
         return MethodType(new, cls)
 
 
 AsDataFrame = As[pd.DataFrame]
-"""Alias of As[pandas.DataFrame]."""
+"""Alias of ``As[pandas.DataFrame]``."""
 
 
 AsSeries = As[pd.Series]
-"""Alias of As[pandas.Series]."""
-
-
-# runtime functions
-def get_factory(cls: Any) -> Type[AnyPandas]:
-    """Extract a pandas factory from an As-inherited class."""
-    for base in cls.__orig_bases__:
-        if get_origin(base) is not As:
-            continue
-
-        factory = get_args(base)[0]
-
-        if issubclass(factory, (pd.DataFrame, pd.Series)):
-            return factory
-
-    raise TypeError("Could not find any pandas factory.")
+"""Alias of ``As[pandas.Series]``."""
