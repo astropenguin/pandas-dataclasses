@@ -2,15 +2,15 @@
 
 [![Release](https://img.shields.io/pypi/v/pandas-dataclasses?label=Release&color=cornflowerblue&style=flat-square)](https://pypi.org/project/pandas-dataclasses/)
 [![Python](https://img.shields.io/pypi/pyversions/pandas-dataclasses?label=Python&color=cornflowerblue&style=flat-square)](https://pypi.org/project/pandas-dataclasses/)
-![Downloads](https://img.shields.io/pypi/dm/pandas-dataclasses?label=Downloads&color=cornflowerblue&style=flat-square)
-[![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.6127352-cornflowerblue?style=flat-square)](https://doi.org/10.5281/zenodo.6127352)
+[![Downloads](https://img.shields.io/pypi/dm/pandas-dataclasses?label=Downloads&color=cornflowerblue&style=flat-square)](https://pepy.tech/project/pandas-dataclasses)
+[![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.5633924-cornflowerblue?style=flat-square)](https://doi.org/10.5281/zenodo.5633924)
 [![Tests](https://img.shields.io/github/workflow/status/astropenguin/pandas-dataclasses/Tests?label=Tests&style=flat-square)](https://github.com/astropenguin/pandas-dataclasses/actions)
 
-pandas extension for typed Series and DataFrame creation
+pandas data creation made easy by dataclass
 
 ## Overview
 
-pandas-dataclass makes it easy to create [pandas] Series and DataFrame objects that are "typed" (i.e. fixed data types, attributes, and names) using [dataclass]:
+pandas-dataclass makes it easy to create [pandas] data (Series and DataFrame) by Python's [dataclass] that enables to specify their data types, attributes, and names:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -40,7 +40,9 @@ df = Weather.new(
 )
 ```
 
-```plaintext
+where `df` will become a DataFrame object like:
+
+```
             temp  humid
 year month
 2020 1       7.1   65.0
@@ -52,11 +54,11 @@ year month
 
 ### Features
 
-- Type casting to [NumPy] and [pandas] data types
-- Easy hierarchial indexing (`MultiIndex`)
-- Metadata storing in attributes (`attrs`)
-- Support for dataclass features (`field`, `__post_init__`, ...)
-- Support for static type check ([Pylance], [Pyright], ...)
+- Type specification of pandas indexes and data
+- Metadata storing in pandas data attributes
+- Support for hierarchical index and columns
+- Support for full [dataclass] features
+- Support for static type check by [Pyright] ([Pylance])
 
 ### Installation
 
@@ -68,8 +70,8 @@ pip install pandas-dataclasses
 
 pandas-dataclasses provides you the following features:
 
-- Type hints for dataclass fields (`Attr`, `Data`, `Index`, `Name`) for specifying field types and data types
-- Mix-in classes for dataclasses (`AsDataFrame`, `AsSeries`) for creating a Series or DataFrame object via a classmethod (`new`)
+- Type hints for dataclass fields (`Attr`, `Data`, `Index`, `Name`) to specify index(es), data, attributes, and names of pandas data
+- Mix-in classes for dataclasses (`As`, `AsDataFrame`, `AsSeries`) to create pandas data by a classmethod (`new`) that takes the same arguments as dataclass initialization
 
 When you call `new`, it will first create a dataclass object and then create a Series or DataFrame object from the dataclass object according the type hints and values in it.
 In the example above, `df = Weather.new(...)` is thus equivalent to:
@@ -80,7 +82,7 @@ df = asdataframe(obj)
 ```
 
 where `asdataframe` is a conversion function.
-pandas-dataclasses does not touch the dataclass object creation itself; this allows you to fully customize your dataclass before conversion using the dataclass features (`field`, `__post_init__`, ...).
+pandas-dataclasses does not touch the dataclass object creation itself; this allows you to fully customize your dataclass before conversion by the dataclass features (`field`, `__post_init__`, ...).
 
 ## Basic usage
 
@@ -111,15 +113,15 @@ class Weather(AsDataFrame):
 df = Weather.new(...)
 ```
 
-where fields typed by `Index` are "index fields", each value of which will become an index or a part of a hierarchial index of a DataFrame object.
+where fields typed by `Index` are "index fields", each value of which will become an index or a part of a hierarchical index of a DataFrame object.
 Fields typed by `Data` are "data fields", each value of which will become a data column of a DataFrame object.
-Fields typed by other types are just ignored in DataFrame creation.
+Fields typed by other types are just ignored in the DataFrame creation.
 
-Each data or index will be cast to the data type specified in the type hint like `Index[int]`.
-Use `Any` or `None` if you do not want type casting.
+Each data or index will be cast to the data type specified in a type hint like `Index[int]`.
+Use `Any` or `None` (like `Index[Any]`) if you do not want type casting.
 See [data typing rules](#data-typing-rules) for more examples.
 
-By default, field name (i.e. argument name) is used for the name of data or index.
+By default, a field name (i.e. an argument name) is used for the name of corresponding data or index.
 See [custom data/index naming](#custom-naming) if you want customization.
 
 ### Series creation
@@ -148,14 +150,14 @@ class Temperature(AsSeries):
 ser = Temperature.new(...)
 ```
 
-Unlike `AsDataFrame`, the second and subsequent data fields are ignored in Series creation.
+Unlike `AsDataFrame`, the second and subsequent data fields are ignored in the Series creation.
 Other rules are the same as for the DataFrame creation.
 
 ## Advanced usage
 
 ### Metadata storing
 
-Fields typed by `Attr` are "attribute fields", each value of which will become an item of attributes (`attrs`) of a DataFrame of Series object:
+Fields typed by `Attr` are "attribute fields", each value of which will become an item of attributes (`attrs`) of a DataFrame or a Series object:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -188,7 +190,7 @@ In this example, `Weather.new(...).attrs` will become like:
 
 ### Custom naming
 
-The name of data, index, or attribute can be explicitly specified by adding an annotation to the corresponding type:
+The name of data, index, or attribute can be explicitly specified by adding a string annotation to the corresponding type:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -216,7 +218,7 @@ class Weather(AsDataFrame):
 
 In this example, `Weather.new(...)` and its attributes will become like:
 
-```plaintext
+```
             Temperature (deg C)  Humidity (%)
 Year Month
 2020 1                      7.1          65.0
@@ -230,13 +232,56 @@ Year Month
 {"Location": "Tokyo", "Longitude (deg)": 139.69167, "Latitude (deg)": 35.68944}
 ```
 
+Adding dictionary annotations to data fields will create DataFrame objects with hierarchical columns, where dictionary keys will become the names of column levels and dictionary values will become the names of columns:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+from dataclasses import dataclass
+from typing import Annotated as Ann
+from pandas_dataclasses import AsDataFrame, Data, Index
+```
+</details>
+
+```python
+def name(stat: str, cat: str) -> dict[str, str]:
+    return {"Statistic": stat, "Category": cat}
+
+
+@dataclass
+class Weather(AsDataFrame):
+    """Weather information."""
+
+    year: Ann[Index[int], "Year"]
+    month: Ann[Index[int], "Month"]
+    temp_avg: Ann[Data[float], name("Temperature (degC)", "Average")]
+    temp_max: Ann[Data[float], name("Temperature (degC)", "Maximum")]
+    wind_avg: Ann[Data[float], name("Wind speed (m/s)", "Average")]
+    wind_max: Ann[Data[float], name("Wind speed (m/s)", "Maximum")]
+```
+
+In this example, `Weather.new(...)` will become like:
+
+```
+Statistic  Temperature (degC)         Wind speed (m/s)
+Category              Average Maximum          Average Maximum
+Year Month
+2020 1                    7.1    11.1              2.4     8.8
+     7                   24.3    27.7              3.1    10.2
+2021 1                    5.4    10.3              2.3    10.7
+     7                   25.9    30.3              2.4     9.0
+2022 1                    4.9     9.4              2.6     8.8
+```
+
 For the Series creation, a field typed by `Name` is a "name field", whose value will become the name of a Series object.
 This is useful for dynamic naming.
 See also [naming rules](#naming-rules) for more details and examples.
 
 ### Custom pandas factory
 
-A custom class can be used as a factory of Series or DataFrame creation by `As`, the generic version of the mix-in classes:
+A custom class can be specified as a factory for the Series or DataFrame creation by `As`, the generic version of `AsDataFrame` and `AsSeries`.
+Note that the custom class must be a subclass of either `pandas.Series` or `pandas.DataFrame`:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -279,17 +324,15 @@ The following table shows how the data type is inferred:
 <summary>Click to see all imports</summary>
 
 ```python
-from typing import Any
-from typing import Annotated as Ann
-from typing import Literal as L
+from typing import Any, Annotated as Ann, Literal as L
 from pandas_dataclasses import Data
 ```
 </details>
 
 Type hint | Inferred data type
 --- | ---
-`Data[Any]` | None (no type casting)
-`Data[None]` | None (no type casting)
+`Data[Any]` | `None` (no type casting)
+`Data[None]` | `None` (no type casting)
 `Data[int]` | `numpy.dtype("i8")`
 `Data[numpy.int32]` | `numpy.dtype("i4")`
 `Data[L["datetime64[ns]"]]` | `numpy.dtype("<M8[ns]")`
@@ -304,7 +347,7 @@ Type hint | Inferred data type
 The name of data/index is determined by the following rules:
 
 1. If a name field exists, its value will be preferentially used (Series creation only)
-1. If a data/index field is annotated, the first hashable annotation in the first `Data`/`Index` type will be used
+1. If a data/index field is annotated, the first annotation in the first `Data`/`Index` type will be used
 1. Otherwise, the field name (i.e. argument name) will be used
 
 The following table shows how the name is inferred in the case of 2 and 3:
@@ -313,28 +356,27 @@ The following table shows how the name is inferred in the case of 2 and 3:
 <summary>Click to see all imports</summary>
 
 ```python
-from typing import Any
-from typing import Annotated as Ann
+from typing import Any, Annotated as Ann
 from pandas_dataclasses import Data
 ```
 </details>
 
 Type hint | Inferred name
 --- | ---
-`Data[Any]` | (field name)
-`Ann[Data[Any], {}]` | (field name)
+`Data[Any]` | Field name
 `Ann[Data[Any], "spam"]` | `"spam"`
 `Ann[Data[Any], "spam"]` | `"spam"`
 `Ann[Data[Any], "spam", "ham"]` | `"spam"`
-`Ann[Data[Any], {}, "spam"]` | `"spam"`
 `Ann[Data[Any], "spam"] \| Ann[str, "ham"]` | `"spam"`
 `Ann[Data[Any], "spam"] \| Ann[Data[float], "ham"]` | `"spam"`
+`Ann[Data[Any], {"0": "spam", "1": "ham"}]` | `("spam", "ham")`
 
 ### Development roadmap
 
 Release version | Features
 --- | ---
-v0.4.0 | Support for hierarchial column
+v0.4.0 | Support for hierarchical column
+v0.5.0 | Support for dynamic naming of indexes and data
 v1.0.0 | Initial major release (freezing public features until v2.0.0)
 
 <!-- References -->
