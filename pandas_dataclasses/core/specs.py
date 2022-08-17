@@ -48,6 +48,14 @@ class ArraySpec:
     default: Any
     """Default value of the array."""
 
+    @property
+    def hashable_name(self) -> Hashable:
+        """Hashable name of the array."""
+        if isinstance(self.name, dict):
+            return tuple(self.name.values())
+        else:
+            return self.name
+
     def __matmul__(self, obj: DataClass[P]) -> "ArraySpec":
         """Update the specification by a dataclass object."""
         return replace(self, name=format_name(self.name, obj))
@@ -68,6 +76,14 @@ class ScalarSpec:
 
     default: Any
     """Default value of the scalar."""
+
+    @property
+    def hashable_name(self) -> Hashable:
+        """Hashable name of the scalar."""
+        if isinstance(self.name, dict):
+            return tuple(self.name.values())
+        else:
+            return self.name
 
     def __matmul__(self, obj: DataClass[P]) -> "ScalarSpec":
         """Update the specification by a dataclass object."""
