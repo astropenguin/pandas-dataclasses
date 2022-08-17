@@ -6,7 +6,7 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.5633924-cornflowerblue?style=flat-square)](https://doi.org/10.5281/zenodo.5633924)
 [![Tests](https://img.shields.io/github/workflow/status/astropenguin/pandas-dataclasses/Tests?label=Tests&style=flat-square)](https://github.com/astropenguin/pandas-dataclasses/actions)
 
-pandas extension for typed Series and DataFrame creation
+pandas data creation made easy by dataclass
 
 ## Overview
 
