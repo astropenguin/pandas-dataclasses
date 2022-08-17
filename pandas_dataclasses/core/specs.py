@@ -2,9 +2,9 @@ __all__ = ["DataSpec"]
 
 
 # standard library
-from dataclasses import dataclass, field, fields
+from dataclasses import dataclass, field, fields, replace
 from functools import lru_cache
-from typing import Any, Dict, Optional, Type
+from typing import Any, Dict, Hashable, List, Optional, Type
 
 
 # dependencies
@@ -13,12 +13,12 @@ from typing_extensions import Literal, TypeAlias, get_type_hints
 
 # submodules
 from .typing import (
+    P,
     AnyDType,
     AnyField,
     AnyName,
     AnyPandas,
     DataClass,
-    P,
     Role,
     get_annotated,
     get_dtype,
@@ -48,6 +48,10 @@ class ArraySpec:
     default: Any
     """Default value of the array."""
 
+    def __matmul__(self, obj: DataClass[P]) -> "ArraySpec":
+        """Update the specification by a dataclass object."""
+        return replace(self, name=format_name(self.name, obj))
+
 
 @dataclass(frozen=True)
 class ScalarSpec:
@@ -64,6 +68,10 @@ class ScalarSpec:
 
     default: Any
     """Default value of the scalar."""
+
+    def __matmul__(self, obj: DataClass[P]) -> "ScalarSpec":
+        """Update the specification by a dataclass object."""
+        return replace(self, name=format_name(self.name, obj))
 
 
 class Specs(Dict[str, AnySpec]):
@@ -125,6 +133,24 @@ def eval_types(dataclass: Type[DataClass[P]]) -> Type[DataClass[P]]:
         field.type = types[field.name]
 
     return dataclass
+
+
+def format_name(name: AnyName, obj: DataClass[P]) -> AnyName:
+    """Format a name by the attributes of a dataclass object."""
+    if isinstance(name, str):
+        return name.format(obj)
+
+    if isinstance(name, dict):
+        keys: List[Hashable] = []
+        vals: List[Hashable] = []
+
+        for key, val in name.items():
+            keys.append(key.format(obj) if isinstance(key, str) else key)
+            vals.append(val.format(obj) if isinstance(val, str) else val)
+
+        return dict(zip(keys, vals))
+
+    return name
 
 
 @lru_cache(maxsize=None)
