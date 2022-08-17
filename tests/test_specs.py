@@ -6,7 +6,7 @@ from typing import Dict
 # dependencies
 import numpy as np
 from pandas_dataclasses.core.specs import DataSpec
-from pandas_dataclasses.core.typing import Attr, Data, Index, Name
+from pandas_dataclasses.core.typing import Attr, Data, Index
 from typing_extensions import Annotated as Ann
 from typing_extensions import Literal as L
 
@@ -28,7 +28,6 @@ class Weather:
     location: Attr[str] = "Tokyo"
     longitude: Attr[float] = 139.69167
     latitude: Attr[float] = 35.68944
-    name: Name[str] = "weather"
 
 
 # test functions
@@ -102,15 +101,6 @@ def test_latitude() -> None:
     assert spec.role == "attr"
     assert spec.type is float
     assert spec.default == 35.68944
-
-
-def test_name() -> None:
-    spec = DataSpec.from_dataclass(Weather).specs.of_name["name"]
-
-    assert spec.name == "name"
-    assert spec.role == "name"
-    assert spec.type is str
-    assert spec.default == "weather"
 
 
 def test_factory() -> None:

@@ -1,18 +1,12 @@
 # standard library
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 # dependencies
 import numpy as np
 import pandas as pd
-from pandas_dataclasses.core.parsers import (
-    get_attrs,
-    get_data,
-    get_factory,
-    get_index,
-    get_name,
-)
-from pandas_dataclasses.core.typing import Attr, Data, Index, Name
+from pandas_dataclasses.core.parsers import get_attrs, get_data, get_factory, get_index
+from pandas_dataclasses.core.typing import Attr, Data, Index
 from typing_extensions import Annotated as Ann
 
 
@@ -28,10 +22,6 @@ class Weather:
     loc: Ann[Attr[str], "Location"] = "Tokyo"
     lon: Ann[Attr[float], "Longitude (deg)"] = 139.69167
     lat: Ann[Attr[float], "Latitude (deg)"] = 35.68944
-    name: Name[str] = field(init=False)
-
-    def __post_init__(self) -> None:
-        self.name = f"Weather at {self.loc}"
 
 
 weather = Weather(
@@ -74,10 +64,6 @@ def test_index() -> None:
     assert (index == expected).all()
     assert (index.dtypes == expected.dtypes).all()  # type: ignore
     assert index.names == expected.names  # type: ignore
-
-
-def test_name() -> None:
-    assert get_name(weather) == "Weather at Tokyo"
 
 
 def test_factory() -> None:

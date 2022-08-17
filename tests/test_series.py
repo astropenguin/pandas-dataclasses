@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 from pandas_dataclasses.core.mixins import As
-from pandas_dataclasses.core.typing import Attr, Data, Index, Name
+from pandas_dataclasses.core.typing import Attr, Data, Index
 from typing_extensions import Annotated as Ann
 from typing_extensions import Literal as L
 
@@ -23,11 +23,10 @@ class Temperature(As[CustomSeries]):
     """Temperature information at a location."""
 
     time: Ann[Index[L["M8[ns]"]], "Time in UTC"]
-    data: Data[float]
+    data: Ann[Data[float], "Temperature (deg C)"]
     loc: Ann[Attr[str], "Location"] = "Tokyo"
     lon: Ann[Attr[float], "Longitude (deg)"] = 139.69167
     lat: Ann[Attr[float], "Latitude (deg)"] = 35.68944
-    name: Name[str] = "Temperature (deg C)"
 
 
 time = pd.date_range("2020-01", "2020-06", freq="MS")

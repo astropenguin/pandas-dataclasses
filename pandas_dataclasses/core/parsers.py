@@ -12,7 +12,7 @@ import pandas as pd
 
 # submodules
 from .specs import DataSpec
-from .typing import P, T, AnyDType, AnyName, AnyPandas, DataClass, PandasClass
+from .typing import P, T, AnyDType, AnyPandas, DataClass, PandasClass
 
 
 # type hints
@@ -75,10 +75,12 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
     attrs = get_attrs(obj)
     data = get_data(obj)
     index = get_index(obj)
-    name = get_name(obj)
 
-    if data is not None:
-        data = next(iter(data.values()))
+    if data is None:
+        name = None
+    else:
+        name = first(data.keys())
+        data = first(data.values())
 
     if factory is None:
         factory = get_factory(obj) or pd.Series
@@ -107,14 +109,6 @@ def atleast_1d(data: Any) -> Any:
         return np.atleast_1d(data)
 
 
-def final(name: AnyName) -> Hashable:
-    """Return the final hashable from a name."""
-    if isinstance(name, dict):
-        return tuple(name.values())
-    else:
-        return name
-
-
 def first(obj: Iterable[T]) -> T:
     """Return the first item of an iterable."""
     return next(iter(obj))
@@ -126,7 +120,7 @@ def get_attrs(obj: DataClass[P]) -> AnyDict:
     attrs: AnyDict = {}
 
     for key, spec in specs.of_attr.items():
-        attrs[final(spec.name)] = getattr(obj, key)
+        attrs[(spec @ obj).hashable_name] = getattr(obj, key)
 
     return attrs
 
@@ -160,7 +154,7 @@ def get_data(obj: DataClass[P]) -> Optional[AnyDict]:
         return
 
     for key, spec in specs.of_data.items():
-        data[final(spec.name)] = astype(
+        data[(spec @ obj).hashable_name] = astype(
             atleast_1d(getattr(obj, key)),
             spec.dtype,
         )
@@ -182,7 +176,7 @@ def get_index(obj: DataClass[P]) -> Optional[pd.Index]:
         return
 
     for key, spec in specs.of_index.items():
-        indexes[final(spec.name)] = astype(
+        indexes[(spec @ obj).hashable_name] = astype(
             atleast_1d(getattr(obj, key)),
             spec.dtype,
         )
@@ -197,14 +191,3 @@ def get_index(obj: DataClass[P]) -> Optional[pd.Index]:
             np.broadcast_arrays(*indexes.values()),
             names=indexes.keys(),
         )
-
-
-def get_name(obj: DataClass[P]) -> Hashable:
-    """Derive name from a dataclass object."""
-    specs = DataSpec.from_dataclass(type(obj)).specs
-
-    for key in specs.of_name.keys():
-        return getattr(obj, key)
-
-    for spec in specs.of_data.values():
-        return final(spec.name)
