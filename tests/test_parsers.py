@@ -5,13 +5,7 @@ from dataclasses import dataclass, field
 # dependencies
 import numpy as np
 import pandas as pd
-from pandas_dataclasses.core.parsers import (
-    get_attrs,
-    get_data,
-    get_factory,
-    get_index,
-    get_name,
-)
+from pandas_dataclasses.core.parsers import get_attrs, get_data, get_factory, get_index
 from pandas_dataclasses.core.typing import Attr, Data, Index, Name
 from typing_extensions import Annotated as Ann
 
@@ -74,10 +68,6 @@ def test_index() -> None:
     assert (index == expected).all()
     assert (index.dtypes == expected.dtypes).all()  # type: ignore
     assert index.names == expected.names  # type: ignore
-
-
-def test_name() -> None:
-    assert get_name(weather) == "Weather at Tokyo"
 
 
 def test_factory() -> None:

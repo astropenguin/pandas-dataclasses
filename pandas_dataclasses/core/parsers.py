@@ -75,10 +75,12 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
     attrs = get_attrs(obj)
     data = get_data(obj)
     index = get_index(obj)
-    name = get_name(obj)
 
-    if data is not None:
-        data = next(iter(data.values()))
+    if data is None:
+        name = None
+    else:
+        name = first(data.keys())
+        data = first(data.values())
 
     if factory is None:
         factory = get_factory(obj) or pd.Series
@@ -197,14 +199,3 @@ def get_index(obj: DataClass[P]) -> Optional[pd.Index]:
             np.broadcast_arrays(*indexes.values()),
             names=indexes.keys(),
         )
-
-
-def get_name(obj: DataClass[P]) -> Hashable:
-    """Derive name from a dataclass object."""
-    specs = DataSpec.from_dataclass(type(obj)).specs
-
-    for key in specs.of_name.keys():
-        return getattr(obj, key)
-
-    for spec in specs.of_data.values():
-        return final(spec.name)
