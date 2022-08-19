@@ -1,131 +1,196 @@
 # standard library
-from dataclasses import MISSING, dataclass
-from typing import Dict
+from dataclasses import MISSING
 
 
 # dependencies
 import numpy as np
+from data import Weather, weather
 from pandas_dataclasses.core.specs import Spec
-from pandas_dataclasses.core.typing import Attr, Data, Index
-from typing_extensions import Annotated as Ann
-from typing_extensions import Literal as L
 
 
-# test datasets
-def name(stat: str, cat: str) -> Dict[str, str]:
-    return {"Statistic": stat, "Category": cat}
-
-
-@dataclass
-class Weather:
-    """Weather information at a location."""
-
-    time: Ann[Index[L["M8[ns]"]], "Time in UTC"]
-    temp_avg: Ann[Data[float], name("Temperature (degC)", "Average")]
-    temp_max: Ann[Data[float], name("Temperature (degC)", "Maximum")]
-    wind_avg: Ann[Data[float], name("Wind speed (m/s)", "Average")]
-    wind_max: Ann[Data[float], name("Wind speed (m/s)", "Maximum")]
-    location: Attr[str] = "Tokyo"
-    longitude: Attr[float] = 139.69167
-    latitude: Attr[float] = 35.68944
+# test data
+spec = Spec.from_dataclass(Weather)
+spec_updated = spec @ weather
 
 
 # test functions
-def test_time() -> None:
-    field = Spec.from_dataclass(Weather).fields.of_index[0]
+def name(stat: str, cat: str) -> "dict[str, str]":
+    return {"Statistic": stat, "Category": cat}
 
-    assert field.id == "time"
-    assert field.name == "Time in UTC"
-    assert field.hashable_name == "Time in UTC"
+
+def test_year() -> None:
+    field = spec.fields.of_index[0]
+
+    assert field.id == "year"
+    assert field.name == "Year"
     assert field.role == "index"
-    assert field.type == Ann[Index[L["M8[ns]"]], "Time in UTC"]
-    assert field.dtype == np.dtype("M8[ns]")
+    assert field.dtype == np.int64
     assert field.default is MISSING
+
+
+def test_year_updated() -> None:
+    field = spec_updated.fields.of_index[0]
+
+    assert field.id == "year"
+    assert field.name == "Year"
+    assert field.role == "index"
+    assert field.dtype == np.int64
+    assert field.default == [2020, 2020, 2021, 2021, 2022]
+
+
+def test_month() -> None:
+    field = spec.fields.of_index[1]
+
+    assert field.id == "month"
+    assert field.name == "Month"
+    assert field.role == "index"
+    assert field.dtype == np.int64
+    assert field.default is MISSING
+
+
+def test_month_updated() -> None:
+    field = spec_updated.fields.of_index[1]
+
+    assert field.id == "month"
+    assert field.name == "Month"
+    assert field.role == "index"
+    assert field.dtype == np.int64
+    assert field.default == [1, 7, 1, 7, 1]
 
 
 def test_temp_avg() -> None:
-    field = Spec.from_dataclass(Weather).fields.of_data[0]
+    field = spec.fields.of_data[0]
 
     assert field.id == "temp_avg"
-    assert field.name == name("Temperature (degC)", "Average")
-    assert field.hashable_name == ("Temperature (degC)", "Average")
+    assert field.name == name("Temperature ({.temp_unit})", "Average")
     assert field.role == "data"
-    assert field.type == Ann[Data[float], name("Temperature (degC)", "Average")]
     assert field.dtype == np.float64
     assert field.default is MISSING
+
+
+def test_temp_avg_updated() -> None:
+    field = spec_updated.fields.of_data[0]
+
+    assert field.id == "temp_avg"
+    assert field.name == name("Temperature (deg C)", "Average")
+    assert field.role == "data"
+    assert field.dtype == np.float64
+    assert field.default == [7.1, 24.3, 5.4, 25.9, 4.9]
 
 
 def test_temp_max() -> None:
-    field = Spec.from_dataclass(Weather).fields.of_data[1]
+    field = spec.fields.of_data[1]
 
     assert field.id == "temp_max"
-    assert field.name == name("Temperature (degC)", "Maximum")
-    assert field.hashable_name == ("Temperature (degC)", "Maximum")
+    assert field.name == name("Temperature ({.temp_unit})", "Maximum")
     assert field.role == "data"
-    assert field.type == Ann[Data[float], name("Temperature (degC)", "Maximum")]
     assert field.dtype == np.float64
     assert field.default is MISSING
+
+
+def test_temp_max_updated() -> None:
+    field = spec_updated.fields.of_data[1]
+
+    assert field.id == "temp_max"
+    assert field.name == name("Temperature (deg C)", "Maximum")
+    assert field.role == "data"
+    assert field.dtype == np.float64
+    assert field.default == [11.1, 27.7, 10.3, 30.3, 9.4]
 
 
 def test_wind_avg() -> None:
-    field = Spec.from_dataclass(Weather).fields.of_data[2]
+    field = spec.fields.of_data[2]
+
+    assert field.id == "wind_avg"
+    assert field.name == name("Wind speed ({.wind_unit})", "Average")
+    assert field.role == "data"
+    assert field.dtype == np.float64
+    assert field.default is MISSING
+
+
+def test_wind_avg_updated() -> None:
+    field = spec_updated.fields.of_data[2]
 
     assert field.id == "wind_avg"
     assert field.name == name("Wind speed (m/s)", "Average")
-    assert field.hashable_name == ("Wind speed (m/s)", "Average")
     assert field.role == "data"
-    assert field.type == Ann[Data[float], name("Wind speed (m/s)", "Average")]
     assert field.dtype == np.float64
-    assert field.default is MISSING
+    assert field.default == [2.4, 3.1, 2.3, 2.4, 2.6]
 
 
 def test_wind_max() -> None:
-    field = Spec.from_dataclass(Weather).fields.of_data[3]
+    field = spec.fields.of_data[3]
 
     assert field.id == "wind_max"
-    assert field.name == name("Wind speed (m/s)", "Maximum")
-    assert field.hashable_name == ("Wind speed (m/s)", "Maximum")
+    assert field.name == name("Wind speed ({.wind_unit})", "Maximum")
     assert field.role == "data"
-    assert field.type == Ann[Data[float], name("Wind speed (m/s)", "Maximum")]
     assert field.dtype == np.float64
     assert field.default is MISSING
 
 
-def test_location() -> None:
-    field = Spec.from_dataclass(Weather).fields.of_attr[0]
+def test_wind_max_updated() -> None:
+    field = spec_updated.fields.of_data[3]
 
-    assert field.id == "location"
-    assert field.name == "location"
-    assert field.hashable_name == "location"
+    assert field.id == "wind_max"
+    assert field.name == name("Wind speed (m/s)", "Maximum")
+    assert field.role == "data"
+    assert field.dtype == np.float64
+    assert field.default == [8.8, 10.2, 10.7, 9.0, 8.8]
+
+
+def test_loc() -> None:
+    field = spec.fields.of_attr[0]
+
+    assert field.id == "loc"
+    assert field.name == "Location"
     assert field.role == "attr"
-    assert field.type == Attr[str]
-    assert field.dtype is None
     assert field.default == "Tokyo"
 
 
-def test_longitude() -> None:
-    field = Spec.from_dataclass(Weather).fields.of_attr[1]
+def test_loc_updated() -> None:
+    field = spec_updated.fields.of_attr[0]
 
-    assert field.id == "longitude"
-    assert field.name == "longitude"
-    assert field.hashable_name == "longitude"
+    assert field.id == "loc"
+    assert field.name == "Location"
     assert field.role == "attr"
-    assert field.type == Attr[float]
-    assert field.dtype is None
+    assert field.default == "Tokyo"
+
+
+def test_lon() -> None:
+    field = spec.fields.of_attr[1]
+
+    assert field.id == "lon"
+    assert field.name == "Longitude ({.lon_unit})"
+    assert field.role == "attr"
     assert field.default == 139.69167
 
 
-def test_latitude() -> None:
-    field = Spec.from_dataclass(Weather).fields.of_attr[2]
+def test_lon_updated() -> None:
+    field = spec_updated.fields.of_attr[1]
 
-    assert field.id == "latitude"
-    assert field.name == "latitude"
-    assert field.hashable_name == "latitude"
+    assert field.id == "lon"
+    assert field.name == "Longitude (deg)"
     assert field.role == "attr"
-    assert field.type == Attr[float]
-    assert field.dtype is None
+    assert field.default == 139.69167
+
+
+def test_lat() -> None:
+    field = spec.fields.of_attr[2]
+
+    assert field.id == "lat"
+    assert field.name == "Latitude ({.lat_unit})"
+    assert field.role == "attr"
+    assert field.default == 35.68944
+
+
+def test_lat_updated() -> None:
+    field = spec_updated.fields.of_attr[2]
+
+    assert field.id == "lat"
+    assert field.name == "Latitude (deg)"
+    assert field.role == "attr"
     assert field.default == 35.68944
 
 
 def test_factory() -> None:
-    assert Spec.from_dataclass(Weather).factory is None
+    assert spec.factory is None
