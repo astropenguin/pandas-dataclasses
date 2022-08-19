@@ -12,7 +12,7 @@ import pandas as pd
 
 # submodules
 from .specs import Spec
-from .typing import P, T, AnyDType, AnyPandas, DataClass, PandasClass
+from .typing import P, T, AnyDType, DataClass, PandasClass
 
 
 # type hints
@@ -39,13 +39,14 @@ def asdataframe(obj: DataClass[P], *, factory: None = None) -> pd.DataFrame:
 
 def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     """Create a DataFrame object from a dataclass object."""
-    attrs = get_attrs(obj)
-    data = get_data(obj)
-    index = get_index(obj)
-    columns = get_columns(obj)
+    spec = Spec.from_dataclass(type(obj)).update(obj)
+    attrs = get_attrs(spec)
+    data = get_data(spec)
+    index = get_index(spec)
+    columns = get_columns(spec)
 
     if factory is None:
-        factory = get_factory(obj) or pd.DataFrame
+        factory = spec.factory or pd.DataFrame
 
     if not issubclass(factory, pd.DataFrame):
         raise TypeError("Factory was not a subclass of DataFrame.")
@@ -72,9 +73,10 @@ def asseries(obj: DataClass[P], *, factory: None = None) -> pd.Series:
 
 def asseries(obj: Any, *, factory: Any = None) -> Any:
     """Create a Series object from a dataclass object."""
-    attrs = get_attrs(obj)
-    data = get_data(obj)
-    index = get_index(obj)
+    spec = Spec.from_dataclass(type(obj)).update(obj)
+    attrs = get_attrs(spec)
+    data = get_data(spec)
+    index = get_index(spec)
 
     if data is None:
         name = None
@@ -83,7 +85,7 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
         data = first(data.values())
 
     if factory is None:
-        factory = get_factory(obj) or pd.Series
+        factory = spec.factory or pd.Series
 
     if not issubclass(factory, pd.Series):
         raise TypeError("Factory was not a subclass of Series.")
@@ -114,20 +116,18 @@ def first(obj: Iterable[T]) -> T:
     return next(iter(obj))
 
 
-def get_attrs(obj: DataClass[P]) -> AnyDict:
-    """Derive attributes from a dataclass object."""
-    spec = Spec.from_dataclass(type(obj)).update(obj)
+def get_attrs(spec: Spec) -> AnyDict:
+    """Derive attributes from a specification."""
     attrs: AnyDict = {}
 
     for field in spec.fields.of_attr:
-        attrs[field.hashable_name] = getattr(obj, field.id)
+        attrs[field.hashable_name] = field.default
 
     return attrs
 
 
-def get_columns(obj: DataClass[P]) -> Optional[pd.Index]:
-    """Derive columns from a dataclass object."""
-    spec = Spec.from_dataclass(type(obj)).update(obj)
+def get_columns(spec: Spec) -> Optional[pd.Index]:
+    """Derive columns from a specification."""
     names: Any = [field.name for field in spec.fields.of_data]
 
     if all(isinstance(name, Hashable) for name in names):
@@ -145,9 +145,8 @@ def get_columns(obj: DataClass[P]) -> Optional[pd.Index]:
     raise ValueError("Could not create columns.")
 
 
-def get_data(obj: DataClass[P]) -> Optional[AnyDict]:
-    """Derive data from a dataclass object."""
-    spec = Spec.from_dataclass(type(obj)).update(obj)
+def get_data(spec: Spec) -> Optional[AnyDict]:
+    """Derive data from a specification."""
     data: AnyDict = {}
 
     if not spec.fields.of_data:
@@ -155,21 +154,15 @@ def get_data(obj: DataClass[P]) -> Optional[AnyDict]:
 
     for field in spec.fields.of_data:
         data[field.hashable_name] = astype(
-            atleast_1d(getattr(obj, field.id)),
+            atleast_1d(field.default),
             field.dtype,
         )
 
     return data
 
 
-def get_factory(obj: DataClass[P]) -> Optional[Type[AnyPandas]]:
-    """Derive pandas factory from a dataclass object."""
-    return Spec.from_dataclass(type(obj)).factory
-
-
-def get_index(obj: DataClass[P]) -> Optional[pd.Index]:
-    """Derive index from a dataclass object."""
-    spec = Spec.from_dataclass(type(obj)).update(obj)
+def get_index(spec: Spec) -> Optional[pd.Index]:
+    """Derive index from a specification."""
     indexes: AnyDict = {}
 
     if not spec.fields.of_index:
@@ -177,7 +170,7 @@ def get_index(obj: DataClass[P]) -> Optional[pd.Index]:
 
     for field in spec.fields.of_index:
         indexes[field.hashable_name] = astype(
-            atleast_1d(getattr(obj, field.id)),
+            atleast_1d(field.default),
             field.dtype,
         )
 
