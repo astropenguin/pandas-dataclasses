@@ -5,7 +5,8 @@ from dataclasses import dataclass
 # dependencies
 import numpy as np
 import pandas as pd
-from pandas_dataclasses.core.parsers import get_attrs, get_data, get_factory, get_index
+from pandas_dataclasses.core.parsers import get_attrs, get_data, get_index
+from pandas_dataclasses.core.specs import Spec
 from pandas_dataclasses.core.typing import Attr, Data, Index
 from typing_extensions import Annotated as Ann
 
@@ -34,7 +35,9 @@ weather = Weather(
 
 # test functions
 def test_attrs() -> None:
-    assert get_attrs(weather) == {
+    spec = Spec.from_dataclass(type(weather)) @ weather
+
+    assert get_attrs(spec) == {
         "Location": "Tokyo",
         "Longitude (deg)": 139.69167,
         "Latitude (deg)": 35.68944,
@@ -42,7 +45,8 @@ def test_attrs() -> None:
 
 
 def test_data() -> None:
-    data = get_data(weather)
+    spec = Spec.from_dataclass(type(weather)) @ weather
+    data = get_data(spec)
     data_temp = data.get("Average temperature (deg C)")  # type: ignore
     data_humid = data.get("Average humidity (%)")  # type: ignore
     expected_temp = np.array(weather.temp, float)
@@ -55,7 +59,8 @@ def test_data() -> None:
 
 
 def test_index() -> None:
-    index = get_index(weather)
+    spec = Spec.from_dataclass(type(weather)) @ weather
+    index = get_index(spec)
     expected = pd.MultiIndex.from_arrays(
         [weather.year, weather.month],
         names=["Year", "Month"],
@@ -64,7 +69,3 @@ def test_index() -> None:
     assert (index == expected).all()
     assert (index.dtypes == expected.dtypes).all()  # type: ignore
     assert index.names == expected.names  # type: ignore
-
-
-def test_factory() -> None:
-    assert get_factory(weather) is None

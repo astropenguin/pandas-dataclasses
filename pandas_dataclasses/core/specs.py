@@ -59,7 +59,11 @@ class Field:
 
     def update(self, obj: DataClass[P]) -> "Field":
         """Update the specification by a dataclass object."""
-        return replace(self, name=format_name(self.name, obj))
+        return replace(
+            self,
+            name=format_name(self.name, obj),
+            default=getattr(obj, self.id),
+        )
 
 
 class Fields(List[Field]):
@@ -112,6 +116,10 @@ class Spec:
     def update(self, obj: DataClass[P]) -> "Spec":
         """Update the specification by a dataclass object."""
         return replace(self, fields=self.fields.update(obj))
+
+    def __matmul__(self, obj: DataClass[P]) -> "Spec":
+        """Alias of the update method."""
+        return self.update(obj)
 
 
 # runtime functions
