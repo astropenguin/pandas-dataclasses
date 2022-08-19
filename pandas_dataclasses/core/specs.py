@@ -59,7 +59,11 @@ class Field:
 
     def update(self, obj: DataClass[P]) -> "Field":
         """Update the specification by a dataclass object."""
-        return replace(self, name=format_name(self.name, obj))
+        return replace(
+            self,
+            name=format_name(self.name, obj),
+            default=getattr(obj, self.id),
+        )
 
 
 class Fields(List[Field]):
