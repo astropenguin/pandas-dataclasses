@@ -11,7 +11,7 @@ import pandas as pd
 
 
 # submodules
-from .specs import DataSpec
+from .specs import Spec
 from .typing import P, T, AnyDType, AnyPandas, DataClass, PandasClass
 
 
@@ -116,19 +116,19 @@ def first(obj: Iterable[T]) -> T:
 
 def get_attrs(obj: DataClass[P]) -> AnyDict:
     """Derive attributes from a dataclass object."""
-    specs = DataSpec.from_dataclass(type(obj)).specs
+    spec = Spec.from_dataclass(type(obj)).update(obj)
     attrs: AnyDict = {}
 
-    for key, spec in specs.of_attr.items():
-        attrs[(spec @ obj).hashable_name] = getattr(obj, key)
+    for field in spec.fields.of_attr:
+        attrs[field.hashable_name] = getattr(obj, field.id)
 
     return attrs
 
 
 def get_columns(obj: DataClass[P]) -> Optional[pd.Index]:
     """Derive columns from a dataclass object."""
-    specs = DataSpec.from_dataclass(type(obj)).specs
-    names: Any = [spec.name for spec in specs.of_data.values()]
+    spec = Spec.from_dataclass(type(obj)).update(obj)
+    names: Any = [field.name for field in spec.fields.of_data]
 
     if all(isinstance(name, Hashable) for name in names):
         return
@@ -147,16 +147,16 @@ def get_columns(obj: DataClass[P]) -> Optional[pd.Index]:
 
 def get_data(obj: DataClass[P]) -> Optional[AnyDict]:
     """Derive data from a dataclass object."""
-    specs = DataSpec.from_dataclass(type(obj)).specs
+    spec = Spec.from_dataclass(type(obj)).update(obj)
     data: AnyDict = {}
 
-    if not specs.of_data:
+    if not spec.fields.of_data:
         return
 
-    for key, spec in specs.of_data.items():
-        data[(spec @ obj).hashable_name] = astype(
-            atleast_1d(getattr(obj, key)),
-            spec.dtype,
+    for field in spec.fields.of_data:
+        data[field.hashable_name] = astype(
+            atleast_1d(getattr(obj, field.id)),
+            field.dtype,
         )
 
     return data
@@ -164,21 +164,21 @@ def get_data(obj: DataClass[P]) -> Optional[AnyDict]:
 
 def get_factory(obj: DataClass[P]) -> Optional[Type[AnyPandas]]:
     """Derive pandas factory from a dataclass object."""
-    return DataSpec.from_dataclass(type(obj)).factory
+    return Spec.from_dataclass(type(obj)).factory
 
 
 def get_index(obj: DataClass[P]) -> Optional[pd.Index]:
     """Derive index from a dataclass object."""
-    specs = DataSpec.from_dataclass(type(obj)).specs
+    spec = Spec.from_dataclass(type(obj)).update(obj)
     indexes: AnyDict = {}
 
-    if not specs.of_index:
+    if not spec.fields.of_index:
         return
 
-    for key, spec in specs.of_index.items():
-        indexes[(spec @ obj).hashable_name] = astype(
-            atleast_1d(getattr(obj, key)),
-            spec.dtype,
+    for field in spec.fields.of_index:
+        indexes[field.hashable_name] = astype(
+            atleast_1d(getattr(obj, field.id)),
+            field.dtype,
         )
 
     if len(indexes) == 1:

@@ -1,192 +1,168 @@
-__all__ = ["DataSpec"]
+__all__ = ["Spec"]
 
 
 # standard library
-from dataclasses import dataclass, field, fields, replace
+from dataclasses import dataclass, replace
+from dataclasses import Field as Field_, fields as fields_
 from functools import lru_cache
-from typing import Any, Dict, Hashable, List, Optional, Type
+from typing import Any, Hashable, List, Optional, Type
 
 
 # dependencies
-from typing_extensions import Literal, TypeAlias, get_type_hints
+from typing_extensions import Literal, get_type_hints
 
 
 # submodules
 from .typing import (
     P,
     AnyDType,
-    AnyField,
     AnyName,
     AnyPandas,
     DataClass,
     Role,
-    get_annotated,
     get_dtype,
     get_name,
     get_role,
 )
 
 
-# type hints
-AnySpec: TypeAlias = "ArraySpec | ScalarSpec"
-
-
 # runtime classes
 @dataclass(frozen=True)
-class ArraySpec:
-    """Specification of an array."""
+class Field:
+    """Specification of a field."""
+
+    id: str
+    """Identifier of the field."""
 
     name: AnyName
-    """Name of the array."""
+    """Name of the field."""
 
-    role: Literal["data", "index"]
-    """Role of the array."""
+    role: Literal["attr", "data", "index"]
+    """Role of the field."""
+
+    type: Optional[Any]
+    """Type (hint) of the field data."""
 
     dtype: Optional[AnyDType]
-    """Data type of the array."""
+    """Data type of the field data."""
 
     default: Any
-    """Default value of the array."""
+    """Default value of the field data."""
 
     @property
     def hashable_name(self) -> Hashable:
-        """Hashable name of the array."""
+        """Hashable name of the field."""
         if isinstance(self.name, dict):
             return tuple(self.name.values())
         else:
             return self.name
 
-    def __matmul__(self, obj: DataClass[P]) -> "ArraySpec":
+    def update(self, obj: DataClass[P]) -> "Field":
         """Update the specification by a dataclass object."""
         return replace(self, name=format_name(self.name, obj))
 
 
-@dataclass(frozen=True)
-class ScalarSpec:
-    """Specification of a scalar."""
-
-    name: AnyName
-    """Name of the scalar."""
-
-    role: Literal["attr", "name"]
-    """Role of the scalar."""
-
-    type: Any
-    """Type (hint) of the scalar."""
-
-    default: Any
-    """Default value of the scalar."""
+class Fields(List[Field]):
+    """List of field specifications (with selectors)."""
 
     @property
-    def hashable_name(self) -> Hashable:
-        """Hashable name of the scalar."""
-        if isinstance(self.name, dict):
-            return tuple(self.name.values())
-        else:
-            return self.name
-
-    def __matmul__(self, obj: DataClass[P]) -> "ScalarSpec":
-        """Update the specification by a dataclass object."""
-        return replace(self, name=format_name(self.name, obj))
-
-
-class Specs(Dict[str, AnySpec]):
-    """Dictionary of any specifications."""
+    def of_attr(self) -> "Fields":
+        """Select only attribute field specifications."""
+        return Fields(field for field in self if field.role == "attr")
 
     @property
-    def of_attr(self) -> Dict[str, ScalarSpec]:
-        """Limit to attribute specifications."""
-        return {k: v for k, v in self.items() if v.role == "attr"}
+    def of_data(self) -> "Fields":
+        """Select only data field specifications."""
+        return Fields(field for field in self if field.role == "data")
 
     @property
-    def of_data(self) -> Dict[str, ArraySpec]:
-        """Limit to data specifications."""
-        return {k: v for k, v in self.items() if v.role == "data"}
+    def of_index(self) -> "Fields":
+        """Select only index field specifications."""
+        return Fields(field for field in self if field.role == "index")
 
-    @property
-    def of_index(self) -> Dict[str, ArraySpec]:
-        """Limit to index specifications."""
-        return {k: v for k, v in self.items() if v.role == "index"}
-
-    @property
-    def of_name(self) -> Dict[str, ScalarSpec]:
-        """Limit to name specifications."""
-        return {k: v for k, v in self.items() if v.role == "name"}
+    def update(self, obj: DataClass[P]) -> "Fields":
+        """Update the specifications by a dataclass object."""
+        return Fields(field.update(obj) for field in self)
 
 
 @dataclass(frozen=True)
-class DataSpec:
-    """Data specification of a pandas dataclass."""
+class Spec:
+    """Specification of a pandas dataclass."""
+
+    fields: Fields
+    """List of field specifications."""
 
     factory: Optional[Type[AnyPandas]] = None
     """Factory for pandas data creation."""
 
-    specs: Specs = field(default_factory=Specs)
-    """Dictionary of any specifications."""
-
     @classmethod
-    def from_dataclass(cls, dataclass: Type[DataClass[P]]) -> "DataSpec":
-        """Create a data specification from a dataclass."""
-        specs = Specs()
+    def from_dataclass(cls, dataclass: Type[DataClass[P]]) -> "Spec":
+        """Create a specification from a data class."""
+        fields = Fields()
 
-        for field in fields(eval_types(dataclass)):
-            spec = get_spec(field)
+        for field_ in fields_(eval_types(dataclass)):
+            field = convert_field(field_)
 
-            if spec is not None:
-                specs[field.name] = spec
+            if field is not None:
+                fields.append(field)
 
         factory = getattr(dataclass, "__pandas_factory__", None)
-        return cls(factory, specs)
+        return cls(fields, factory)
+
+    def update(self, obj: DataClass[P]) -> "Spec":
+        """Update the specification by a dataclass object."""
+        return replace(self, fields=self.fields.update(obj))
 
 
 # runtime functions
+@lru_cache(maxsize=None)
+def convert_field(field_: "Field_[Any]") -> Optional[Field]:
+    """Convert a dataclass field to a field specification."""
+    role = get_role(field_.type)
+
+    if role is Role.ATTR:
+        role = "attr"
+    elif role is Role.DATA:
+        role = "data"
+    elif role is Role.INDEX:
+        role = "index"
+    else:
+        return
+
+    return Field(
+        id=field_.name,
+        name=get_name(field_.type, field_.name),
+        role=role,
+        type=field_.type,
+        dtype=get_dtype(field_.type),
+        default=field_.default,
+    )
+
+
 @lru_cache(maxsize=None)
 def eval_types(dataclass: Type[DataClass[P]]) -> Type[DataClass[P]]:
     """Evaluate field types of a dataclass."""
     types = get_type_hints(dataclass, include_extras=True)
 
-    for field in fields(dataclass):
+    for field in fields_(dataclass):
         field.type = types[field.name]
 
     return dataclass
 
 
 def format_name(name: AnyName, obj: DataClass[P]) -> AnyName:
-    """Format a name by the attributes of a dataclass object."""
+    """Format a name by a dataclass object."""
     if isinstance(name, str):
         return name.format(obj)
 
     if isinstance(name, dict):
-        keys: List[Hashable] = []
-        vals: List[Hashable] = []
+        formatted: "dict[Hashable, Hashable]" = {}
 
         for key, val in name.items():
-            keys.append(key.format(obj) if isinstance(key, str) else key)
-            vals.append(val.format(obj) if isinstance(val, str) else val)
+            key = key.format(obj) if isinstance(key, str) else key
+            val = val.format(obj) if isinstance(val, str) else val
+            formatted[key] = val
 
-        return dict(zip(keys, vals))
+        return formatted
 
     return name
-
-
-@lru_cache(maxsize=None)
-def get_spec(field: AnyField) -> Optional[AnySpec]:
-    """Convert a dataclass field to a specification."""
-    name = get_name(field.type, field.name)
-    role = get_role(field.type)
-
-    if role is Role.DATA or role is Role.INDEX:
-        return ArraySpec(
-            name=name,
-            role=role.value,
-            dtype=get_dtype(field.type),
-            default=field.default,
-        )
-
-    if role is Role.ATTR or role is Role.NAME:
-        return ScalarSpec(
-            name=name,
-            role=role.value,
-            type=get_annotated(field.type),
-            default=field.default,
-        )

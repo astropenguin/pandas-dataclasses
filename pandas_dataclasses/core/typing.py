@@ -3,13 +3,12 @@ __all__ = ["Attr", "Data", "Index", "Name", "Other"]
 
 # standard library
 from dataclasses import Field
-from enum import Enum
+from enum import Enum, auto
 from itertools import chain
 from typing import (
     Any,
     ClassVar,
     Collection,
-    Dict,
     Hashable,
     Iterable,
     Optional,
@@ -20,8 +19,8 @@ from typing import (
 
 
 # dependencies
-from numpy import dtype
-from pandas import DataFrame, Series
+import numpy as np
+import pandas as pd
 from pandas.api.extensions import ExtensionDtype
 from pandas.api.types import pandas_dtype  # type: ignore
 from typing_extensions import (
@@ -37,10 +36,9 @@ from typing_extensions import (
 
 
 # type hints (private)
-AnyDType: TypeAlias = "dtype[Any] | ExtensionDtype"
-AnyField: TypeAlias = "Field[Any]"
+AnyDType: TypeAlias = "np.dtype[Any] | ExtensionDtype"
 AnyName: TypeAlias = "Hashable | dict[Hashable, Hashable]"
-AnyPandas: TypeAlias = "DataFrame | Series"
+AnyPandas: TypeAlias = "pd.DataFrame | pd.Series"
 P = ParamSpec("P")
 T = TypeVar("T")
 THashable = TypeVar("THashable", bound=Hashable)
@@ -50,7 +48,7 @@ TPandas = TypeVar("TPandas", bound=AnyPandas)
 class DataClass(Protocol[P]):
     """Type hint for dataclass objects."""
 
-    __dataclass_fields__: ClassVar[Dict[str, AnyField]]
+    __dataclass_fields__: ClassVar["dict[str, Field[Any]]"]
 
     def __init__(self, *args: P.args, **kwargs: P.kwargs) -> None:
         ...
@@ -65,27 +63,24 @@ class PandasClass(DataClass[P], Protocol[P, TPandas]):
 class Role(Enum):
     """Annotations for typing dataclass fields."""
 
-    ATTR = "attr"
+    ATTR = auto()
     """Annotation for attribute fields."""
 
-    DATA = "data"
+    DATA = auto()
     """Annotation for data fields."""
 
-    INDEX = "index"
+    INDEX = auto()
     """Annotation for index fields."""
 
-    NAME = "name"
+    NAME = auto()
     """Annotation for name fields."""
 
-    OTHER = "other"
+    OTHER = auto()
     """Annotation for other fields."""
 
     @classmethod
     def annotates(cls, tp: Any) -> bool:
         """Check if any role annotates a type hint."""
-        if get_origin(tp) is not Annotated:
-            return False
-
         return any(isinstance(arg, cls) for arg in get_args(tp))
 
 
@@ -111,9 +106,9 @@ def deannotate(tp: Any) -> Any:
     """Recursively remove annotations in a type hint."""
 
     class Temporary:
-        __annotations__ = dict(type=tp)
+        __annotations__ = dict(tp=tp)
 
-    return get_type_hints(Temporary)["type"]
+    return get_type_hints(Temporary)["tp"]
 
 
 def find_annotated(tp: Any) -> Iterable[Any]:
@@ -147,8 +142,8 @@ def get_dtype(tp: Any) -> Optional[AnyDType]:
     """Extract a NumPy or pandas data type."""
     try:
         dtype = get_args(get_annotated(tp))[0]
-    except TypeError:
-        raise TypeError(f"Could not find any dtype in {tp!r}.")
+    except (IndexError, TypeError):
+        return
 
     if dtype is Any or dtype is type(None):
         return
@@ -156,7 +151,7 @@ def get_dtype(tp: Any) -> Optional[AnyDType]:
     if get_origin(dtype) is Literal:
         dtype = get_args(dtype)[0]
 
-    return pandas_dtype(dtype)  # type: ignore
+    return pandas_dtype(dtype)
 
 
 def get_name(tp: Any, default: AnyName = None) -> AnyName:
@@ -171,10 +166,10 @@ def get_name(tp: Any, default: AnyName = None) -> AnyName:
 
     if (
         isinstance(name, dict)
-        and all(isinstance(k, Hashable) for k in name.keys())
-        and all(isinstance(v, Hashable) for v in name.values())
+        and all(isinstance(key, Hashable) for key in name.keys())
+        and all(isinstance(val, Hashable) for val in name.values())
     ):
-        return name
+        return dict(name)
 
     raise ValueError("Could not find any valid name.")
 
