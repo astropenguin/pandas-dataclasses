@@ -142,8 +142,8 @@ def get_dtype(tp: Any) -> Optional[AnyDType]:
     """Extract a NumPy or pandas data type."""
     try:
         dtype = get_args(get_annotated(tp))[0]
-    except TypeError:
-        raise TypeError(f"Could not find any dtype in {tp!r}.")
+    except (IndexError, TypeError):
+        return
 
     if dtype is Any or dtype is type(None):
         return
