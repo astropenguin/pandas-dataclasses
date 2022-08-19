@@ -2,7 +2,7 @@ __all__ = ["DataSpec"]
 
 
 # standard library
-from dataclasses import dataclass, field, fields, replace
+from dataclasses import Field, dataclass, field, fields, replace
 from functools import lru_cache
 from typing import Any, Dict, Hashable, List, Optional, Type
 
@@ -15,7 +15,6 @@ from typing_extensions import Literal, TypeAlias, get_type_hints
 from .typing import (
     P,
     AnyDType,
-    AnyField,
     AnyName,
     AnyPandas,
     DataClass,
@@ -170,7 +169,7 @@ def format_name(name: AnyName, obj: DataClass[P]) -> AnyName:
 
 
 @lru_cache(maxsize=None)
-def get_spec(field: AnyField) -> Optional[AnySpec]:
+def get_spec(field: "Field[Any]") -> Optional[AnySpec]:
     """Convert a dataclass field to a specification."""
     name = get_name(field.type, field.name)
     role = get_role(field.type)

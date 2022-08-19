@@ -38,7 +38,6 @@ from typing_extensions import (
 
 # type hints (private)
 AnyDType: TypeAlias = "dtype[Any] | ExtensionDtype"
-AnyField: TypeAlias = "Field[Any]"
 AnyName: TypeAlias = "Hashable | dict[Hashable, Hashable]"
 AnyPandas: TypeAlias = "DataFrame | Series"
 P = ParamSpec("P")
@@ -50,7 +49,7 @@ TPandas = TypeVar("TPandas", bound=AnyPandas)
 class DataClass(Protocol[P]):
     """Type hint for dataclass objects."""
 
-    __dataclass_fields__: ClassVar[Dict[str, AnyField]]
+    __dataclass_fields__: ClassVar[Dict[str, "Field[Any]"]]
 
     def __init__(self, *args: P.args, **kwargs: P.kwargs) -> None:
         ...
