@@ -6,8 +6,7 @@ from typing import Any, Union
 import numpy as np
 import pandas as pd
 from pytest import mark
-from typing_extensions import Annotated as Ann
-from typing_extensions import Literal as L
+from typing_extensions import Annotated as Ann, Literal as L
 from pandas_dataclasses.core.typing import (
     Attr,
     Data,
@@ -20,7 +19,7 @@ from pandas_dataclasses.core.typing import (
 )
 
 
-# test datasets
+# test data
 testdata_dtype = [
     (Data[Any], None),
     (Data[None], None),
