@@ -2,7 +2,7 @@ __all__ = ["asdataframe", "asseries"]
 
 
 # standard library
-from typing import Any, Dict, Hashable, Iterable, Optional, Type, TypeVar, overload
+from typing import Any, Hashable, List, Optional, Type, TypeVar, overload
 
 
 # dependencies
@@ -12,11 +12,10 @@ import pandas as pd
 
 # submodules
 from .specs import Spec
-from .typing import P, T, AnyDType, DataClass, PandasClass
+from .typing import P, AnyDType, DataClass, PandasClass
 
 
 # type hints
-AnyDict = Dict[Hashable, Any]
 TDataFrame = TypeVar("TDataFrame", bound=pd.DataFrame)
 TSeries = TypeVar("TSeries", bound=pd.Series)
 
@@ -49,7 +48,7 @@ def asdataframe(obj: Any, *, factory: Any = None) -> Any:
         factory = spec.factory or pd.DataFrame
 
     if not issubclass(factory, pd.DataFrame):
-        raise TypeError("Factory was not a subclass of DataFrame.")
+        raise TypeError("Factory must be a subclass of DataFrame.")
 
     dataframe = factory(data, index, columns)
     dataframe.attrs.update(attrs)
@@ -81,44 +80,33 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
     if data is None:
         name = None
     else:
-        name = first(data.keys())
-        data = first(data.values())
+        name, data = list(data.items())[0]
 
     if factory is None:
         factory = spec.factory or pd.Series
 
     if not issubclass(factory, pd.Series):
-        raise TypeError("Factory was not a subclass of Series.")
+        raise TypeError("Factory must be a subclass of Series.")
 
     series = factory(data, index, name=name)
     series.attrs.update(attrs)
     return series
 
 
-def astype(data: Any, dtype: Optional[AnyDType]) -> Any:
-    """Convert data to have given data type."""
+def ensure(data: Any, dtype: Optional[AnyDType]) -> Any:
+    """Ensure data to be 1D and have given data type."""
+    if not isinstance(data, (pd.Index, pd.Series)):
+        data = np.atleast_1d(data)
+
     if dtype is None:
         return data
     else:
         return data.astype(dtype, copy=False)
 
 
-def atleast_1d(data: Any) -> Any:
-    """Convert data to be at least one dimensional."""
-    if isinstance(data, pd.Series):
-        return data
-    else:
-        return np.atleast_1d(data)
-
-
-def first(obj: Iterable[T]) -> T:
-    """Return the first item of an iterable."""
-    return next(iter(obj))
-
-
-def get_attrs(spec: Spec) -> AnyDict:
+def get_attrs(spec: Spec) -> "dict[Hashable, Any]":
     """Derive attributes from a specification."""
-    attrs: AnyDict = {}
+    attrs: "dict[Hashable, Any]" = {}
 
     for field in spec.fields.of_attr:
         attrs[field.hashable_name] = field.default
@@ -128,59 +116,56 @@ def get_attrs(spec: Spec) -> AnyDict:
 
 def get_columns(spec: Spec) -> Optional[pd.Index]:
     """Derive columns from a specification."""
-    names: Any = [field.name for field in spec.fields.of_data]
-
-    if all(isinstance(name, Hashable) for name in names):
-        return
-
-    if (
-        all(isinstance(name, dict) for name in names)
-        and len(set(map(tuple, names))) == 1
-    ):
-        return pd.MultiIndex.from_tuples(
-            [tuple(name.values()) for name in names],
-            names=first(names).keys(),
-        )
-
-    raise ValueError("Could not create columns.")
-
-
-def get_data(spec: Spec) -> Optional[AnyDict]:
-    """Derive data from a specification."""
-    data: AnyDict = {}
-
     if not spec.fields.of_data:
         return
 
-    for field in spec.fields.of_data:
-        data[field.hashable_name] = astype(
-            atleast_1d(field.default),
-            field.dtype,
-        )
+    names_ = [field.name for field in spec.fields.of_data]
 
-    return data
+    if all(isinstance(name, Hashable) for name in names_):
+        return
+
+    if not all(isinstance(name, dict) for name in names_):
+        raise ValueError("All names must be dictionaries.")
+
+    names = [tuple(name.keys()) for name in names_]  # type: ignore
+    indexes = [tuple(name.values()) for name in names_]  # type: ignore
+
+    if not len(set(names)) == 1:
+        raise ValueError("All name keys must be same.")
+
+    return pd.MultiIndex.from_tuples(indexes, names=names[0])
+
+
+def get_data(spec: Spec) -> Optional["dict[Hashable, Any]"]:
+    """Derive data from a specification."""
+    if not spec.fields.of_data:
+        return
+
+    names: List[Hashable] = []
+    data: List[Any] = []
+
+    for field in spec.fields.of_data:
+        names.append(field.hashable_name)
+        data.append(ensure(field.default, field.dtype))
+
+    return dict(zip(names, data))
 
 
 def get_index(spec: Spec) -> Optional[pd.Index]:
     """Derive index from a specification."""
-    indexes: AnyDict = {}
-
     if not spec.fields.of_index:
         return
 
+    names: List[Hashable] = []
+    indexes: List[Any] = []
+
     for field in spec.fields.of_index:
-        indexes[field.hashable_name] = astype(
-            atleast_1d(field.default),
-            field.dtype,
-        )
+        names.append(field.hashable_name)
+        indexes.append(ensure(field.default, field.dtype))
+
+    indexes = np.broadcast_arrays(*indexes)
 
     if len(indexes) == 1:
-        return pd.Index(
-            first(indexes.values()),
-            name=first(indexes.keys()),
-        )
+        return pd.Index(indexes[0], name=names[0])
     else:
-        return pd.MultiIndex.from_arrays(
-            np.broadcast_arrays(*indexes.values()),
-            names=indexes.keys(),
-        )
+        return pd.MultiIndex.from_arrays(indexes, names=names)
