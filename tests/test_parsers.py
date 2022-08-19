@@ -35,7 +35,7 @@ weather = Weather(
 
 # test functions
 def test_attrs() -> None:
-    spec = Spec.from_dataclass(type(weather)).update(weather)
+    spec = Spec.from_dataclass(type(weather)) @ weather
 
     assert get_attrs(spec) == {
         "Location": "Tokyo",
@@ -45,7 +45,7 @@ def test_attrs() -> None:
 
 
 def test_data() -> None:
-    spec = Spec.from_dataclass(type(weather)).update(weather)
+    spec = Spec.from_dataclass(type(weather)) @ weather
     data = get_data(spec)
     data_temp = data.get("Average temperature (deg C)")  # type: ignore
     data_humid = data.get("Average humidity (%)")  # type: ignore
@@ -59,7 +59,7 @@ def test_data() -> None:
 
 
 def test_index() -> None:
-    spec = Spec.from_dataclass(type(weather)).update(weather)
+    spec = Spec.from_dataclass(type(weather)) @ weather
     index = get_index(spec)
     expected = pd.MultiIndex.from_arrays(
         [weather.year, weather.month],

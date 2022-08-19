@@ -39,7 +39,7 @@ def asdataframe(obj: DataClass[P], *, factory: None = None) -> pd.DataFrame:
 
 def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     """Create a DataFrame object from a dataclass object."""
-    spec = Spec.from_dataclass(type(obj)).update(obj)
+    spec = Spec.from_dataclass(type(obj)) @ obj
     attrs = get_attrs(spec)
     data = get_data(spec)
     index = get_index(spec)
@@ -73,7 +73,7 @@ def asseries(obj: DataClass[P], *, factory: None = None) -> pd.Series:
 
 def asseries(obj: Any, *, factory: Any = None) -> Any:
     """Create a Series object from a dataclass object."""
-    spec = Spec.from_dataclass(type(obj)).update(obj)
+    spec = Spec.from_dataclass(type(obj)) @ obj
     attrs = get_attrs(spec)
     data = get_data(spec)
     index = get_index(spec)

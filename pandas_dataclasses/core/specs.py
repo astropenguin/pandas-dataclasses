@@ -117,6 +117,10 @@ class Spec:
         """Update the specification by a dataclass object."""
         return replace(self, fields=self.fields.update(obj))
 
+    def __matmul__(self, obj: DataClass[P]) -> "Spec":
+        """Alias of the update method."""
+        return self.update(obj)
+
 
 # runtime functions
 @lru_cache(maxsize=None)
