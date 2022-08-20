@@ -193,7 +193,7 @@ where `df.attrs` will become like:
 
 ### Custom naming
 
-The name of data, index, or attribute can be explicitly specified by adding a string annotation to the corresponding type:
+The name of data, index, or attribute can be explicitly specified by adding a hashable annotation to the corresponding type:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -217,9 +217,12 @@ class Weather(AsDataFrame):
     loc: Ann[Attr[str], "Location"] = "Tokyo"
     lon: Ann[Attr[float], "Longitude (deg)"] = 139.69167
     lat: Ann[Attr[float], "Latitude (deg)"] = 35.68944
+
+
+df = Weather.new(...)
 ```
 
-In this example, `Weather.new(...)` and its attributes will become like:
+where `df` and `df.attrs` will become like:
 
 ```
             Temperature (deg C)  Wind speed (m/s)
@@ -262,9 +265,12 @@ class Weather(AsDataFrame):
     temp_max: Ann[Data[float], name("Temperature (deg C)", "Maximum")]
     wind_avg: Ann[Data[float], name("Wind speed (m/s)", "Average")]
     wind_max: Ann[Data[float], name("Wind speed (m/s)", "Maximum")]
+
+
+df = Weather.new(...)
 ```
 
-In this example, `Weather.new(...)` will become like:
+where `df` will become like:
 
 ```
 Statistic  Temperature (deg C)        Wind speed (m/s)
@@ -302,8 +308,7 @@ class Weather(AsDataFrame):
     wind_unit: str = "m/s"
 ```
 
-In this example, units of the temperature and the wind speed can be dynamically updated like `Weather.new(..., temp_unit="deg F", wind_unit="km/h"`).
-
+where units of the temperature and the wind speed can be dynamically updated like `Weather.new(..., temp_unit="deg F", wind_unit="km/h"`).
 
 ### Custom pandas factory
 
