@@ -1,71 +1,112 @@
 # standard library
-from dataclasses import dataclass
+from typing import Any, Hashable, cast
 
 
 # dependencies
-import numpy as np
 import pandas as pd
-from pandas_dataclasses.core.parsers import get_attrs, get_data, get_index
+from data import Weather, weather, df_weather_true, ser_weather_true
 from pandas_dataclasses.core.specs import Spec
-from pandas_dataclasses.core.typing import Attr, Data, Index
-from typing_extensions import Annotated as Ann
-
-
-# test datasets
-@dataclass
-class Weather:
-    """Weather information at a location."""
-
-    year: Ann[Index[int], "Year"]
-    month: Ann[Index[int], "Month"]
-    temp: Ann[Data[float], "Average temperature (deg C)"]
-    humid: Ann[Data[float], "Average humidity (%)"]
-    loc: Ann[Attr[str], "Location"] = "Tokyo"
-    lon: Ann[Attr[float], "Longitude (deg)"] = 139.69167
-    lat: Ann[Attr[float], "Latitude (deg)"] = 35.68944
-
-
-weather = Weather(
-    [2020, 2020, 2021, 2021, 2022],
-    [1, 7, 1, 7, 1],
-    [7.1, 24.3, 5.4, 25.9, 4.9],
-    [65, 89, 57, 83, 52],
+from pandas_dataclasses.core.parsers import (
+    asdataframe,
+    asseries,
+    get_attrs,
+    get_columns,
+    get_data,
+    get_index,
 )
 
 
+# test data
+spec = Spec.from_dataclass(Weather) @ weather
+
+
 # test functions
-def test_attrs() -> None:
-    spec = Spec.from_dataclass(type(weather)) @ weather
+def test_asseries() -> None:
+    ser_weather = asseries(weather)
 
-    assert get_attrs(spec) == {
-        "Location": "Tokyo",
-        "Longitude (deg)": 139.69167,
-        "Latitude (deg)": 35.68944,
-    }
+    assert ser_weather.attrs == ser_weather_true.attrs
+    assert ser_weather.name == ser_weather_true.name
+    assert ser_weather.dtype == ser_weather_true.dtype
+    assert (ser_weather == ser_weather_true).all()
 
-
-def test_data() -> None:
-    spec = Spec.from_dataclass(type(weather)) @ weather
-    data = get_data(spec)
-    data_temp = data.get("Average temperature (deg C)")  # type: ignore
-    data_humid = data.get("Average humidity (%)")  # type: ignore
-    expected_temp = np.array(weather.temp, float)
-    expected_humid = np.array(weather.humid, float)
-
-    assert (data_temp == expected_temp).all()
-    assert (data_humid == expected_humid).all()
-    assert data_temp.dtype == expected_temp.dtype  # type: ignore
-    assert data_humid.dtype == expected_humid.dtype  # type: ignore
+    assert ser_weather.index.name == ser_weather_true.index.name
+    assert ser_weather.index.dtype == ser_weather_true.index.dtype
+    assert (ser_weather.index == ser_weather_true.index).all()
 
 
-def test_index() -> None:
-    spec = Spec.from_dataclass(type(weather)) @ weather
-    index = get_index(spec)
-    expected = pd.MultiIndex.from_arrays(
-        [weather.year, weather.month],
-        names=["Year", "Month"],
-    )
+def test_asdataframe() -> None:
+    df_weather = asdataframe(weather)
 
-    assert (index == expected).all()
-    assert (index.dtypes == expected.dtypes).all()  # type: ignore
-    assert index.names == expected.names  # type: ignore
+    assert df_weather.attrs == df_weather_true.attrs
+    assert df_weather.iloc[:, 0].dtype == df_weather_true.iloc[:, 0].dtype
+    assert df_weather.iloc[:, 1].dtype == df_weather_true.iloc[:, 1].dtype
+    assert df_weather.iloc[:, 2].dtype == df_weather_true.iloc[:, 2].dtype
+    assert df_weather.iloc[:, 3].dtype == df_weather_true.iloc[:, 3].dtype
+    assert (df_weather == df_weather_true).all().all()
+
+    assert df_weather.columns.names == df_weather_true.columns.names
+    assert (df_weather.columns.dtypes == df_weather_true.columns.dtypes).all()
+    assert (df_weather.columns == df_weather_true.columns).all()
+
+    assert df_weather.index.names == df_weather_true.index.names
+    assert (df_weather.index.dtypes == df_weather_true.index.dtypes).all()  # type: ignore
+    assert (df_weather.index == df_weather_true.index).all()
+
+
+def test_get_attrs() -> None:
+    attrs = get_attrs(spec)
+    keys = list(attrs.keys())
+    values = list(attrs.values())
+
+    assert keys[0] == spec.fields.of_attr[0].hashable_name
+    assert keys[1] == spec.fields.of_attr[1].hashable_name
+    assert keys[2] == spec.fields.of_attr[2].hashable_name
+
+    assert values[0] == spec.fields.of_attr[0].default
+    assert values[1] == spec.fields.of_attr[1].default
+    assert values[2] == spec.fields.of_attr[2].default
+
+
+def test_get_columns() -> None:
+    index = cast(pd.Index, get_columns(spec))
+
+    assert index.names == list(spec.fields.of_data[0].name)  # type: ignore
+    assert index[0] == spec.fields.of_data[0].hashable_name
+    assert index[1] == spec.fields.of_data[1].hashable_name
+    assert index[2] == spec.fields.of_data[2].hashable_name
+    assert index[3] == spec.fields.of_data[3].hashable_name
+
+
+def test_get_data() -> None:
+    data = cast("dict[Hashable, Any]", get_data(spec))
+    keys = list(data.keys())
+    values = list(data.values())
+
+    assert keys[0] == spec.fields.of_data[0].hashable_name
+    assert keys[1] == spec.fields.of_data[1].hashable_name
+    assert keys[2] == spec.fields.of_data[2].hashable_name
+    assert keys[3] == spec.fields.of_data[3].hashable_name
+
+    assert values[0].dtype == spec.fields.of_data[0].dtype
+    assert values[1].dtype == spec.fields.of_data[1].dtype
+    assert values[2].dtype == spec.fields.of_data[2].dtype
+    assert values[3].dtype == spec.fields.of_data[3].dtype
+
+    assert (values[0] == spec.fields.of_data[0].default).all()
+    assert (values[1] == spec.fields.of_data[1].default).all()
+    assert (values[2] == spec.fields.of_data[2].default).all()
+    assert (values[3] == spec.fields.of_data[3].default).all()
+
+
+def test_get_index() -> None:
+    index = cast(pd.Index, get_index(spec))
+    df = cast(pd.DataFrame, index.to_frame())
+
+    assert df.iloc[:, 0].name == spec.fields.of_index[0].hashable_name
+    assert df.iloc[:, 1].name == spec.fields.of_index[1].hashable_name
+
+    assert df.iloc[:, 0].dtype == spec.fields.of_index[0].dtype
+    assert df.iloc[:, 1].dtype == spec.fields.of_index[1].dtype
+
+    assert (df.iloc[:, 0] == spec.fields.of_index[0].default).all()
+    assert (df.iloc[:, 1] == spec.fields.of_index[1].default).all()
