@@ -1,9 +1,7 @@
 __all__ = [
     "Weather",
     "weather",
-    "df_weather",
     "df_weather_true",
-    "ser_weather",
     "ser_weather_true",
 ]
 
@@ -14,11 +12,11 @@ from dataclasses import dataclass
 
 # dependencies
 import pandas as pd
-from pandas_dataclasses import AsDataFrame, AsSeries, Attr, Data, Index
+from pandas_dataclasses import Attr, Data, Index
 from typing_extensions import Annotated as Ann
 
 
-# test dataclass and pandas data
+# test dataclass and object
 def name(stat: str, cat: str) -> "dict[str, str]":
     """Shorthand function for data names."""
     return {"Statistic": stat, "Category": cat}
@@ -68,41 +66,7 @@ class Weather:
     """Units of the latitude."""
 
 
-@dataclass
-class DataFrameWeather(Weather, AsDataFrame):
-    """Weather information as DataFrame."""
-
-    pass
-
-
-@dataclass
-class SeriesWeather(Weather, AsSeries):
-    """Weather information as Series."""
-
-    pass
-
-
 weather = Weather(
-    [2020, 2020, 2021, 2021, 2022],
-    [1, 7, 1, 7, 1],
-    [7.1, 24.3, 5.4, 25.9, 4.9],
-    [11.1, 27.7, 10.3, 30.3, 9.4],
-    [2.4, 3.1, 2.3, 2.4, 2.6],
-    [8.8, 10.2, 10.7, 9.0, 8.8],
-)
-
-
-df_weather = DataFrameWeather.new(
-    [2020, 2020, 2021, 2021, 2022],
-    [1, 7, 1, 7, 1],
-    [7.1, 24.3, 5.4, 25.9, 4.9],
-    [11.1, 27.7, 10.3, 30.3, 9.4],
-    [2.4, 3.1, 2.3, 2.4, 2.6],
-    [8.8, 10.2, 10.7, 9.0, 8.8],
-)
-
-
-ser_weather = SeriesWeather.new(
     [2020, 2020, 2021, 2021, 2022],
     [1, 7, 1, 7, 1],
     [7.1, 24.3, 5.4, 25.9, 4.9],
