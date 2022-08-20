@@ -342,8 +342,9 @@ class Temperature(As[CustomSeries]):
 
 
 ser = Temperature.new(...)
-isinstance(ser, CustomSeries)  # True
 ```
+
+where `ser` will be a `CustomSeries` object.
 
 ## Appendix
 
