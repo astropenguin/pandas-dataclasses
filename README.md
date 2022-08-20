@@ -3,7 +3,7 @@
 [![Release](https://img.shields.io/pypi/v/pandas-dataclasses?label=Release&color=cornflowerblue&style=flat-square)](https://pypi.org/project/pandas-dataclasses/)
 [![Python](https://img.shields.io/pypi/pyversions/pandas-dataclasses?label=Python&color=cornflowerblue&style=flat-square)](https://pypi.org/project/pandas-dataclasses/)
 [![Downloads](https://img.shields.io/pypi/dm/pandas-dataclasses?label=Downloads&color=cornflowerblue&style=flat-square)](https://pepy.tech/project/pandas-dataclasses)
-[![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.5633924-cornflowerblue?style=flat-square)](https://doi.org/10.5281/zenodo.5633924)
+[![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.6127352-cornflowerblue?style=flat-square)](https://doi.org/10.5281/zenodo.6127352)
 [![Tests](https://img.shields.io/github/workflow/status/astropenguin/pandas-dataclasses/Tests?label=Tests&style=flat-square)](https://github.com/astropenguin/pandas-dataclasses/actions)
 
 pandas data creation made easy by dataclass
@@ -29,27 +29,27 @@ class Weather(AsDataFrame):
     year: Index[int]
     month: Index[int]
     temp: Data[float]
-    humid: Data[float]
+    wind: Data[float]
 
 
 df = Weather.new(
     [2020, 2020, 2021, 2021, 2022],
     [1, 7, 1, 7, 1],
     [7.1, 24.3, 5.4, 25.9, 4.9],
-    [65, 89, 57, 83, 52],
+    [2.4, 3.1, 2.3, 2.4, 2.6],
 )
 ```
 
 where `df` will become a DataFrame object like:
 
 ```
-            temp  humid
+            temp  wind
 year month
-2020 1       7.1   65.0
-     7      24.3   89.0
-2021 1       5.4   57.0
-     7      25.9   83.0
-2022 1       4.9   52.0
+2020 1       7.1   2.4
+     7      24.3   3.1
+2021 1       5.4   2.3
+     7      25.9   2.4
+2022 1       4.9   2.6
 ```
 
 ### Features
@@ -70,14 +70,14 @@ pip install pandas-dataclasses
 
 pandas-dataclasses provides you the following features:
 
-- Type hints for dataclass fields (`Attr`, `Data`, `Index`, `Name`) to specify index(es), data, attributes, and names of pandas data
+- Type hints for dataclass fields (`Attr`, `Data`, `Index`) to specify index(es), data, and attributes of pandas data
 - Mix-in classes for dataclasses (`As`, `AsDataFrame`, `AsSeries`) to create pandas data by a classmethod (`new`) that takes the same arguments as dataclass initialization
 
 When you call `new`, it will first create a dataclass object and then create a Series or DataFrame object from the dataclass object according the type hints and values in it.
 In the example above, `df = Weather.new(...)` is thus equivalent to:
 
 ```python
-obj = Weather([2020, ...], [1, ...], [7.1, ...], [65, ...])
+obj = Weather([2020, ...], [1, ...], [7.1, ...], [2.4, ...])
 df = asdataframe(obj)
 ```
 
@@ -107,7 +107,7 @@ class Weather(AsDataFrame):
     year: Index[int]
     month: Index[int]
     temp: Data[float]
-    humid: Data[float]
+    wind: Data[float]
 
 
 df = Weather.new(...)
@@ -119,10 +119,10 @@ Fields typed by other types are just ignored in the DataFrame creation.
 
 Each data or index will be cast to the data type specified in a type hint like `Index[int]`.
 Use `Any` or `None` (like `Index[Any]`) if you do not want type casting.
-See [data typing rules](#data-typing-rules) for more examples.
+See also [data typing rules](#data-typing-rules) for more examples.
 
 By default, a field name (i.e. an argument name) is used for the name of corresponding data or index.
-See [custom data/index naming](#custom-naming) if you want customization.
+See also [custom naming](#custom-naming) and [naming rules](#naming-rules) if you want customization.
 
 ### Series creation
 
@@ -139,25 +139,25 @@ from pandas_dataclasses import AsSeries, Data, Index
 
 ```python
 @dataclass
-class Temperature(AsSeries):
-    """Temperature information."""
+class Weather(AsSeries):
+    """Weather information."""
 
     year: Index[int]
     month: Index[int]
     temp: Data[float]
 
 
-ser = Temperature.new(...)
+ser = Weather.new(...)
 ```
 
-Unlike `AsDataFrame`, the second and subsequent data fields are ignored in the Series creation.
+Unlike `AsDataFrame`, the second and subsequent data fields are ignored in the Series creation even if they exist.
 Other rules are the same as for the DataFrame creation.
 
 ## Advanced usage
 
 ### Metadata storing
 
-Fields typed by `Attr` are "attribute fields", each value of which will become an item of attributes (`attrs`) of a DataFrame or a Series object:
+Fields typed by `Attr` are "attribute fields", each value of which will become an item of attributes of a DataFrame or a Series object:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -176,13 +176,16 @@ class Weather(AsDataFrame):
     year: Index[int]
     month: Index[int]
     temp: Data[float]
-    humid: Data[float]
+    wind: Data[float]
     loc: Attr[str] = "Tokyo"
     lon: Attr[float] = 139.69167
     lat: Attr[float] = 35.68944
+
+
+df = Weather.new(...)
 ```
 
-In this example, `Weather.new(...).attrs` will become like:
+where `df.attrs` will become like:
 
 ```python
 {"loc": "Tokyo", "lon": 139.69167, "lat": 35.68944}
@@ -190,7 +193,7 @@ In this example, `Weather.new(...).attrs` will become like:
 
 ### Custom naming
 
-The name of data, index, or attribute can be explicitly specified by adding a string annotation to the corresponding type:
+The name of data, index, or attribute can be explicitly specified by adding a hashable annotation to the corresponding type:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -210,22 +213,25 @@ class Weather(AsDataFrame):
     year: Ann[Index[int], "Year"]
     month: Ann[Index[int], "Month"]
     temp: Ann[Data[float], "Temperature (deg C)"]
-    humid: Ann[Data[float], "Humidity (%)"]
+    wind: Ann[Data[float], "Wind speed (m/s)"]
     loc: Ann[Attr[str], "Location"] = "Tokyo"
     lon: Ann[Attr[float], "Longitude (deg)"] = 139.69167
     lat: Ann[Attr[float], "Latitude (deg)"] = 35.68944
+
+
+df = Weather.new(...)
 ```
 
-In this example, `Weather.new(...)` and its attributes will become like:
+where `df` and `df.attrs` will become like:
 
 ```
-            Temperature (deg C)  Humidity (%)
+            Temperature (deg C)  Wind speed (m/s)
 Year Month
-2020 1                      7.1          65.0
-     7                     24.3          89.0
-2021 1                      5.4          57.0
-     7                     25.9          83.0
-2022 1                      4.9          52.0
+2020 1                      7.1               2.4
+     7                     24.3               3.1
+2021 1                      5.4               2.3
+     7                     25.9               2.4
+2022 1                      4.9               2.6
 ```
 
 ```python
@@ -255,16 +261,19 @@ class Weather(AsDataFrame):
 
     year: Ann[Index[int], "Year"]
     month: Ann[Index[int], "Month"]
-    temp_avg: Ann[Data[float], name("Temperature (degC)", "Average")]
-    temp_max: Ann[Data[float], name("Temperature (degC)", "Maximum")]
+    temp_avg: Ann[Data[float], name("Temperature (deg C)", "Average")]
+    temp_max: Ann[Data[float], name("Temperature (deg C)", "Maximum")]
     wind_avg: Ann[Data[float], name("Wind speed (m/s)", "Average")]
     wind_max: Ann[Data[float], name("Wind speed (m/s)", "Maximum")]
+
+
+df = Weather.new(...)
 ```
 
-In this example, `Weather.new(...)` will become like:
+where `df` will become like:
 
 ```
-Statistic  Temperature (degC)         Wind speed (m/s)
+Statistic  Temperature (deg C)        Wind speed (m/s)
 Category              Average Maximum          Average Maximum
 Year Month
 2020 1                    7.1    11.1              2.4     8.8
@@ -274,9 +283,32 @@ Year Month
 2022 1                    4.9     9.4              2.6     8.8
 ```
 
-For the Series creation, a field typed by `Name` is a "name field", whose value will become the name of a Series object.
-This is useful for dynamic naming.
-See also [naming rules](#naming-rules) for more details and examples.
+If an annotation is a [format string] or a dictionary that has [format string]s as keys and/or values, it will be formatted by a dataclass object before the data creation:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+from dataclasses import dataclass
+from typing import Annotated as Ann
+from pandas_dataclasses import AsDataFrame, Data, Index
+```
+</details>
+
+```python
+@dataclass
+class Weather(AsDataFrame):
+    """Weather information."""
+
+    year: Ann[Index[int], "Year"]
+    month: Ann[Index[int], "Month"]
+    temp: Ann[Data[float], "Temperature ({.temp_unit})"]
+    wind: Ann[Data[float], "Wind speed ({.wind_unit})"]
+    temp_unit: str = "deg C"
+    wind_unit: str = "m/s"
+```
+
+where units of the temperature and the wind speed can be dynamically updated like `Weather.new(..., temp_unit="deg F", wind_unit="km/h"`).
 
 ### Custom pandas factory
 
@@ -310,14 +342,15 @@ class Temperature(As[CustomSeries]):
 
 
 ser = Temperature.new(...)
-isinstance(ser, CustomSeries)  # True
 ```
+
+where `ser` will be a `CustomSeries` object.
 
 ## Appendix
 
 ### Data typing rules
 
-The data type (dtype) of data/index is inferred from the first `Data`/`Index` type of the corresponding field.
+The data type (dtype) of data/index is determined from the first `Data`/`Index` type of the corresponding field.
 The following table shows how the data type is inferred:
 
 <details>
@@ -333,24 +366,21 @@ Type hint | Inferred data type
 --- | ---
 `Data[Any]` | `None` (no type casting)
 `Data[None]` | `None` (no type casting)
-`Data[int]` | `numpy.dtype("i8")`
-`Data[numpy.int32]` | `numpy.dtype("i4")`
+`Data[int]` | `numpy.int64`
+`Data[numpy.int32]` | `numpy.int32`
 `Data[L["datetime64[ns]"]]` | `numpy.dtype("<M8[ns]")`
 `Data[L["category"]]` | `pandas.CategoricalDtype()`
-`Data[int] \| str` | `numpy.dtype("i8")`
-`Data[int] \| Data[float]` | `numpy.dtype("i8")`
-`Ann[Data[int], "spam"]` | `numpy.dtype("i8")`
-`Data[Ann[int, "spam"]]` | `numpy.dtype("i8")`
+`Data[int] \| str` | `numpy.int64`
+`Data[int] \| Data[float]` | `numpy.int64`
+`Ann[Data[int], "spam"]` | `numpy.int64`
+`Data[Ann[int, "spam"]]` | `numpy.int64`
 
 ### Naming rules
 
-The name of data/index is determined by the following rules:
-
-1. If a name field exists, its value will be preferentially used (Series creation only)
-1. If a data/index field is annotated, the first annotation in the first `Data`/`Index` type will be used
-1. Otherwise, the field name (i.e. argument name) will be used
-
-The following table shows how the name is inferred in the case of 2 and 3:
+The name of data/index/attribute is determined from the first annotation of the first `Data`/`Index`/`Attr` type of the corresponding field.
+If the annotation is a [format string] or a dictionary that has [format string]s as keys and/or values, it will be formatted by a dataclass object before the data creation.
+Otherwise, the field name (i.e. argument name) will be used.
+The following table shows how the name is inferred:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -363,24 +393,28 @@ from pandas_dataclasses import Data
 
 Type hint | Inferred name
 --- | ---
-`Data[Any]` | Field name
-`Ann[Data[Any], "spam"]` | `"spam"`
+`Data[Any]` | (field name)
 `Ann[Data[Any], "spam"]` | `"spam"`
 `Ann[Data[Any], "spam", "ham"]` | `"spam"`
 `Ann[Data[Any], "spam"] \| Ann[str, "ham"]` | `"spam"`
 `Ann[Data[Any], "spam"] \| Ann[Data[float], "ham"]` | `"spam"`
+`Ann[Data[Any], "{.name}"` | `"{.name}".format(obj)`
 `Ann[Data[Any], {"0": "spam", "1": "ham"}]` | `("spam", "ham")`
+`Ann[Data[Any], {"0": "{.name}", "1": "ham"}]` | `("{.name}".format(obj), "ham")`
+
+where `obj` is a dataclass object that is expected to have `obj.name`.
 
 ### Development roadmap
 
 Release version | Features
 --- | ---
 v0.4.0 | Support for hierarchical column
-v0.5.0 | Support for dynamic naming of indexes and data
+v0.5.0 | Support for dynamic naming
 v1.0.0 | Initial major release (freezing public features until v2.0.0)
 
 <!-- References -->
 [dataclass]: https://docs.python.org/3/library/dataclasses.html
+[format string]: https://docs.python.org/3/library/string.html#format-string-syntax
 [NumPy]: https://numpy.org
 [pandas]: https://pandas.pydata.org
 [Pylance]: https://github.com/microsoft/pylance-release
