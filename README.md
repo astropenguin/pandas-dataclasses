@@ -119,7 +119,7 @@ Fields typed by other types are just ignored in the DataFrame creation.
 
 Each data or index will be cast to the data type specified in a type hint like `Index[int]`.
 Use `Any` or `None` (like `Index[Any]`) if you do not want type casting.
-See [data typing rules](#data-typing-rules) for more examples.
+See also [data typing rules](#data-typing-rules) for more examples.
 
 By default, a field name (i.e. an argument name) is used for the name of corresponding data or index.
 See [custom data/index naming](#custom-naming) if you want customization.
@@ -317,7 +317,7 @@ isinstance(ser, CustomSeries)  # True
 
 ### Data typing rules
 
-The data type (dtype) of data/index is inferred from the first `Data`/`Index` type of the corresponding field.
+The data type (dtype) of data/index is determined from the first `Data`/`Index` type of the corresponding field.
 The following table shows how the data type is inferred:
 
 <details>
@@ -333,14 +333,14 @@ Type hint | Inferred data type
 --- | ---
 `Data[Any]` | `None` (no type casting)
 `Data[None]` | `None` (no type casting)
-`Data[int]` | `numpy.dtype("i8")`
-`Data[numpy.int32]` | `numpy.dtype("i4")`
+`Data[int]` | `numpy.int64`
+`Data[numpy.int32]` | `numpy.int32`
 `Data[L["datetime64[ns]"]]` | `numpy.dtype("<M8[ns]")`
 `Data[L["category"]]` | `pandas.CategoricalDtype()`
-`Data[int] \| str` | `numpy.dtype("i8")`
-`Data[int] \| Data[float]` | `numpy.dtype("i8")`
-`Ann[Data[int], "spam"]` | `numpy.dtype("i8")`
-`Data[Ann[int, "spam"]]` | `numpy.dtype("i8")`
+`Data[int] \| str` | `numpy.int64`
+`Data[int] \| Data[float]` | `numpy.int64`
+`Ann[Data[int], "spam"]` | `numpy.int64`
+`Data[Ann[int, "spam"]]` | `numpy.int64`
 
 ### Naming rules
 
