@@ -157,7 +157,7 @@ Other rules are the same as for the DataFrame creation.
 
 ### Metadata storing
 
-Fields typed by `Attr` are "attribute fields", each value of which will become an item of attributes (`attrs`) of a DataFrame or a Series object:
+Fields typed by `Attr` are "attribute fields", each value of which will become an item of attributes of a DataFrame or a Series object:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -180,9 +180,12 @@ class Weather(AsDataFrame):
     loc: Attr[str] = "Tokyo"
     lon: Attr[float] = 139.69167
     lat: Attr[float] = 35.68944
+
+
+df = Weather.new(...)
 ```
 
-In this example, `Weather.new(...).attrs` will become like:
+where `df.attrs` will become like:
 
 ```python
 {"loc": "Tokyo", "lon": 139.69167, "lat": 35.68944}
