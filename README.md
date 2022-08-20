@@ -70,7 +70,7 @@ pip install pandas-dataclasses
 
 pandas-dataclasses provides you the following features:
 
-- Type hints for dataclass fields (`Attr`, `Data`, `Index`, `Name`) to specify index(es), data, attributes, and names of pandas data
+- Type hints for dataclass fields (`Attr`, `Data`, `Index`) to specify index(es), data, and attributes of pandas data
 - Mix-in classes for dataclasses (`As`, `AsDataFrame`, `AsSeries`) to create pandas data by a classmethod (`new`) that takes the same arguments as dataclass initialization
 
 When you call `new`, it will first create a dataclass object and then create a Series or DataFrame object from the dataclass object according the type hints and values in it.
@@ -122,7 +122,7 @@ Use `Any` or `None` (like `Index[Any]`) if you do not want type casting.
 See also [data typing rules](#data-typing-rules) for more examples.
 
 By default, a field name (i.e. an argument name) is used for the name of corresponding data or index.
-See [custom data/index naming](#custom-naming) if you want customization.
+See also [custom naming](#custom-naming) and [naming rules](#naming-rules) if you want customization.
 
 ### Series creation
 
@@ -274,9 +274,33 @@ Year Month
 2022 1                    4.9     9.4              2.6     8.8
 ```
 
-For the Series creation, a field typed by `Name` is a "name field", whose value will become the name of a Series object.
-This is useful for dynamic naming.
-See also [naming rules](#naming-rules) for more details and examples.
+If an annotation is a [format string] or a dictionary that has [format string]s as keys and/or values, it will be formatted by a dataclass object before the data creation:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+from dataclasses import dataclass
+from typing import Annotated as Ann
+from pandas_dataclasses import AsDataFrame, Data, Index
+```
+</details>
+
+```python
+@dataclass
+class Weather(AsDataFrame):
+    """Weather information."""
+
+    year: Ann[Index[int], "Year"]
+    month: Ann[Index[int], "Month"]
+    temp: Ann[Data[float], "Temperature ({.temp_unit})"]
+    wind: Ann[Data[float], "Wind speed ({.wind_unit})"]
+    temp_unit: str = "deg C"
+    wind_unit: str = "m/s"
+```
+
+In this example, units of the temperature and the wind speed can be dynamically updated like `Weather.new(..., temp_unit="deg F", wind_unit="km/h"`).
+
 
 ### Custom pandas factory
 
@@ -344,13 +368,10 @@ Type hint | Inferred data type
 
 ### Naming rules
 
-The name of data/index is determined by the following rules:
-
-1. If a name field exists, its value will be preferentially used (Series creation only)
-1. If a data/index field is annotated, the first annotation in the first `Data`/`Index` type will be used
-1. Otherwise, the field name (i.e. argument name) will be used
-
-The following table shows how the name is inferred in the case of 2 and 3:
+The name of data/index/attribute is determined from the first annotation of the first `Data`/`Index`/`Attr` type of the corresponding field.
+If the annotation is a [format string] or a dictionary that has [format string]s as keys and/or values, it will be formatted by a dataclass object before the data creation.
+Otherwise, the field name (i.e. argument name) will be used.
+The following table shows how the name is inferred:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -363,24 +384,28 @@ from pandas_dataclasses import Data
 
 Type hint | Inferred name
 --- | ---
-`Data[Any]` | Field name
-`Ann[Data[Any], "spam"]` | `"spam"`
+`Data[Any]` | (field name)
 `Ann[Data[Any], "spam"]` | `"spam"`
 `Ann[Data[Any], "spam", "ham"]` | `"spam"`
 `Ann[Data[Any], "spam"] \| Ann[str, "ham"]` | `"spam"`
 `Ann[Data[Any], "spam"] \| Ann[Data[float], "ham"]` | `"spam"`
+`Ann[Data[Any], "{.name}"` | `"{.name}".format(obj)`
 `Ann[Data[Any], {"0": "spam", "1": "ham"}]` | `("spam", "ham")`
+`Ann[Data[Any], {"0": "{.name}", "1": "ham"}]` | `("{.name}".format(obj), "ham")`
+
+where `obj` is a dataclass object that is expected to have `obj.name`.
 
 ### Development roadmap
 
 Release version | Features
 --- | ---
 v0.4.0 | Support for hierarchical column
-v0.5.0 | Support for dynamic naming of indexes and data
+v0.5.0 | Support for dynamic naming
 v1.0.0 | Initial major release (freezing public features until v2.0.0)
 
 <!-- References -->
 [dataclass]: https://docs.python.org/3/library/dataclasses.html
+[format string]: https://docs.python.org/3/library/string.html#format-string-syntax
 [NumPy]: https://numpy.org
 [pandas]: https://pandas.pydata.org
 [Pylance]: https://github.com/microsoft/pylance-release
