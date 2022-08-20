@@ -29,27 +29,27 @@ class Weather(AsDataFrame):
     year: Index[int]
     month: Index[int]
     temp: Data[float]
-    humid: Data[float]
+    wind: Data[float]
 
 
 df = Weather.new(
     [2020, 2020, 2021, 2021, 2022],
     [1, 7, 1, 7, 1],
     [7.1, 24.3, 5.4, 25.9, 4.9],
-    [65, 89, 57, 83, 52],
+    [2.4, 3.1, 2.3, 2.4, 2.6],
 )
 ```
 
 where `df` will become a DataFrame object like:
 
 ```
-            temp  humid
+            temp  wind
 year month
-2020 1       7.1   65.0
-     7      24.3   89.0
-2021 1       5.4   57.0
-     7      25.9   83.0
-2022 1       4.9   52.0
+2020 1       7.1   2.4
+     7      24.3   3.1
+2021 1       5.4   2.3
+     7      25.9   2.4
+2022 1       4.9   2.6
 ```
 
 ### Features
@@ -77,7 +77,7 @@ When you call `new`, it will first create a dataclass object and then create a S
 In the example above, `df = Weather.new(...)` is thus equivalent to:
 
 ```python
-obj = Weather([2020, ...], [1, ...], [7.1, ...], [65, ...])
+obj = Weather([2020, ...], [1, ...], [7.1, ...], [2.4, ...])
 df = asdataframe(obj)
 ```
 
@@ -107,7 +107,7 @@ class Weather(AsDataFrame):
     year: Index[int]
     month: Index[int]
     temp: Data[float]
-    humid: Data[float]
+    wind: Data[float]
 
 
 df = Weather.new(...)
@@ -139,18 +139,18 @@ from pandas_dataclasses import AsSeries, Data, Index
 
 ```python
 @dataclass
-class Temperature(AsSeries):
-    """Temperature information."""
+class Weather(AsSeries):
+    """Weather information."""
 
     year: Index[int]
     month: Index[int]
     temp: Data[float]
 
 
-ser = Temperature.new(...)
+ser = Weather.new(...)
 ```
 
-Unlike `AsDataFrame`, the second and subsequent data fields are ignored in the Series creation.
+Unlike `AsDataFrame`, the second and subsequent data fields are ignored in the Series creation even if they exist.
 Other rules are the same as for the DataFrame creation.
 
 ## Advanced usage
@@ -176,7 +176,7 @@ class Weather(AsDataFrame):
     year: Index[int]
     month: Index[int]
     temp: Data[float]
-    humid: Data[float]
+    wind: Data[float]
     loc: Attr[str] = "Tokyo"
     lon: Attr[float] = 139.69167
     lat: Attr[float] = 35.68944
@@ -210,7 +210,7 @@ class Weather(AsDataFrame):
     year: Ann[Index[int], "Year"]
     month: Ann[Index[int], "Month"]
     temp: Ann[Data[float], "Temperature (deg C)"]
-    humid: Ann[Data[float], "Humidity (%)"]
+    wind: Ann[Data[float], "Wind speed (m/s)"]
     loc: Ann[Attr[str], "Location"] = "Tokyo"
     lon: Ann[Attr[float], "Longitude (deg)"] = 139.69167
     lat: Ann[Attr[float], "Latitude (deg)"] = 35.68944
@@ -219,13 +219,13 @@ class Weather(AsDataFrame):
 In this example, `Weather.new(...)` and its attributes will become like:
 
 ```
-            Temperature (deg C)  Humidity (%)
+            Temperature (deg C)  Wind speed (m/s)
 Year Month
-2020 1                      7.1          65.0
-     7                     24.3          89.0
-2021 1                      5.4          57.0
-     7                     25.9          83.0
-2022 1                      4.9          52.0
+2020 1                      7.1               2.4
+     7                     24.3               3.1
+2021 1                      5.4               2.3
+     7                     25.9               2.4
+2022 1                      4.9               2.6
 ```
 
 ```python
@@ -255,8 +255,8 @@ class Weather(AsDataFrame):
 
     year: Ann[Index[int], "Year"]
     month: Ann[Index[int], "Month"]
-    temp_avg: Ann[Data[float], name("Temperature (degC)", "Average")]
-    temp_max: Ann[Data[float], name("Temperature (degC)", "Maximum")]
+    temp_avg: Ann[Data[float], name("Temperature (deg C)", "Average")]
+    temp_max: Ann[Data[float], name("Temperature (deg C)", "Maximum")]
     wind_avg: Ann[Data[float], name("Wind speed (m/s)", "Average")]
     wind_max: Ann[Data[float], name("Wind speed (m/s)", "Maximum")]
 ```
@@ -264,7 +264,7 @@ class Weather(AsDataFrame):
 In this example, `Weather.new(...)` will become like:
 
 ```
-Statistic  Temperature (degC)         Wind speed (m/s)
+Statistic  Temperature (deg C)        Wind speed (m/s)
 Category              Average Maximum          Average Maximum
 Year Month
 2020 1                    7.1    11.1              2.4     8.8
