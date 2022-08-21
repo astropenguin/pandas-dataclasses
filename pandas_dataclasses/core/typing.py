@@ -36,7 +36,7 @@ from typing_extensions import (
 
 
 # type hints (private)
-AnyDType: TypeAlias = "np.dtype[Any] | ExtensionDtype"
+AnyDtype: TypeAlias = "np.dtype[Any] | ExtensionDtype"
 AnyName: TypeAlias = "Hashable | dict[Hashable, Hashable]"
 AnyPandas: TypeAlias = "pd.DataFrame | pd.Series"
 P = ParamSpec("P")
@@ -138,7 +138,7 @@ def get_annotations(tp: Any) -> Tuple[Any, ...]:
     raise TypeError("Could not find any role-annotated type.")
 
 
-def get_dtype(tp: Any) -> Optional[AnyDType]:
+def get_dtype(tp: Any) -> Optional[AnyDtype]:
     """Extract a NumPy or pandas data type."""
     try:
         dtype = get_args(get_annotated(tp))[0]

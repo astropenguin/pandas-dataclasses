@@ -12,7 +12,7 @@ import pandas as pd
 
 # submodules
 from .specs import Spec
-from .typing import P, AnyDType, DataClass, PandasClass
+from .typing import P, AnyDtype, DataClass, PandasClass
 
 
 # type hints
@@ -93,7 +93,7 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
     return series
 
 
-def ensure(data: Any, dtype: Optional[AnyDType]) -> Any:
+def ensure(data: Any, dtype: Optional[AnyDtype]) -> Any:
     """Ensure data to be 1D and have given data type."""
     if not isinstance(data, (pd.Index, pd.Series)):
         data = np.atleast_1d(data)
