@@ -3,7 +3,6 @@ from dataclasses import MISSING
 
 
 # dependencies
-import numpy as np
 from data import Weather, weather
 from pandas_dataclasses.core.specs import Spec
 
@@ -24,7 +23,7 @@ def test_year() -> None:
     assert field.id == "year"
     assert field.name == "Year"
     assert field.role == "index"
-    assert field.dtype == np.int64
+    assert field.dtype == "int64"
     assert field.default is MISSING
 
 
@@ -34,7 +33,7 @@ def test_year_updated() -> None:
     assert field.id == "year"
     assert field.name == "Year"
     assert field.role == "index"
-    assert field.dtype == np.int64
+    assert field.dtype == "int64"
     assert field.default == [2020, 2020, 2021, 2021, 2022]
 
 
@@ -44,7 +43,7 @@ def test_month() -> None:
     assert field.id == "month"
     assert field.name == "Month"
     assert field.role == "index"
-    assert field.dtype == np.int64
+    assert field.dtype == "int64"
     assert field.default is MISSING
 
 
@@ -54,7 +53,7 @@ def test_month_updated() -> None:
     assert field.id == "month"
     assert field.name == "Month"
     assert field.role == "index"
-    assert field.dtype == np.int64
+    assert field.dtype == "int64"
     assert field.default == [1, 7, 1, 7, 1]
 
 
@@ -64,7 +63,7 @@ def test_temp_avg() -> None:
     assert field.id == "temp_avg"
     assert field.name == name("Temperature ({.temp_unit})", "Average")
     assert field.role == "data"
-    assert field.dtype == np.float64
+    assert field.dtype == "float64"
     assert field.default is MISSING
 
 
@@ -74,7 +73,7 @@ def test_temp_avg_updated() -> None:
     assert field.id == "temp_avg"
     assert field.name == name("Temperature (deg C)", "Average")
     assert field.role == "data"
-    assert field.dtype == np.float64
+    assert field.dtype == "float64"
     assert field.default == [7.1, 24.3, 5.4, 25.9, 4.9]
 
 
@@ -84,7 +83,7 @@ def test_temp_max() -> None:
     assert field.id == "temp_max"
     assert field.name == name("Temperature ({.temp_unit})", "Maximum")
     assert field.role == "data"
-    assert field.dtype == np.float64
+    assert field.dtype == "float64"
     assert field.default is MISSING
 
 
@@ -94,7 +93,7 @@ def test_temp_max_updated() -> None:
     assert field.id == "temp_max"
     assert field.name == name("Temperature (deg C)", "Maximum")
     assert field.role == "data"
-    assert field.dtype == np.float64
+    assert field.dtype == "float64"
     assert field.default == [11.1, 27.7, 10.3, 30.3, 9.4]
 
 
@@ -104,7 +103,7 @@ def test_wind_avg() -> None:
     assert field.id == "wind_avg"
     assert field.name == name("Wind speed ({.wind_unit})", "Average")
     assert field.role == "data"
-    assert field.dtype == np.float64
+    assert field.dtype == "float64"
     assert field.default is MISSING
 
 
@@ -114,7 +113,7 @@ def test_wind_avg_updated() -> None:
     assert field.id == "wind_avg"
     assert field.name == name("Wind speed (m/s)", "Average")
     assert field.role == "data"
-    assert field.dtype == np.float64
+    assert field.dtype == "float64"
     assert field.default == [2.4, 3.1, 2.3, 2.4, 2.6]
 
 
@@ -124,7 +123,7 @@ def test_wind_max() -> None:
     assert field.id == "wind_max"
     assert field.name == name("Wind speed ({.wind_unit})", "Maximum")
     assert field.role == "data"
-    assert field.dtype == np.float64
+    assert field.dtype == "float64"
     assert field.default is MISSING
 
 
@@ -134,7 +133,7 @@ def test_wind_max_updated() -> None:
     assert field.id == "wind_max"
     assert field.name == name("Wind speed (m/s)", "Maximum")
     assert field.role == "data"
-    assert field.dtype == np.float64
+    assert field.dtype == "float64"
     assert field.default == [8.8, 10.2, 10.7, 9.0, 8.8]
 
 

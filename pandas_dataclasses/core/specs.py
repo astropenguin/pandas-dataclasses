@@ -15,7 +15,6 @@ from typing_extensions import Literal, get_type_hints
 # submodules
 from .typing import (
     P,
-    AnyDtype,
     AnyName,
     AnyPandas,
     DataClass,
@@ -43,7 +42,7 @@ class Field:
     type: Optional[Any]
     """Type (hint) of the field data."""
 
-    dtype: Optional[AnyDtype]
+    dtype: Optional[str]
     """Data type of the field data."""
 
     default: Any

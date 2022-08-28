@@ -12,7 +12,7 @@ import pandas as pd
 
 # submodules
 from .specs import Spec
-from .typing import P, AnyDtype, DataClass, PandasClass
+from .typing import P, DataClass, PandasClass
 
 
 # type hints
@@ -93,7 +93,7 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
     return series
 
 
-def ensure(data: Any, dtype: Optional[AnyDtype]) -> Any:
+def ensure(data: Any, dtype: Optional[str]) -> Any:
     """Ensure data to be 1D and have given data type."""
     if not np.ndim(data):
         data = [data]
