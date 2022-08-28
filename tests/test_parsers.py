@@ -87,10 +87,10 @@ def test_get_data() -> None:
     assert keys[2] == spec.fields.of_data[2].hashable_name
     assert keys[3] == spec.fields.of_data[3].hashable_name
 
-    assert values[0].dtype == spec.fields.of_data[0].dtype
-    assert values[1].dtype == spec.fields.of_data[1].dtype
-    assert values[2].dtype == spec.fields.of_data[2].dtype
-    assert values[3].dtype == spec.fields.of_data[3].dtype
+    assert values[0].dtype.numpy_dtype == spec.fields.of_data[0].dtype
+    assert values[1].dtype.numpy_dtype == spec.fields.of_data[1].dtype
+    assert values[2].dtype.numpy_dtype == spec.fields.of_data[2].dtype
+    assert values[3].dtype.numpy_dtype == spec.fields.of_data[3].dtype
 
     assert (values[0] == spec.fields.of_data[0].default).all()
     assert (values[1] == spec.fields.of_data[1].default).all()
