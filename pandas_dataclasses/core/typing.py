@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Data", "Index", "Name", "Other"]
+__all__ = ["Attr", "Data", "Index", "Other"]
 
 
 # standard library
@@ -72,9 +72,6 @@ class Role(Enum):
     INDEX = auto()
     """Annotation for index fields."""
 
-    NAME = auto()
-    """Annotation for name fields."""
-
     OTHER = auto()
     """Annotation for other fields."""
 
@@ -93,9 +90,6 @@ Data = Annotated[Collection[T], Role.DATA]
 
 Index = Annotated[Collection[T], Role.INDEX]
 """Type hint for index fields (``Index[T]``)."""
-
-Name = Annotated[THashable, Role.NAME]
-"""Type hint for name fields (``Name[T]``)."""
 
 Other = Annotated[T, Role.OTHER]
 """Type hint for other fields (``Other[T]``)."""
