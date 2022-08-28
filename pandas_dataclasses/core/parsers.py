@@ -95,13 +95,13 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
 
 def ensure(data: Any, dtype: Optional[AnyDtype]) -> Any:
     """Ensure data to be 1D and have given data type."""
-    if not isinstance(data, (pd.Index, pd.Series)):
-        data = np.atleast_1d(data)
+    if not np.ndim(data):
+        data = [data]
 
-    if dtype is None:
-        return data
+    if isinstance(data, (pd.Index, pd.Series)):
+        return type(data)(data, dtype=dtype, copy=False)
     else:
-        return data.astype(dtype, copy=False)
+        return pd.array(data, dtype=dtype, copy=False)
 
 
 def get_attrs(spec: Spec) -> "dict[Hashable, Any]":
