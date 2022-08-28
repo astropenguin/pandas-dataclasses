@@ -408,9 +408,9 @@ where `obj` is a dataclass object that is expected to have `obj.name`.
 
 Release version | Features
 --- | ---
-v0.4.0 | Support for hierarchical column
-v0.5.0 | Support for dynamic naming
-v1.0.0 | Initial major release (freezing public features until v2.0.0)
+v0.5 | Support for dynamic naming
+v0.6 | support for extension array and dtype
+v1.0 | Initial major release (freezing public features until v2.0)
 
 <!-- References -->
 [dataclass]: https://docs.python.org/3/library/dataclasses.html
