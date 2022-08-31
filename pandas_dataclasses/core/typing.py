@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Data", "Index", "Other"]
+__all__ = ["Attr", "Column", "Data", "Index", "Other"]
 
 
 # standard library
@@ -63,6 +63,9 @@ class Role(Enum):
     ATTR = auto()
     """Annotation for attribute fields."""
 
+    COLUMN = auto()
+    """Annotation for column fields."""
+
     DATA = auto()
     """Annotation for data fields."""
 
@@ -81,6 +84,9 @@ class Role(Enum):
 # type hints (public)
 Attr = Annotated[T, Role.ATTR]
 """Type hint for attribute fields (``Attr[T]``)."""
+
+Column = Annotated[T, Role.COLUMN]
+"""Type hint for column fields (``Column[T]``)."""
 
 Data = Annotated[Collection[T], Role.DATA]
 """Type hint for data fields (``Data[T]``)."""

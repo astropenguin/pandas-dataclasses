@@ -36,7 +36,7 @@ class Field:
     name: AnyName
     """Name of the field."""
 
-    role: Literal["attr", "data", "index"]
+    role: Literal["attr", "column", "data", "index"]
     """Role of the field."""
 
     type: Optional[Any]
@@ -72,6 +72,11 @@ class Fields(List[Field]):
     def of_attr(self) -> "Fields":
         """Select only attribute field specifications."""
         return Fields(field for field in self if field.role == "attr")
+
+    @property
+    def of_column(self) -> "Fields":
+        """Select only column field specifications."""
+        return Fields(field for field in self if field.role == "column")
 
     @property
     def of_data(self) -> "Fields":
@@ -129,6 +134,8 @@ def convert_field(field_: "Field_[Any]") -> Optional[Field]:
 
     if role is Role.ATTR:
         role = "attr"
+    elif role is Role.COLUMN:
+        role = "column"
     elif role is Role.DATA:
         role = "data"
     elif role is Role.INDEX:
