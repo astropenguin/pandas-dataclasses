@@ -42,7 +42,7 @@ def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     attrs = get_attrs(spec)
     data = get_data(spec)
     index = get_index(spec)
-    columns = get_columns(spec)
+    names = get_columns(spec)
 
     if factory is None:
         factory = spec.factory or pd.DataFrame
@@ -50,7 +50,8 @@ def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     if not issubclass(factory, pd.DataFrame):
         raise TypeError("Factory must be a subclass of DataFrame.")
 
-    dataframe = factory(data, index, columns)
+    dataframe = factory(data, index)
+    dataframe.columns.names = names
     dataframe.attrs.update(attrs)
     return dataframe
 
@@ -109,31 +110,22 @@ def get_attrs(spec: Spec) -> "dict[Hashable, Any]":
     attrs: "dict[Hashable, Any]" = {}
 
     for field in spec.fields.of_attr:
-        attrs[field.hashable_name] = field.default
+        attrs[field.name] = field.default
 
     return attrs
 
 
-def get_columns(spec: Spec) -> Optional[pd.Index]:
-    """Derive columns from a specification."""
-    if not spec.fields.of_data:
-        return
+def get_columns(spec: Spec) -> "list[Hashable]":
+    """Derive column names from a specification."""
+    objs: "dict[Hashable, Any]" = {}
 
-    names_ = [field.name for field in spec.fields.of_data]
+    for field in spec.fields.of_column:
+        objs[field.name] = field.default
 
-    if all(isinstance(name, Hashable) for name in names_):
-        return
-
-    if not all(isinstance(name, dict) for name in names_):
-        raise ValueError("All names must be dictionaries.")
-
-    names = [tuple(name.keys()) for name in names_]  # type: ignore
-    indexes = [tuple(name.values()) for name in names_]  # type: ignore
-
-    if not len(set(names)) == 1:
-        raise ValueError("All name keys must be same.")
-
-    return pd.MultiIndex.from_tuples(indexes, names=names[0])
+    if not objs:
+        return [None]
+    else:
+        return list(objs.keys())
 
 
 def get_data(spec: Spec) -> Optional["dict[Hashable, Any]"]:
@@ -145,7 +137,7 @@ def get_data(spec: Spec) -> Optional["dict[Hashable, Any]"]:
     data: List[Any] = []
 
     for field in spec.fields.of_data:
-        names.append(field.hashable_name)
+        names.append(field.name)
         data.append(ensure(field.default, field.dtype))
 
     return dict(zip(names, data))
@@ -160,7 +152,7 @@ def get_index(spec: Spec) -> Optional[pd.Index]:
     indexes: List[Any] = []
 
     for field in spec.fields.of_index:
-        names.append(field.hashable_name)
+        names.append(field.name)
         indexes.append(ensure(field.default, field.dtype))
 
     indexes = np.broadcast_arrays(*indexes)

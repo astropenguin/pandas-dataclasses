@@ -13,16 +13,7 @@ from typing_extensions import Literal, get_type_hints
 
 
 # submodules
-from .typing import (
-    P,
-    AnyName,
-    AnyPandas,
-    DataClass,
-    Role,
-    get_dtype,
-    get_name,
-    get_role,
-)
+from .typing import P, AnyPandas, DataClass, Role, get_dtype, get_name, get_role
 
 
 # runtime classes
@@ -33,7 +24,7 @@ class Field:
     id: str
     """Identifier of the field."""
 
-    name: AnyName
+    name: Hashable
     """Name of the field."""
 
     role: Literal["attr", "column", "data", "index"]
@@ -48,20 +39,12 @@ class Field:
     default: Any
     """Default value of the field data."""
 
-    @property
-    def hashable_name(self) -> Hashable:
-        """Hashable name of the field."""
-        if isinstance(self.name, dict):
-            return tuple(self.name.values())
-        else:
-            return self.name
-
     def update(self, obj: DataClass[P]) -> "Field":
         """Update the specification by a dataclass object."""
         return replace(
             self,
             name=format_name(self.name, obj),
-            default=getattr(obj, self.id),
+            default=getattr(obj, self.id, self.default),
         )
 
 
@@ -164,19 +147,12 @@ def eval_types(dataclass: Type[DataClass[P]]) -> Type[DataClass[P]]:
     return dataclass
 
 
-def format_name(name: AnyName, obj: DataClass[P]) -> AnyName:
+def format_name(name: Hashable, obj: DataClass[P]) -> Hashable:
     """Format a name by a dataclass object."""
+    if isinstance(name, tuple):
+        return type(name)(format_name(elem, obj) for elem in name)
+
     if isinstance(name, str):
         return name.format(obj)
-
-    if isinstance(name, dict):
-        formatted: "dict[Hashable, Hashable]" = {}
-
-        for key, val in name.items():
-            key = key.format(obj) if isinstance(key, str) else key
-            val = val.format(obj) if isinstance(val, str) else val
-            formatted[key] = val
-
-        return formatted
 
     return name

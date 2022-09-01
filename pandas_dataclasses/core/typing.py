@@ -34,7 +34,6 @@ from typing_extensions import (
 
 
 # type hints (private)
-AnyName: TypeAlias = "Hashable | dict[Hashable, Hashable]"
 AnyPandas: TypeAlias = "pd.DataFrame | pd.Series"
 P = ParamSpec("P")
 T = TypeVar("T")
@@ -151,24 +150,19 @@ def get_dtype(tp: Any) -> Optional[str]:
     return pandas_dtype(dtype).name
 
 
-def get_name(tp: Any, default: AnyName = None) -> AnyName:
+def get_name(tp: Any, default: Hashable = None) -> Hashable:
     """Extract a name if found or return given default."""
     try:
         name = get_annotations(tp)[1]
     except (IndexError, TypeError):
         return default
 
-    if isinstance(name, Hashable):
-        return name
+    try:
+        hash(name)
+    except TypeError:
+        raise ValueError("Could not find any valid name.")
 
-    if (
-        isinstance(name, dict)
-        and all(isinstance(key, Hashable) for key in name.keys())
-        and all(isinstance(val, Hashable) for val in name.values())
-    ):
-        return dict(name)
-
-    raise ValueError("Could not find any valid name.")
+    return name
 
 
 def get_role(tp: Any, default: Role = Role.OTHER) -> Role:
