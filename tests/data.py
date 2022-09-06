@@ -7,21 +7,16 @@ __all__ = [
 
 
 # standard library
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 # dependencies
 import pandas as pd
-from pandas_dataclasses import Attr, Data, Index
+from pandas_dataclasses import Attr, Column, Data, Index
 from typing_extensions import Annotated as Ann
 
 
 # test dataclass and object
-def name(stat: str, cat: str) -> "dict[str, str]":
-    """Shorthand function for data names."""
-    return {"Statistic": stat, "Category": cat}
-
-
 @dataclass
 class Weather:
     """Weather information."""
@@ -32,16 +27,22 @@ class Weather:
     month: Ann[Index[int], "Month"]
     """Month of the measured time."""
 
-    temp_avg: Ann[Data[float], name("Temperature ({.temp_unit})", "Average")]
+    meas: Ann[Column[None], "Measurement"] = field(init=False, repr=False)
+    """Name of the measurement."""
+
+    stat: Ann[Column[None], "Statistic"] = field(init=False, repr=False)
+    """Name of the statistic."""
+
+    temp_avg: Ann[Data[float], ("Temperature ({.temp_unit})", "Average")]
     """Monthly average temperature with given units."""
 
-    temp_max: Ann[Data[float], name("Temperature ({.temp_unit})", "Maximum")]
+    temp_max: Ann[Data[float], ("Temperature ({.temp_unit})", "Maximum")]
     """Monthly maximum temperature with given units."""
 
-    wind_avg: Ann[Data[float], name("Wind speed ({.wind_unit})", "Average")]
+    wind_avg: Ann[Data[float], ("Wind speed ({.wind_unit})", "Average")]
     """Monthly average wind speed with given units."""
 
-    wind_max: Ann[Data[float], name("Wind speed ({.wind_unit})", "Maximum")]
+    wind_max: Ann[Data[float], ("Wind speed ({.wind_unit})", "Maximum")]
     """Monthly maximum wind speed with given units."""
 
     loc: Ann[Attr[str], "Location"] = "Tokyo"
@@ -98,7 +99,7 @@ df_weather_true = pd.DataFrame(
             ("Wind speed (m/s)", "Average"),
             ("Wind speed (m/s)", "Maximum"),
         ],
-        names=("Statistic", "Category"),
+        names=("Measurement", "Statistic"),
     ),
 )
 df_weather_true.attrs = {

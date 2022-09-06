@@ -13,10 +13,6 @@ spec_updated = spec @ weather
 
 
 # test functions
-def name(stat: str, cat: str) -> "dict[str, str]":
-    return {"Statistic": stat, "Category": cat}
-
-
 def test_year() -> None:
     field = spec.fields.of_index[0]
 
@@ -57,11 +53,47 @@ def test_month_updated() -> None:
     assert field.default == [1, 7, 1, 7, 1]
 
 
+def test_meas() -> None:
+    field = spec.fields.of_column[0]
+
+    assert field.id == "meas"
+    assert field.name == "Measurement"
+    assert field.role == "column"
+    assert field.default is MISSING
+
+
+def test_meas_updated() -> None:
+    field = spec_updated.fields.of_column[0]
+
+    assert field.id == "meas"
+    assert field.name == "Measurement"
+    assert field.role == "column"
+    assert field.default is MISSING
+
+
+def test_stat() -> None:
+    field = spec.fields.of_column[1]
+
+    assert field.id == "stat"
+    assert field.name == "Statistic"
+    assert field.role == "column"
+    assert field.default is MISSING
+
+
+def test_stat_updated() -> None:
+    field = spec_updated.fields.of_column[1]
+
+    assert field.id == "stat"
+    assert field.name == "Statistic"
+    assert field.role == "column"
+    assert field.default is MISSING
+
+
 def test_temp_avg() -> None:
     field = spec.fields.of_data[0]
 
     assert field.id == "temp_avg"
-    assert field.name == name("Temperature ({.temp_unit})", "Average")
+    assert field.name == ("Temperature ({.temp_unit})", "Average")
     assert field.role == "data"
     assert field.dtype == "float64"
     assert field.default is MISSING
@@ -71,7 +103,7 @@ def test_temp_avg_updated() -> None:
     field = spec_updated.fields.of_data[0]
 
     assert field.id == "temp_avg"
-    assert field.name == name("Temperature (deg C)", "Average")
+    assert field.name == ("Temperature (deg C)", "Average")
     assert field.role == "data"
     assert field.dtype == "float64"
     assert field.default == [7.1, 24.3, 5.4, 25.9, 4.9]
@@ -81,7 +113,7 @@ def test_temp_max() -> None:
     field = spec.fields.of_data[1]
 
     assert field.id == "temp_max"
-    assert field.name == name("Temperature ({.temp_unit})", "Maximum")
+    assert field.name == ("Temperature ({.temp_unit})", "Maximum")
     assert field.role == "data"
     assert field.dtype == "float64"
     assert field.default is MISSING
@@ -91,7 +123,7 @@ def test_temp_max_updated() -> None:
     field = spec_updated.fields.of_data[1]
 
     assert field.id == "temp_max"
-    assert field.name == name("Temperature (deg C)", "Maximum")
+    assert field.name == ("Temperature (deg C)", "Maximum")
     assert field.role == "data"
     assert field.dtype == "float64"
     assert field.default == [11.1, 27.7, 10.3, 30.3, 9.4]
@@ -101,7 +133,7 @@ def test_wind_avg() -> None:
     field = spec.fields.of_data[2]
 
     assert field.id == "wind_avg"
-    assert field.name == name("Wind speed ({.wind_unit})", "Average")
+    assert field.name == ("Wind speed ({.wind_unit})", "Average")
     assert field.role == "data"
     assert field.dtype == "float64"
     assert field.default is MISSING
@@ -111,7 +143,7 @@ def test_wind_avg_updated() -> None:
     field = spec_updated.fields.of_data[2]
 
     assert field.id == "wind_avg"
-    assert field.name == name("Wind speed (m/s)", "Average")
+    assert field.name == ("Wind speed (m/s)", "Average")
     assert field.role == "data"
     assert field.dtype == "float64"
     assert field.default == [2.4, 3.1, 2.3, 2.4, 2.6]
@@ -121,7 +153,7 @@ def test_wind_max() -> None:
     field = spec.fields.of_data[3]
 
     assert field.id == "wind_max"
-    assert field.name == name("Wind speed ({.wind_unit})", "Maximum")
+    assert field.name == ("Wind speed ({.wind_unit})", "Maximum")
     assert field.role == "data"
     assert field.dtype == "float64"
     assert field.default is MISSING
@@ -131,7 +163,7 @@ def test_wind_max_updated() -> None:
     field = spec_updated.fields.of_data[3]
 
     assert field.id == "wind_max"
-    assert field.name == name("Wind speed (m/s)", "Maximum")
+    assert field.name == ("Wind speed (m/s)", "Maximum")
     assert field.role == "data"
     assert field.dtype == "float64"
     assert field.default == [8.8, 10.2, 10.7, 9.0, 8.8]
