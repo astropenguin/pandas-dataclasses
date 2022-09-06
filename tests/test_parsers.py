@@ -58,9 +58,9 @@ def test_get_attrs() -> None:
     keys = list(attrs.keys())
     values = list(attrs.values())
 
-    assert keys[0] == spec.fields.of_attr[0].hashable_name
-    assert keys[1] == spec.fields.of_attr[1].hashable_name
-    assert keys[2] == spec.fields.of_attr[2].hashable_name
+    assert keys[0] == spec.fields.of_attr[0].name
+    assert keys[1] == spec.fields.of_attr[1].name
+    assert keys[2] == spec.fields.of_attr[2].name
 
     assert values[0] == spec.fields.of_attr[0].default
     assert values[1] == spec.fields.of_attr[1].default
@@ -68,13 +68,10 @@ def test_get_attrs() -> None:
 
 
 def test_get_columns() -> None:
-    index = cast(pd.Index, get_columns(spec))
+    columns = get_columns(spec)
 
-    assert index.names == list(spec.fields.of_data[0].name)  # type: ignore
-    assert index[0] == spec.fields.of_data[0].hashable_name
-    assert index[1] == spec.fields.of_data[1].hashable_name
-    assert index[2] == spec.fields.of_data[2].hashable_name
-    assert index[3] == spec.fields.of_data[3].hashable_name
+    assert columns[0] == spec.fields.of_column[0].name
+    assert columns[1] == spec.fields.of_column[1].name
 
 
 def test_get_data() -> None:
@@ -82,10 +79,10 @@ def test_get_data() -> None:
     keys = list(data.keys())
     values = list(data.values())
 
-    assert keys[0] == spec.fields.of_data[0].hashable_name
-    assert keys[1] == spec.fields.of_data[1].hashable_name
-    assert keys[2] == spec.fields.of_data[2].hashable_name
-    assert keys[3] == spec.fields.of_data[3].hashable_name
+    assert keys[0] == spec.fields.of_data[0].name
+    assert keys[1] == spec.fields.of_data[1].name
+    assert keys[2] == spec.fields.of_data[2].name
+    assert keys[3] == spec.fields.of_data[3].name
 
     assert values[0].dtype.name == spec.fields.of_data[0].dtype
     assert values[1].dtype.name == spec.fields.of_data[1].dtype
@@ -102,8 +99,8 @@ def test_get_index() -> None:
     index = cast(pd.Index, get_index(spec))
     df = cast(pd.DataFrame, index.to_frame())
 
-    assert df.iloc[:, 0].name == spec.fields.of_index[0].hashable_name
-    assert df.iloc[:, 1].name == spec.fields.of_index[1].hashable_name
+    assert df.iloc[:, 0].name == spec.fields.of_index[0].name
+    assert df.iloc[:, 1].name == spec.fields.of_index[1].name
 
     assert df.iloc[:, 0].dtype == spec.fields.of_index[0].dtype
     assert df.iloc[:, 1].dtype == spec.fields.of_index[1].dtype

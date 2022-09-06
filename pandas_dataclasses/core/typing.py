@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Data", "Index", "Other"]
+__all__ = ["Attr", "Column", "Data", "Index", "Other"]
 
 
 # standard library
@@ -12,7 +12,6 @@ from typing import (
     Hashable,
     Iterable,
     Optional,
-    Tuple,
     Type,
     TypeVar,
 )
@@ -34,7 +33,6 @@ from typing_extensions import (
 
 
 # type hints (private)
-AnyName: TypeAlias = "Hashable | dict[Hashable, Hashable]"
 AnyPandas: TypeAlias = "pd.DataFrame | pd.Series"
 P = ParamSpec("P")
 T = TypeVar("T")
@@ -63,6 +61,9 @@ class Role(Enum):
     ATTR = auto()
     """Annotation for attribute fields."""
 
+    COLUMN = auto()
+    """Annotation for column fields."""
+
     DATA = auto()
     """Annotation for data fields."""
 
@@ -81,6 +82,9 @@ class Role(Enum):
 # type hints (public)
 Attr = Annotated[T, Role.ATTR]
 """Type hint for attribute fields (``Attr[T]``)."""
+
+Column = Annotated[T, Role.COLUMN]
+"""Type hint for column fields (``Column[T]``)."""
 
 Data = Annotated[Collection[T], Role.DATA]
 """Type hint for data fields (``Data[T]``)."""
@@ -121,7 +125,7 @@ def get_annotated(tp: Any) -> Any:
     raise TypeError("Could not find any role-annotated type.")
 
 
-def get_annotations(tp: Any) -> Tuple[Any, ...]:
+def get_annotations(tp: Any) -> "tuple[Any, ...]":
     """Extract annotations of the first role-annotated type."""
     for annotated in filter(Role.annotates, find_annotated(tp)):
         return get_args(annotated)[1:]
@@ -145,24 +149,19 @@ def get_dtype(tp: Any) -> Optional[str]:
     return pandas_dtype(dtype).name
 
 
-def get_name(tp: Any, default: AnyName = None) -> AnyName:
+def get_name(tp: Any, default: Hashable = None) -> Hashable:
     """Extract a name if found or return given default."""
     try:
         name = get_annotations(tp)[1]
     except (IndexError, TypeError):
         return default
 
-    if isinstance(name, Hashable):
-        return name
+    try:
+        hash(name)
+    except TypeError:
+        raise ValueError("Could not find any valid name.")
 
-    if (
-        isinstance(name, dict)
-        and all(isinstance(key, Hashable) for key in name.keys())
-        and all(isinstance(val, Hashable) for val in name.values())
-    ):
-        return dict(name)
-
-    raise ValueError("Could not find any valid name.")
+    return name
 
 
 def get_role(tp: Any, default: Role = Role.OTHER) -> Role:
