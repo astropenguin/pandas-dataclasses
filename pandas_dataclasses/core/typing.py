@@ -12,7 +12,6 @@ from typing import (
     Hashable,
     Iterable,
     Optional,
-    Tuple,
     Type,
     TypeVar,
 )
@@ -126,7 +125,7 @@ def get_annotated(tp: Any) -> Any:
     raise TypeError("Could not find any role-annotated type.")
 
 
-def get_annotations(tp: Any) -> Tuple[Any, ...]:
+def get_annotations(tp: Any) -> "tuple[Any, ...]":
     """Extract annotations of the first role-annotated type."""
     for annotated in filter(Role.annotates, find_annotated(tp)):
         return get_args(annotated)[1:]
