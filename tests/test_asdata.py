@@ -6,7 +6,7 @@ from typing import Any, Hashable, cast
 import pandas as pd
 from data import Weather, weather, df_weather_true, ser_weather_true
 from pandas_dataclasses.core.specs import Spec
-from pandas_dataclasses.core.parsers import (
+from pandas_dataclasses.core.asdata import (
     asdataframe,
     asseries,
     get_attrs,
