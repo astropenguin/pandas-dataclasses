@@ -130,17 +130,12 @@ def get_columns(spec: Spec) -> "list[Hashable]":
 
 def get_data(spec: Spec) -> Optional["dict[Hashable, Any]"]:
     """Derive data from a specification."""
-    if not spec.fields.of_data:
-        return
-
-    names: List[Hashable] = []
-    data: List[Any] = []
+    objs: "dict[Hashable, Any]" = {}
 
     for field in spec.fields.of_data:
-        names.append(field.name)
-        data.append(ensure(field.default, field.dtype))
+        objs[field.name] = ensure(field.default, field.dtype)
 
-    return dict(zip(names, data))
+    return objs if objs else None
 
 
 def get_index(spec: Spec) -> Optional[pd.Index]:
