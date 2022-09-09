@@ -122,10 +122,7 @@ def get_columns(spec: Spec) -> "list[Hashable]":
     for field in spec.fields.of_column:
         objs[field.name] = field.default
 
-    if not objs:
-        return [None]
-    else:
-        return list(objs.keys())
+    return list(objs) if objs else [None]
 
 
 def get_data(spec: Spec) -> Optional["dict[Hashable, Any]"]:
