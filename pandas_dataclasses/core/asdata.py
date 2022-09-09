@@ -107,12 +107,12 @@ def ensure(data: Any, dtype: Optional[str]) -> Any:
 
 def get_attrs(spec: Spec) -> "dict[Hashable, Any]":
     """Derive attributes from a specification."""
-    attrs: "dict[Hashable, Any]" = {}
+    objs: "dict[Hashable, Any]" = {}
 
     for field in spec.fields.of_attr:
-        attrs[field.name] = field.default
+        objs[field.name] = field.default
 
-    return attrs
+    return objs
 
 
 def get_columns(spec: Spec) -> "list[Hashable]":
