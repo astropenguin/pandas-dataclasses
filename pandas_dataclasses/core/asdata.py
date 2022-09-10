@@ -2,7 +2,7 @@ __all__ = ["asdataframe", "asseries"]
 
 
 # standard library
-from typing import Any, Hashable, List, Optional, Type, TypeVar, overload
+from typing import Any, Hashable, Optional, Type, TypeVar, overload
 
 
 # dependencies
@@ -137,19 +137,17 @@ def get_data(spec: Spec) -> "dict[Hashable, Any]":
 
 def get_index(spec: Spec) -> Optional[pd.Index]:
     """Derive index from a specification."""
-    if not spec.fields.of_index:
-        return
-
-    names: List[Hashable] = []
-    indexes: List[Any] = []
+    objs: "dict[Hashable, Any]" = {}
 
     for field in spec.fields.of_index:
-        names.append(field.name)
-        indexes.append(ensure(field.default, field.dtype))
+        objs[field.name] = ensure(field.default, field.dtype)
 
-    indexes = np.broadcast_arrays(*indexes)
+    if not objs:
+        return
 
-    if len(indexes) == 1:
-        return pd.Index(indexes[0], name=names[0])
+    names, arrays = zip(*objs.items())
+
+    if len(names) == 1:
+        return pd.Index(arrays[0], name=names[0])
     else:
-        return pd.MultiIndex.from_arrays(indexes, names=names)
+        return pd.MultiIndex.from_arrays(arrays, names=names)
