@@ -39,10 +39,6 @@ def asdataframe(obj: DataClass[P], *, factory: None = None) -> pd.DataFrame:
 def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     """Create a DataFrame object from a dataclass object."""
     spec = Spec.from_dataclass(type(obj)) @ obj
-    attrs = get_attrs(spec)
-    data = get_data(spec)
-    index = get_index(spec)
-    names = get_columns(spec)
 
     if factory is None:
         factory = spec.factory or pd.DataFrame
@@ -50,9 +46,9 @@ def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     if not issubclass(factory, pd.DataFrame):
         raise TypeError("Factory must be a subclass of DataFrame.")
 
-    dataframe = factory(data, index)
-    dataframe.columns.names = names
-    dataframe.attrs.update(attrs)
+    dataframe = factory(data=get_data(spec), index=get_index(spec))
+    dataframe.columns.names = get_columns(spec)
+    dataframe.attrs.update(get_attrs(spec))
     return dataframe
 
 
