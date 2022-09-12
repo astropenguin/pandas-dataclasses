@@ -2,7 +2,7 @@ __all__ = ["asdataframe", "asseries"]
 
 
 # standard library
-from typing import Any, Hashable, Optional, Type, TypeVar, overload
+from typing import Any, Hashable, Optional, Type, overload
 
 
 # dependencies
@@ -12,12 +12,7 @@ import pandas as pd
 
 # submodules
 from .specs import Spec
-from .typing import P, DataClass, PandasClass
-
-
-# type hints
-TDataFrame = TypeVar("TDataFrame", bound=pd.DataFrame)
-TSeries = TypeVar("TSeries", bound=pd.Series)
+from .typing import P, DataClass, PandasClass, TDataFrame, TSeries
 
 
 # runtime functions

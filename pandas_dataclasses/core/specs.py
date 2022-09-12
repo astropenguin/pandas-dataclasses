@@ -13,7 +13,8 @@ from typing_extensions import Literal, get_type_hints
 
 
 # submodules
-from .typing import P, AnyPandas, DataClass, Role, get_dtype, get_name, get_role
+import pandas as pd
+from .typing import P, DataClass, Role, get_dtype, get_name, get_role
 
 
 # runtime classes
@@ -83,7 +84,7 @@ class Spec:
     fields: Fields
     """List of field specifications."""
 
-    factory: Optional[Type[AnyPandas]] = None
+    factory: Optional[Type["pd.DataFrame | pd.Series"]] = None
     """Factory for pandas data creation."""
 
     @classmethod
