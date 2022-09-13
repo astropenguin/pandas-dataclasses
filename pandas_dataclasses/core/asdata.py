@@ -2,7 +2,7 @@ __all__ = ["asdataframe", "asseries"]
 
 
 # standard library
-from typing import Any, Hashable, List, Optional, Type, TypeVar, overload
+from typing import Any, Hashable, Optional, Type, overload
 
 
 # dependencies
@@ -12,12 +12,7 @@ import pandas as pd
 
 # submodules
 from .specs import Spec
-from .typing import P, DataClass, PandasClass
-
-
-# type hints
-TDataFrame = TypeVar("TDataFrame", bound=pd.DataFrame)
-TSeries = TypeVar("TSeries", bound=pd.Series)
+from .typing import P, DataClass, PandasClass, TDataFrame, TSeries
 
 
 # runtime functions
@@ -39,10 +34,6 @@ def asdataframe(obj: DataClass[P], *, factory: None = None) -> pd.DataFrame:
 def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     """Create a DataFrame object from a dataclass object."""
     spec = Spec.from_dataclass(type(obj)) @ obj
-    attrs = get_attrs(spec)
-    data = get_data(spec)
-    index = get_index(spec)
-    names = get_columns(spec)
 
     if factory is None:
         factory = spec.factory or pd.DataFrame
@@ -50,9 +41,9 @@ def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     if not issubclass(factory, pd.DataFrame):
         raise TypeError("Factory must be a subclass of DataFrame.")
 
-    dataframe = factory(data, index)
-    dataframe.columns.names = names
-    dataframe.attrs.update(attrs)
+    dataframe = factory(data=get_data(spec), index=get_index(spec))
+    dataframe.columns.names = get_columns(spec)
+    dataframe.attrs.update(get_attrs(spec))
     return dataframe
 
 
@@ -74,14 +65,12 @@ def asseries(obj: DataClass[P], *, factory: None = None) -> pd.Series:
 def asseries(obj: Any, *, factory: Any = None) -> Any:
     """Create a Series object from a dataclass object."""
     spec = Spec.from_dataclass(type(obj)) @ obj
-    attrs = get_attrs(spec)
     data = get_data(spec)
-    index = get_index(spec)
 
-    if data is None:
-        name = None
+    if not data:
+        name, data = None, None
     else:
-        name, data = list(data.items())[0]
+        name, data = next(iter(data.items()))
 
     if factory is None:
         factory = spec.factory or pd.Series
@@ -89,8 +78,8 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
     if not issubclass(factory, pd.Series):
         raise TypeError("Factory must be a subclass of Series.")
 
-    series = factory(data, index, name=name)
-    series.attrs.update(attrs)
+    series = factory(data=data, index=get_index(spec), name=name)
+    series.attrs.update(get_attrs(spec))
     return series
 
 
@@ -107,12 +96,12 @@ def ensure(data: Any, dtype: Optional[str]) -> Any:
 
 def get_attrs(spec: Spec) -> "dict[Hashable, Any]":
     """Derive attributes from a specification."""
-    attrs: "dict[Hashable, Any]" = {}
+    objs: "dict[Hashable, Any]" = {}
 
     for field in spec.fields.of_attr:
-        attrs[field.name] = field.default
+        objs[field.name] = field.default
 
-    return attrs
+    return objs
 
 
 def get_columns(spec: Spec) -> "list[Hashable]":
@@ -122,42 +111,32 @@ def get_columns(spec: Spec) -> "list[Hashable]":
     for field in spec.fields.of_column:
         objs[field.name] = field.default
 
-    if not objs:
-        return [None]
-    else:
-        return list(objs.keys())
+    return list(objs) if objs else [None]
 
 
-def get_data(spec: Spec) -> Optional["dict[Hashable, Any]"]:
+def get_data(spec: Spec) -> "dict[Hashable, Any]":
     """Derive data from a specification."""
-    if not spec.fields.of_data:
-        return
-
-    names: List[Hashable] = []
-    data: List[Any] = []
+    objs: "dict[Hashable, Any]" = {}
 
     for field in spec.fields.of_data:
-        names.append(field.name)
-        data.append(ensure(field.default, field.dtype))
+        objs[field.name] = ensure(field.default, field.dtype)
 
-    return dict(zip(names, data))
+    return objs
 
 
 def get_index(spec: Spec) -> Optional[pd.Index]:
     """Derive index from a specification."""
-    if not spec.fields.of_index:
-        return
-
-    names: List[Hashable] = []
-    indexes: List[Any] = []
+    objs: "dict[Hashable, Any]" = {}
 
     for field in spec.fields.of_index:
-        names.append(field.name)
-        indexes.append(ensure(field.default, field.dtype))
+        objs[field.name] = ensure(field.default, field.dtype)
 
-    indexes = np.broadcast_arrays(*indexes)
+    if not objs:
+        return
 
-    if len(indexes) == 1:
-        return pd.Index(indexes[0], name=names[0])
+    names, arrays = zip(*objs.items())
+
+    if len(names) == 1:
+        return pd.Index(arrays[0], name=names[0])
     else:
-        return pd.MultiIndex.from_arrays(indexes, names=names)
+        return pd.MultiIndex.from_arrays(arrays, names=names)

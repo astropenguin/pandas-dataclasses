@@ -1,7 +1,7 @@
 # type: ignore
 from . import core
+from .core.asdata import *
 from .core.mixins import *
-from .core.parsers import *
 from .core.typing import *
 
 

@@ -4,7 +4,7 @@ __all__ = ["As", "AsDataFrame", "AsSeries"]
 # standard library
 from functools import wraps
 from types import MethodType
-from typing import Any, Callable, Generic, Type, TypeVar
+from typing import Any, Callable, Generic, Type
 
 
 # dependencies
@@ -14,12 +14,8 @@ from typing_extensions import get_args, get_origin
 
 
 # submodules
-from .parsers import asdataframe, asseries
-from .typing import P, AnyPandas, PandasClass
-
-
-# type hints
-TPandas = TypeVar("TPandas", bound=AnyPandas)
+from .asdata import asdataframe, asseries
+from .typing import P, PandasClass, TPandas
 
 
 # runtime classes

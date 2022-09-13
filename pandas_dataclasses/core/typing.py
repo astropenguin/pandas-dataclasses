@@ -25,7 +25,6 @@ from typing_extensions import (
     Literal,
     ParamSpec,
     Protocol,
-    TypeAlias,
     get_args,
     get_origin,
     get_type_hints,
@@ -33,11 +32,11 @@ from typing_extensions import (
 
 
 # type hints (private)
-AnyPandas: TypeAlias = "pd.DataFrame | pd.Series"
 P = ParamSpec("P")
 T = TypeVar("T")
-THashable = TypeVar("THashable", bound=Hashable)
-TPandas = TypeVar("TPandas", bound=AnyPandas)
+TPandas = TypeVar("TPandas", bound="pd.DataFrame | pd.Series")
+TDataFrame = TypeVar("TDataFrame", bound=pd.DataFrame)
+TSeries = TypeVar("TSeries", bound=pd.Series)
 
 
 class DataClass(Protocol[P]):
