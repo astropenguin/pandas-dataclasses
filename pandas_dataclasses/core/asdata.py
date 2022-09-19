@@ -69,12 +69,6 @@ def asseries(obj: DataClass[P], *, factory: None = None) -> pd.Series:
 def asseries(obj: Any, *, factory: Any = None) -> Any:
     """Create a Series object from a dataclass object."""
     spec = Spec.from_dataclass(type(obj)) @ obj
-    data = get_data(spec)
-
-    if not data:
-        name, data = None, None
-    else:
-        name, data = next(iter(data.items()))
 
     if factory is None:
         factory = spec.factory or pd.Series
@@ -82,7 +76,15 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
     if not issubclass(factory, pd.Series):
         raise TypeError("Factory must be a subclass of Series.")
 
-    series = factory(data=data, index=get_index(spec), name=name)
+    data = get_data(spec)
+    index = get_index(spec)
+
+    if not data:
+        series = factory(index=index)
+    else:
+        name, data = next(iter(data.items()))
+        series = factory(data=data, index=index, name=name)
+
     series.attrs.update(get_attrs(spec))
     return series
 
