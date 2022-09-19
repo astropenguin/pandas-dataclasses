@@ -113,8 +113,8 @@ class Weather(AsDataFrame):
 df = Weather.new(...)
 ```
 
-where fields typed by `Index` are "index fields", each value of which will become an index or a part of a hierarchical index of a DataFrame object.
-Fields typed by `Data` are "data fields", each value of which will become a data column of a DataFrame object.
+where fields typed by `Index` are *index fields*, each value of which will become an index or a part of a hierarchical index of a DataFrame object.
+Fields typed by `Data` are *data fields*, each value of which will become a data column of a DataFrame object.
 Fields typed by other types are just ignored in the DataFrame creation.
 
 Each data or index will be cast to the data type specified in a type hint like `Index[int]`.
@@ -157,7 +157,7 @@ Other rules are the same as for the DataFrame creation.
 
 ### Metadata storing
 
-Fields typed by `Attr` are "attribute fields", each value of which will become an item of attributes of a DataFrame or a Series object:
+Fields typed by `Attr` are *attribute fields*, each value of which will become an item of attributes of a DataFrame or a Series object:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -238,52 +238,7 @@ Year Month
 {"Location": "Tokyo", "Longitude (deg)": 139.69167, "Latitude (deg)": 35.68944}
 ```
 
-Adding dictionary annotations to data fields will create DataFrame objects with hierarchical columns, where dictionary keys will become the names of column levels and dictionary values will become the names of columns:
-
-<details>
-<summary>Click to see all imports</summary>
-
-```python
-from dataclasses import dataclass
-from typing import Annotated as Ann
-from pandas_dataclasses import AsDataFrame, Data, Index
-```
-</details>
-
-```python
-def name(stat: str, cat: str) -> dict[str, str]:
-    return {"Statistic": stat, "Category": cat}
-
-
-@dataclass
-class Weather(AsDataFrame):
-    """Weather information."""
-
-    year: Ann[Index[int], "Year"]
-    month: Ann[Index[int], "Month"]
-    temp_avg: Ann[Data[float], name("Temperature (deg C)", "Average")]
-    temp_max: Ann[Data[float], name("Temperature (deg C)", "Maximum")]
-    wind_avg: Ann[Data[float], name("Wind speed (m/s)", "Average")]
-    wind_max: Ann[Data[float], name("Wind speed (m/s)", "Maximum")]
-
-
-df = Weather.new(...)
-```
-
-where `df` will become like:
-
-```
-Statistic  Temperature (deg C)        Wind speed (m/s)
-Category              Average Maximum          Average Maximum
-Year Month
-2020 1                    7.1    11.1              2.4     8.8
-     7                   24.3    27.7              3.1    10.2
-2021 1                    5.4    10.3              2.3    10.7
-     7                   25.9    30.3              2.4     9.0
-2022 1                    4.9     9.4              2.6     8.8
-```
-
-If an annotation is a [format string] or a dictionary that has [format string]s as keys and/or values, it will be formatted by a dataclass object before the data creation:
+If an annotation is a [format string], it will be formatted by a dataclass object before the data creation:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -306,9 +261,101 @@ class Weather(AsDataFrame):
     wind: Ann[Data[float], "Wind speed ({.wind_unit})"]
     temp_unit: str = "deg C"
     wind_unit: str = "m/s"
+
+
+df = Weather.new(..., temp_unit="deg F", wind_unit="km/h")
 ```
 
-where units of the temperature and the wind speed can be dynamically updated like `Weather.new(..., temp_unit="deg F", wind_unit="km/h"`).
+where units of the temperature and the wind speed will be dynamically updated (see also [naming rules](#naming-rules)).
+
+### Hierarchical columns
+
+Adding tuple annotations to data fields will create DataFrame objects with hierarchical columns:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+from dataclasses import dataclass
+from typing import Annotated as Ann
+from pandas_dataclasses import AsDataFrame, Data, Index
+```
+</details>
+
+```python
+@dataclass
+class Weather(AsDataFrame):
+    """Weather information."""
+
+    year: Ann[Index[int], "Year"]
+    month: Ann[Index[int], "Month"]
+    temp_avg: Ann[Data[float], ("Temperature (deg C)", "Average")]
+    temp_max: Ann[Data[float], ("Temperature (deg C)", "Maximum")]
+    wind_avg: Ann[Data[float], ("Wind speed (m/s)", "Average")]
+    wind_max: Ann[Data[float], ("Wind speed (m/s)", "Maximum")]
+
+
+df = Weather.new(...)
+```
+
+where `df` will become like:
+
+```
+           Temperature (deg C)         Wind speed (m/s)
+                       Average Maximum          Average Maximum
+Year Month
+2020 1                     7.1    11.1              2.4     8.8
+     7                    24.3    27.7              3.1    10.2
+2021 1                     5.4    10.3              2.3    10.7
+     7                    25.9    30.3              2.4     9.0
+2022 1                     4.9     9.4              2.6     8.8
+```
+
+Column names can be (explicitly) specified by *column fields* (with hashable annotations):
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+from dataclasses import dataclass
+from typing import Annotated as Ann
+from pandas_dataclasses import AsDataFrame, Column, Data, Index
+```
+</details>
+
+```python
+@dataclass
+class Weather(AsDataFrame):
+    """Weather information."""
+
+    year: Ann[Index[int], "Year"]
+    month: Ann[Index[int], "Month"]
+    temp_avg: Ann[Data[float], ("Temperature (deg C)", "Average")]
+    temp_max: Ann[Data[float], ("Temperature (deg C)", "Maximum")]
+    wind_avg: Ann[Data[float], ("Wind speed (m/s)", "Average")]
+    wind_max: Ann[Data[float], ("Wind speed (m/s)", "Maximum")]
+    meas: Ann[Column[None], "Measurement"] = None
+    stat: Ann[Column[None], "Statistic"] = None
+
+
+df = Weather.new(...)
+```
+
+where `df` will become like:
+
+```
+Measurement Temperature (deg C)         Wind speed (m/s)
+Statistic               Average Maximum          Average Maximum
+Year Month
+2020 1                      7.1    11.1              2.4     8.8
+     7                     24.3    27.7              3.1    10.2
+2021 1                      5.4    10.3              2.3    10.7
+     7                     25.9    30.3              2.4     9.0
+2022 1                      4.9     9.4              2.6     8.8
+```
+
+Note that the values of the columns fields never be used for the data creation (i.e. dummy values).
+If a tuple annotation has [format string]s, they will also be formatted by a dataclass object (see also [naming rules](#naming-rules)).
 
 ### Custom pandas factory
 
@@ -350,7 +397,7 @@ where `ser` will be a `CustomSeries` object.
 
 ### Data typing rules
 
-The data type (dtype) of data/index is determined from the first `Data`/`Index` type of the corresponding field.
+The data type (dtype) of data or index is determined from the first `Data` or `Index` type of the corresponding field, respectively.
 The following table shows how the data type is inferred:
 
 <details>
@@ -377,8 +424,8 @@ Type hint | Inferred data type
 
 ### Naming rules
 
-The name of data/index/attribute is determined from the first annotation of the first `Data`/`Index`/`Attr` type of the corresponding field.
-If the annotation is a [format string] or a dictionary that has [format string]s as keys and/or values, it will be formatted by a dataclass object before the data creation.
+The name of column, data, index, or attribute is determined from the first annotation of the first `Column`, `Data`, `Index`, or `Attr` type of the corresponding field, respectively.
+If the annotation is a [format string] or a tuple that has [format string]s, it (they) will be formatted by a dataclass object before the data creation.
 Otherwise, the field name (i.e. argument name) will be used.
 The following table shows how the name is inferred:
 
@@ -399,8 +446,8 @@ Type hint | Inferred name
 `Ann[Data[Any], "spam"] \| Ann[str, "ham"]` | `"spam"`
 `Ann[Data[Any], "spam"] \| Ann[Data[float], "ham"]` | `"spam"`
 `Ann[Data[Any], "{.name}"` | `"{.name}".format(obj)`
-`Ann[Data[Any], {"0": "spam", "1": "ham"}]` | `("spam", "ham")`
-`Ann[Data[Any], {"0": "{.name}", "1": "ham"}]` | `("{.name}".format(obj), "ham")`
+`Ann[Data[Any], ("spam", "ham")]` | `("spam", "ham")`
+`Ann[Data[Any], ("{.name}", "ham")]` | `("{.name}".format(obj), "ham")`
 
 where `obj` is a dataclass object that is expected to have `obj.name`.
 
@@ -409,7 +456,8 @@ where `obj` is a dataclass object that is expected to have `obj.name`.
 Release version | Features
 --- | ---
 v0.5 | Support for dynamic naming
-v0.6 | support for extension array and dtype
+v0.6 | Support for extension array and dtype
+v0.7 | Support for hierarchical columns
 v1.0 | Initial major release (freezing public features until v2.0)
 
 <!-- References -->
