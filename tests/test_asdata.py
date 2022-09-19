@@ -102,13 +102,12 @@ def test_get_data() -> None:
 
 def test_get_index() -> None:
     index = cast(pd.Index, get_index(spec))
-    df = cast(pd.DataFrame, index.to_frame())
 
-    assert df.iloc[:, 0].name == spec.fields.of_index[0].name
-    assert df.iloc[:, 1].name == spec.fields.of_index[1].name
+    assert index.names[0] == spec.fields.of_index[0].name
+    assert index.names[1] == spec.fields.of_index[1].name
 
-    assert df.iloc[:, 0].dtype == spec.fields.of_index[0].dtype
-    assert df.iloc[:, 1].dtype == spec.fields.of_index[1].dtype
+    assert index.get_level_values(0).dtype == spec.fields.of_index[0].dtype
+    assert index.get_level_values(1).dtype == spec.fields.of_index[1].dtype
 
-    assert (df.iloc[:, 0] == spec.fields.of_index[0].default).all()
-    assert (df.iloc[:, 1] == spec.fields.of_index[1].default).all()
+    assert (index.get_level_values(0) == spec.fields.of_index[0].default).all()
+    assert (index.get_level_values(1) == spec.fields.of_index[1].default).all()
