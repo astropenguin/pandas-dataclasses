@@ -397,7 +397,7 @@ where `ser` will be a `CustomSeries` object.
 
 ### Data typing rules
 
-The data type (dtype) of data/index is determined from the first `Data`/`Index` type of the corresponding field.
+The data type (dtype) of data or index is determined from the first `Data` or `Index` type of the corresponding field, respectively.
 The following table shows how the data type is inferred:
 
 <details>
@@ -424,7 +424,7 @@ Type hint | Inferred data type
 
 ### Naming rules
 
-The name of column/data/index/attribute is determined from the first annotation of the first `Column`/`Data`/`Index`/`Attr` type of the corresponding field.
+The name of column, data, index, or attribute is determined from the first annotation of the first `Column`, `Data`, `Index`, or `Attr` type of the corresponding field, respectively.
 If the annotation is a [format string] or a tuple that has [format string]s, it (they) will be formatted by a dataclass object before the data creation.
 Otherwise, the field name (i.e. argument name) will be used.
 The following table shows how the name is inferred:
