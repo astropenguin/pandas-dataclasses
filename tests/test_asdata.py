@@ -68,10 +68,15 @@ def test_get_attrs() -> None:
 
 
 def test_get_columns() -> None:
-    columns = get_columns(spec)
+    columns = cast(pd.Index, get_columns(spec))
 
-    assert columns[0] == spec.fields.of_column[0].name
-    assert columns[1] == spec.fields.of_column[1].name
+    assert columns.names[0] == spec.fields.of_column[0].name
+    assert columns.names[1] == spec.fields.of_column[1].name
+
+    assert columns[0] == spec.fields.of_data[0].name
+    assert columns[1] == spec.fields.of_data[1].name
+    assert columns[2] == spec.fields.of_data[2].name
+    assert columns[3] == spec.fields.of_data[3].name
 
 
 def test_get_data() -> None:

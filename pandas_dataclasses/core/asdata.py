@@ -41,8 +41,12 @@ def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     if not issubclass(factory, pd.DataFrame):
         raise TypeError("Factory must be a subclass of DataFrame.")
 
-    dataframe = factory(data=get_data(spec), index=get_index(spec))
-    dataframe.columns.names = get_columns(spec)
+    dataframe = factory(
+        data=get_data(spec),
+        index=get_index(spec),
+        columns=get_columns(spec),
+    )
+
     dataframe.attrs.update(get_attrs(spec))
     return dataframe
 
@@ -104,14 +108,17 @@ def get_attrs(spec: Spec) -> "dict[Hashable, Any]":
     return objs
 
 
-def get_columns(spec: Spec) -> "list[Hashable]":
-    """Derive column names from a specification."""
-    objs: "dict[Hashable, Any]" = {}
+def get_columns(spec: Spec) -> Optional[pd.Index]:
+    """Derive columns from a specification."""
+    names = [field.name for field in spec.fields.of_column]
+    elems = [field.name for field in spec.fields.of_data]
 
-    for field in spec.fields.of_column:
-        objs[field.name] = field.default
-
-    return list(objs) if objs else [None]
+    if len(names) == 0:
+        return
+    if len(names) == 1:
+        return pd.Index(pd.array(elems), name=names[0])
+    else:
+        return pd.MultiIndex.from_tuples(elems, names=names)
 
 
 def get_data(spec: Spec) -> "dict[Hashable, Any]":
