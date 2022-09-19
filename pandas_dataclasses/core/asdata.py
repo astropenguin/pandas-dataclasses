@@ -135,17 +135,17 @@ def get_data(spec: Spec) -> "dict[Hashable, Any]":
 
 def get_index(spec: Spec) -> Optional[pd.Index]:
     """Derive index from a specification."""
-    objs: "dict[Hashable, Any]" = {}
+    names: "list[Hashable]" = []
+    elems: "list[Any]" = []
 
     for field in spec.fields.of_index:
-        objs[field.name] = ensure(field.default, field.dtype)
+        names.append(field.name)
+        elems.append(ensure(field.default, field.dtype))
 
-    if not objs:
+    if len(names) == 0:
         return
-
-    names, arrays = zip(*objs.items())
-
     if len(names) == 1:
-        return pd.Index(arrays[0], name=names[0])
+        return pd.Index(elems[0], name=names[0])
     else:
-        return pd.MultiIndex.from_arrays(arrays, names=names)
+        elems = np.broadcast_arrays(*elems)
+        return pd.MultiIndex.from_arrays(elems, names=names)
