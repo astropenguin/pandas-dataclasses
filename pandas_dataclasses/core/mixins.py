@@ -2,23 +2,22 @@ __all__ = ["As", "AsDataFrame", "AsSeries"]
 
 
 # standard library
+from copy import copy
 from functools import wraps
-from types import MethodType
+from types import FunctionType, MethodType
 from typing import Any, Callable, Generic, Type
 
 
 # dependencies
 import pandas as pd
-from morecopy import copy
 from typing_extensions import get_args, get_origin
 
 
 # submodules
 from .asdata import asdataframe, asseries
-from .typing import P, PandasClass, TPandas
+from .typing import P, T, PandasClass, TPandas
 
 
-# runtime classes
 class classproperty:
     """Class property dedicated to ``As.new``."""
 
@@ -32,6 +31,34 @@ class classproperty:
         cls: Type[PandasClass[P, TPandas]],
     ) -> Callable[P, TPandas]:
         return self.__func__(cls)
+
+
+def decorator(func: Any, return_: Any) -> Callable[[T], T]:
+    """Function decorator dedicated to ``As.new``."""
+    if not isinstance(func, FunctionType):
+        return wraps(func)
+
+    copied = type(func)(
+        func.__code__,
+        func.__globals__,
+        "new",
+        func.__defaults__,
+        func.__closure__,
+    )
+
+    for name in (
+        "__annotations__",
+        "__dict__",
+        "__doc__",
+        "__kwdefaults__",
+        "__module__",
+        "__name__",
+        "__qualname__",
+    ):
+        setattr(copied, name, copy(getattr(func, name)))
+
+    copied.__annotations__["return"] = return_
+    return wraps(copied)
 
 
 class As(Generic[TPandas]):
@@ -51,10 +78,8 @@ class As(Generic[TPandas]):
     @classproperty
     def new(cls) -> Any:
         """Create a pandas object from dataclass parameters."""
-        init = copy(cls.__init__)
-        init.__annotations__["return"] = cls.__pandas_factory__
 
-        @wraps(init)
+        @decorator(cls.__init__, cls.__pandas_factory__)
         def new(cls: Any, *args: Any, **kwargs: Any) -> Any:
             if issubclass(cls.__pandas_factory__, pd.DataFrame):
                 return asdataframe(cls(*args, **kwargs))
