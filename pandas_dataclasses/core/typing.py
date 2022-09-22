@@ -5,16 +5,7 @@ __all__ = ["Attr", "Column", "Data", "Index", "Other"]
 from dataclasses import Field
 from enum import Enum, auto
 from itertools import chain
-from typing import (
-    Any,
-    ClassVar,
-    Collection,
-    Hashable,
-    Iterable,
-    Optional,
-    Type,
-    TypeVar,
-)
+from typing import Any, Collection, Hashable, Iterable, Optional, Type, TypeVar
 
 
 # dependencies
