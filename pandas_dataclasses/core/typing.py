@@ -42,16 +42,20 @@ TSeries = TypeVar("TSeries", bound=pd.Series)
 class DataClass(Protocol[P]):
     """Type hint for dataclass objects."""
 
-    __dataclass_fields__: ClassVar["dict[str, Field[Any]]"]
+    __dataclass_fields__: "dict[str, Field[Any]]"
 
     def __init__(self, *args: P.args, **kwargs: P.kwargs) -> None:
         ...
 
 
-class PandasClass(DataClass[P], Protocol[P, TPandas]):
+class PandasClass(Protocol[P, TPandas]):
     """Type hint for dataclass objects with a pandas factory."""
 
+    __dataclass_fields__: "dict[str, Field[Any]]"
     __pandas_factory__: Type[TPandas]
+
+    def __init__(self, *args: P.args, **kwargs: P.kwargs) -> None:
+        ...
 
 
 class Role(Enum):
