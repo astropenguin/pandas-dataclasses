@@ -116,21 +116,13 @@ def convert_field(field_: "Field_[Any]") -> Optional[Field]:
     """Convert a dataclass field to a field specification."""
     role = get_role(field_.type)
 
-    if role is Role.ATTR:
-        role = "attr"
-    elif role is Role.COLUMN:
-        role = "column"
-    elif role is Role.DATA:
-        role = "data"
-    elif role is Role.INDEX:
-        role = "index"
-    else:
+    if role is Role.OTHER:
         return None
 
     return Field(
         id=field_.name,
         name=get_name(field_.type, field_.name),
-        role=role,
+        role=role.name.lower(),  # type: ignore
         type=field_.type,
         dtype=get_dtype(field_.type),
         default=field_.default,
