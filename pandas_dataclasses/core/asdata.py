@@ -116,7 +116,7 @@ def get_columns(spec: Spec) -> Optional[pd.Index]:
     elems = [field.name for field in spec.fields.of_data]
 
     if len(names) == 0:
-        return
+        return None
     if len(names) == 1:
         return pd.Index(pd.array(elems), name=names[0])
     else:
@@ -143,7 +143,7 @@ def get_index(spec: Spec) -> Optional[pd.Index]:
         elems.append(ensure(field.default, field.dtype))
 
     if len(names) == 0:
-        return
+        return None
     if len(names) == 1:
         return pd.Index(elems[0], name=names[0])
     else:

@@ -141,10 +141,10 @@ def get_dtype(tp: Any) -> Optional[str]:
     try:
         dtype = get_args(get_annotated(tp))[0]
     except (IndexError, TypeError):
-        return
+        return None
 
     if dtype is Any or dtype is type(None):
-        return
+        return None
 
     if get_origin(dtype) is Literal:
         dtype = get_args(dtype)[0]

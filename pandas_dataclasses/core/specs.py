@@ -125,7 +125,7 @@ def convert_field(field_: "Field_[Any]") -> Optional[Field]:
     elif role is Role.INDEX:
         role = "index"
     else:
-        return
+        return None
 
     return Field(
         id=field_.name,
