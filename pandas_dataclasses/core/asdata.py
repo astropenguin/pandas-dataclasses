@@ -147,5 +147,5 @@ def get_index(spec: Spec) -> Optional[pd.Index]:
     if len(names) == 1:
         return pd.Index(elems[0], name=names[0])
     else:
-        elems = np.broadcast_arrays(*elems)
-        return pd.MultiIndex.from_arrays(elems, names=names)
+        cast: Any = np.broadcast_arrays
+        return pd.MultiIndex.from_arrays(cast(*elems), names=names)
