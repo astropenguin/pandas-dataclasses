@@ -35,6 +35,9 @@ pyright = "^1.1"
 pytest = "^7.1"
 sphinx = "^5.1"
 
+[tool.mypy]
+strict = true
+
 [tool.pyright]
 reportUnknownArgumentType = "warning"
 reportUnknownMemberType = "warning"
