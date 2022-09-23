@@ -21,16 +21,16 @@ from .typing import P, T, PandasClass, TPandas
 class classproperty:
     """Class property dedicated to ``As.new``."""
 
-    def __init__(self, func: Callable[..., Any]) -> None:
+    def __init__(self, func: Any) -> None:
         self.__doc__ = func.__doc__
-        self.__func__ = func
+        self.func = func
 
     def __get__(
         self,
         obj: Any,
         cls: Type[PandasClass[P, TPandas]],
     ) -> Callable[P, TPandas]:
-        return self.__func__(cls)
+        return self.func(cls)  # type: ignore
 
 
 def wraps(func: Any, return_: Any) -> Callable[[T], T]:

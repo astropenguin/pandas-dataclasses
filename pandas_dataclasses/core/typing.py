@@ -140,7 +140,7 @@ def get_dtype(tp: Any) -> Optional[str]:
     if get_origin(dtype) is Literal:
         dtype = get_args(dtype)[0]
 
-    return pandas_dtype(dtype).name
+    return pandas_dtype(dtype).name  # type: ignore
 
 
 def get_name(tp: Any, default: Hashable = None) -> Hashable:
@@ -155,12 +155,12 @@ def get_name(tp: Any, default: Hashable = None) -> Hashable:
     except TypeError:
         raise ValueError("Could not find any valid name.")
 
-    return name
+    return name  # type: ignore
 
 
 def get_role(tp: Any, default: Role = Role.OTHER) -> Role:
     """Extract a role if found or return given default."""
     try:
-        return get_annotations(tp)[0]
+        return get_annotations(tp)[0]  # type: ignore
     except TypeError:
         return default
