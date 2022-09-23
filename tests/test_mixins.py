@@ -5,7 +5,7 @@ from dataclasses import dataclass
 # dependencies
 import pandas as pd
 from data import Weather, weather, df_weather_true, ser_weather_true
-from pandas_dataclasses.core.mixins import As, AsDataFrame, AsSeries
+from pandas_dataclasses import As, AsDataFrame, AsSeries
 
 
 # test data

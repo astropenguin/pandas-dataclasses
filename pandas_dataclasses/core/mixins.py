@@ -3,7 +3,7 @@ __all__ = ["As", "AsDataFrame", "AsSeries"]
 
 # standard library
 from copy import copy
-from functools import wraps
+from functools import wraps as wraps_
 from types import FunctionType, MethodType
 from typing import Any, Callable, Generic, Type
 
@@ -21,22 +21,22 @@ from .typing import P, T, PandasClass, TPandas
 class classproperty:
     """Class property dedicated to ``As.new``."""
 
-    def __init__(self, func: Callable[..., Any]) -> None:
+    def __init__(self, func: Any) -> None:
         self.__doc__ = func.__doc__
-        self.__func__ = func
+        self.func = func
 
     def __get__(
         self,
         obj: Any,
         cls: Type[PandasClass[P, TPandas]],
     ) -> Callable[P, TPandas]:
-        return self.__func__(cls)
+        return self.func(cls)  # type: ignore
 
 
-def decorator(func: Any, return_: Any) -> Callable[[T], T]:
+def wraps(func: Any, return_: Any) -> Callable[[T], T]:
     """Function decorator dedicated to ``As.new``."""
     if not isinstance(func, FunctionType):
-        return wraps(func)
+        return wraps_(func)
 
     copied = type(func)(
         func.__code__,
@@ -58,7 +58,7 @@ def decorator(func: Any, return_: Any) -> Callable[[T], T]:
         setattr(copied, name, copy(getattr(func, name)))
 
     copied.__annotations__["return"] = return_
-    return wraps(copied)
+    return wraps_(copied)
 
 
 class As(Generic[TPandas]):
@@ -78,15 +78,18 @@ class As(Generic[TPandas]):
     @classproperty
     def new(cls) -> Any:
         """Create a pandas object from dataclass parameters."""
+        factory = cls.__pandas_factory__
 
-        @decorator(cls.__init__, cls.__pandas_factory__)
+        if issubclass(factory, pd.DataFrame):
+            aspandas: Any = asdataframe
+        elif issubclass(factory, pd.Series):
+            aspandas = asseries
+        else:
+            raise TypeError("Not a valid pandas factory.")
+
+        @wraps(cls.__init__, factory)  # type: ignore
         def new(cls: Any, *args: Any, **kwargs: Any) -> Any:
-            if issubclass(cls.__pandas_factory__, pd.DataFrame):
-                return asdataframe(cls(*args, **kwargs))
-            elif issubclass(cls.__pandas_factory__, pd.Series):
-                return asseries(cls(*args, **kwargs))
-            else:
-                raise TypeError("Not a valid pandas factory.")
+            return aspandas(cls(*args, **kwargs))
 
         return MethodType(new, cls)
 

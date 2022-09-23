@@ -5,17 +5,10 @@ from typing import Any, Union
 # dependencies
 import numpy as np
 import pandas as pd
+from pandas_dataclasses import Attr, Data, Index
+from pandas_dataclasses.core.typing import Role, get_dtype, get_name, get_role
 from pytest import mark
 from typing_extensions import Annotated as Ann, Literal as L
-from pandas_dataclasses.core.typing import (
-    Attr,
-    Data,
-    Index,
-    Role,
-    get_dtype,
-    get_name,
-    get_role,
-)
 
 
 # test data
@@ -39,30 +32,30 @@ testdata_dtype = [
 ]
 
 testdata_name = [
-    (Attr[Any], None),
+    (Attr[Any], None),  # type: ignore
     (Data[Any], None),
     (Index[Any], None),
     (Any, None),
-    (Ann[Attr[Any], "attr"], "attr"),
+    (Ann[Attr[Any], "attr"], "attr"),  # type: ignore
     (Ann[Data[Any], "data"], "data"),
     (Ann[Index[Any], "index"], "index"),
     (Ann[Any, "other"], None),
-    (Union[Ann[Attr[Any], "attr"], Ann[Any, "any"]], "attr"),
+    (Union[Ann[Attr[Any], "attr"], Ann[Any, "any"]], "attr"),  # type: ignore
     (Union[Ann[Data[Any], "data"], Ann[Any, "any"]], "data"),
     (Union[Ann[Index[Any], "index"], Ann[Any, "any"]], "index"),
     (Union[Ann[Any, "other"], Ann[Any, "any"]], None),
 ]
 
 testdata_role = [
-    (Attr[Any], Role.ATTR),
+    (Attr[Any], Role.ATTR),  # type: ignore
     (Data[Any], Role.DATA),
     (Index[Any], Role.INDEX),
     (Any, Role.OTHER),
-    (Ann[Attr[Any], "attr"], Role.ATTR),
+    (Ann[Attr[Any], "attr"], Role.ATTR),  # type: ignore
     (Ann[Data[Any], "data"], Role.DATA),
     (Ann[Index[Any], "index"], Role.INDEX),
     (Ann[Any, "other"], Role.OTHER),
-    (Union[Ann[Attr[Any], "attr"], Ann[Any, "any"]], Role.ATTR),
+    (Union[Ann[Attr[Any], "attr"], Ann[Any, "any"]], Role.ATTR),  # type: ignore
     (Union[Ann[Data[Any], "data"], Ann[Any, "any"]], Role.DATA),
     (Union[Ann[Index[Any], "index"], Ann[Any, "any"]], Role.INDEX),
     (Union[Ann[Any, "other"], Ann[Any, "any"]], Role.OTHER),

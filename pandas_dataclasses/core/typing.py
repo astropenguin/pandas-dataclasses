@@ -7,13 +7,15 @@ from enum import Enum, auto
 from itertools import chain
 from typing import (
     Any,
-    ClassVar,
     Collection,
+    Dict,
     Hashable,
     Iterable,
     Optional,
+    Tuple,
     Type,
     TypeVar,
+    Union,
 )
 
 
@@ -34,7 +36,7 @@ from typing_extensions import (
 # type hints (private)
 P = ParamSpec("P")
 T = TypeVar("T")
-TPandas = TypeVar("TPandas", bound="pd.DataFrame | pd.Series")
+TPandas = TypeVar("TPandas", bound=Union[pd.DataFrame, pd.Series])
 TDataFrame = TypeVar("TDataFrame", bound=pd.DataFrame)
 TSeries = TypeVar("TSeries", bound=pd.Series)
 
@@ -42,16 +44,20 @@ TSeries = TypeVar("TSeries", bound=pd.Series)
 class DataClass(Protocol[P]):
     """Type hint for dataclass objects."""
 
-    __dataclass_fields__: ClassVar["dict[str, Field[Any]]"]
+    __dataclass_fields__: Dict[str, "Field[Any]"]
 
     def __init__(self, *args: P.args, **kwargs: P.kwargs) -> None:
         ...
 
 
-class PandasClass(DataClass[P], Protocol[P, TPandas]):
+class PandasClass(Protocol[P, TPandas]):
     """Type hint for dataclass objects with a pandas factory."""
 
+    __dataclass_fields__: Dict[str, "Field[Any]"]
     __pandas_factory__: Type[TPandas]
+
+    def __init__(self, *args: P.args, **kwargs: P.kwargs) -> None:
+        ...
 
 
 class Role(Enum):
@@ -124,7 +130,7 @@ def get_annotated(tp: Any) -> Any:
     raise TypeError("Could not find any role-annotated type.")
 
 
-def get_annotations(tp: Any) -> "tuple[Any, ...]":
+def get_annotations(tp: Any) -> Tuple[Any, ...]:
     """Extract annotations of the first role-annotated type."""
     for annotated in filter(Role.annotates, find_annotated(tp)):
         return get_args(annotated)[1:]
@@ -137,15 +143,15 @@ def get_dtype(tp: Any) -> Optional[str]:
     try:
         dtype = get_args(get_annotated(tp))[0]
     except (IndexError, TypeError):
-        return
+        return None
 
     if dtype is Any or dtype is type(None):
-        return
+        return None
 
     if get_origin(dtype) is Literal:
         dtype = get_args(dtype)[0]
 
-    return pandas_dtype(dtype).name
+    return pandas_dtype(dtype).name  # type: ignore
 
 
 def get_name(tp: Any, default: Hashable = None) -> Hashable:
@@ -160,12 +166,12 @@ def get_name(tp: Any, default: Hashable = None) -> Hashable:
     except TypeError:
         raise ValueError("Could not find any valid name.")
 
-    return name
+    return name  # type: ignore
 
 
 def get_role(tp: Any, default: Role = Role.OTHER) -> Role:
     """Extract a role if found or return given default."""
     try:
-        return get_annotations(tp)[0]
+        return get_annotations(tp)[0]  # type: ignore
     except TypeError:
         return default

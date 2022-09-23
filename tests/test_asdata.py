@@ -5,15 +5,8 @@ from typing import cast
 # dependencies
 import pandas as pd
 from data import Weather, weather, df_weather_true, ser_weather_true
-from pandas_dataclasses.core.asdata import (
-    asdataframe,
-    asseries,
-    get_attrs,
-    get_columns,
-    get_data,
-    get_index,
-)
-from pandas_dataclasses.core.specs import Spec
+from pandas_dataclasses import asdataframe, asseries, Spec
+from pandas_dataclasses.core.asdata import get_attrs, get_columns, get_data, get_index
 
 
 # test data

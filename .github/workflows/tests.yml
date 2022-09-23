@@ -17,10 +17,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.7", "3.8", "3.9", "3.10"]
+        python: ["3.7", "3.8", "3.9", "3.10.6"]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python }}
       - name: Install project dependencies
@@ -29,6 +29,8 @@ jobs:
         run: black --check docs tests pandas_dataclasses
       - name: Test code's typing (Pyright)
         run: pyright docs tests pandas_dataclasses
+      - name: Test code's typing (mypy)
+        run: mypy docs tests pandas_dataclasses
       - name: Test code's execution (pytest)
         run: pytest -v tests
       - name: Test docs' building (Sphinx)
