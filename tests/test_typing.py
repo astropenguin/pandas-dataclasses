@@ -5,17 +5,10 @@ from typing import Any, Union
 # dependencies
 import numpy as np
 import pandas as pd
+from pandas_dataclasses import Attr, Data, Index
+from pandas_dataclasses.core.typing import Role, get_dtype, get_name, get_role
 from pytest import mark
 from typing_extensions import Annotated as Ann, Literal as L
-from pandas_dataclasses.core.typing import (
-    Attr,
-    Data,
-    Index,
-    Role,
-    get_dtype,
-    get_name,
-    get_role,
-)
 
 
 # test data

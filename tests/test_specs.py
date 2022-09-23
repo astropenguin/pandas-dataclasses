@@ -4,7 +4,7 @@ from dataclasses import MISSING
 
 # dependencies
 from data import Weather, weather
-from pandas_dataclasses.core.specs import Spec
+from pandas_dataclasses import Spec
 
 
 # test data

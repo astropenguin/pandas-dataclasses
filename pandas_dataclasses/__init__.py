@@ -7,6 +7,7 @@ __all__ = [
     "Data",
     "Index",
     "Other",
+    "Spec",
     "asdataframe",
     "asseries",
     "core",
@@ -16,6 +17,7 @@ __all__ = [
 from . import core
 from .core.asdata import *
 from .core.mixins import *
+from .core.specs import *
 from .core.typing import *
 
 
