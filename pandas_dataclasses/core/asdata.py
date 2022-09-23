@@ -2,7 +2,7 @@ __all__ = ["asdataframe", "asseries"]
 
 
 # standard library
-from typing import Any, Hashable, Optional, Type, overload
+from typing import Any, Dict, Hashable, List, Optional, Type, overload
 
 
 # dependencies
@@ -100,9 +100,9 @@ def ensure(data: Any, dtype: Optional[str]) -> Any:
         return pd.array(data, dtype=dtype, copy=False)
 
 
-def get_attrs(spec: Spec) -> "dict[Hashable, Any]":
+def get_attrs(spec: Spec) -> Dict[Hashable, Any]:
     """Derive attributes from a specification."""
-    attrs: "dict[Hashable, Any]" = {}
+    attrs: Dict[Hashable, Any] = {}
 
     for field in spec.fields.of_attr:
         attrs[field.name] = field.default
@@ -123,9 +123,9 @@ def get_columns(spec: Spec) -> Optional[pd.Index]:
         return pd.MultiIndex.from_tuples(elems, names=names)
 
 
-def get_data(spec: Spec) -> "dict[Hashable, Any]":
+def get_data(spec: Spec) -> Dict[Hashable, Any]:
     """Derive data from a specification."""
-    data: "dict[Hashable, Any]" = {}
+    data: Dict[Hashable, Any] = {}
 
     for field in spec.fields.of_data:
         data[field.name] = ensure(field.default, field.dtype)
@@ -135,8 +135,8 @@ def get_data(spec: Spec) -> "dict[Hashable, Any]":
 
 def get_index(spec: Spec) -> Optional[pd.Index]:
     """Derive index from a specification."""
-    names: "list[Hashable]" = []
-    elems: "list[Any]" = []
+    names: List[Hashable] = []
+    elems: List[Any] = []
 
     for field in spec.fields.of_index:
         names.append(field.name)

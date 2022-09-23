@@ -5,7 +5,17 @@ __all__ = ["Attr", "Column", "Data", "Index", "Other"]
 from dataclasses import Field
 from enum import Enum, auto
 from itertools import chain
-from typing import Any, Collection, Hashable, Iterable, Optional, Type, TypeVar
+from typing import (
+    Any,
+    Collection,
+    Dict,
+    Hashable,
+    Iterable,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+)
 
 
 # dependencies
@@ -33,7 +43,7 @@ TSeries = TypeVar("TSeries", bound=pd.Series)
 class DataClass(Protocol[P]):
     """Type hint for dataclass objects."""
 
-    __dataclass_fields__: "dict[str, Field[Any]]"
+    __dataclass_fields__: Dict[str, "Field[Any]"]
 
     def __init__(self, *args: P.args, **kwargs: P.kwargs) -> None:
         ...
@@ -42,7 +52,7 @@ class DataClass(Protocol[P]):
 class PandasClass(Protocol[P, TPandas]):
     """Type hint for dataclass objects with a pandas factory."""
 
-    __dataclass_fields__: "dict[str, Field[Any]]"
+    __dataclass_fields__: Dict[str, "Field[Any]"]
     __pandas_factory__: Type[TPandas]
 
     def __init__(self, *args: P.args, **kwargs: P.kwargs) -> None:
@@ -119,7 +129,7 @@ def get_annotated(tp: Any) -> Any:
     raise TypeError("Could not find any role-annotated type.")
 
 
-def get_annotations(tp: Any) -> "tuple[Any, ...]":
+def get_annotations(tp: Any) -> Tuple[Any, ...]:
     """Extract annotations of the first role-annotated type."""
     for annotated in filter(Role.annotates, find_annotated(tp)):
         return get_args(annotated)[1:]
