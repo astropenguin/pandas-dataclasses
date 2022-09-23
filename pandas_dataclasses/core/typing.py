@@ -15,6 +15,7 @@ from typing import (
     Tuple,
     Type,
     TypeVar,
+    Union,
 )
 
 
@@ -35,7 +36,7 @@ from typing_extensions import (
 # type hints (private)
 P = ParamSpec("P")
 T = TypeVar("T")
-TPandas = TypeVar("TPandas", bound="pd.DataFrame | pd.Series")
+TPandas = TypeVar("TPandas", bound=Union[pd.DataFrame, pd.Series])
 TDataFrame = TypeVar("TDataFrame", bound=pd.DataFrame)
 TSeries = TypeVar("TSeries", bound=pd.Series)
 

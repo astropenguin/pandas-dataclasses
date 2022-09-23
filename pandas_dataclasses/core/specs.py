@@ -5,7 +5,7 @@ __all__ = ["Spec"]
 from dataclasses import dataclass, replace
 from dataclasses import Field as Field_, fields as fields_
 from functools import lru_cache
-from typing import Any, Hashable, List, Optional, Type
+from typing import Any, Hashable, List, Optional, Type, Union
 
 
 # dependencies
@@ -84,7 +84,7 @@ class Spec:
     fields: Fields
     """List of field specifications."""
 
-    factory: Optional[Type["pd.DataFrame | pd.Series"]] = None
+    factory: Optional[Type[Union[pd.DataFrame, pd.Series]]] = None
     """Factory for pandas data creation."""
 
     @classmethod
