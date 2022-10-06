@@ -29,8 +29,10 @@ jobs:
         run: black --check docs tests pandas_dataclasses
       - name: Test code's typing (Pyright)
         run: pyright docs tests pandas_dataclasses
+        if: ${{ matrix.python != '3.7' }}
       - name: Test code's typing (mypy)
         run: mypy docs tests pandas_dataclasses
+        if: ${{ matrix.python != '3.7' }}
       - name: Test code's execution (pytest)
         run: pytest -v tests
       - name: Test docs' building (Sphinx)
