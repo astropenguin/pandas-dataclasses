@@ -21,7 +21,7 @@ from typing import (
 
 # dependencies
 import pandas as pd
-from pandas.api.types import pandas_dtype  # type: ignore
+from pandas.api.types import pandas_dtype
 from typing_extensions import (
     Annotated,
     Literal,
@@ -151,7 +151,7 @@ def get_dtype(tp: Any) -> Optional[str]:
     if get_origin(dtype) is Literal:
         dtype = get_args(dtype)[0]
 
-    return pandas_dtype(dtype).name  # type: ignore
+    return pandas_dtype(dtype).name
 
 
 def get_name(tp: Any, default: Hashable = None) -> Hashable:
