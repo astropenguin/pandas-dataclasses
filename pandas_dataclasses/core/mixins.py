@@ -5,7 +5,7 @@ __all__ = ["As", "AsDataFrame", "AsSeries"]
 from copy import copy
 from functools import wraps as wraps_
 from types import FunctionType, MethodType
-from typing import Any, Callable, Generic, Type
+from typing import Any, Callable, ForwardRef, Generic, Type, cast
 
 
 # dependencies
@@ -72,8 +72,15 @@ class As(Generic[TPandas]):
         super().__init_subclass__(**kwargs)
 
         for base in cls.__orig_bases__:  # type: ignore
-            if get_origin(base) is As:
-                cls.__pandas_factory__ = get_args(base)[0]
+            if get_origin(base) is not As:
+                continue
+
+            factory = get_args(base)[0]
+
+            if factory == ForwardRef("pd.Series[Any]"):
+                cls.__pandas_factory__ = cast(Any, pd.Series)
+            else:
+                cls.__pandas_factory__ = factory
 
     @classproperty
     def new(cls) -> Any:
@@ -98,5 +105,5 @@ AsDataFrame = As[pd.DataFrame]
 """Alias of ``As[pandas.DataFrame]``."""
 
 
-AsSeries = As[pd.Series]
-"""Alias of ``As[pandas.Series]``."""
+AsSeries = As["pd.Series[Any]"]
+"""Alias of ``As[pandas.Series[Any]]``."""

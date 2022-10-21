@@ -36,9 +36,9 @@ from typing_extensions import (
 # type hints (private)
 P = ParamSpec("P")
 T = TypeVar("T")
-TPandas = TypeVar("TPandas", bound=Union[pd.DataFrame, pd.Series])
+TPandas = TypeVar("TPandas", bound=Union[pd.DataFrame, "pd.Series[Any]"])
 TDataFrame = TypeVar("TDataFrame", bound=pd.DataFrame)
-TSeries = TypeVar("TSeries", bound=pd.Series)
+TSeries = TypeVar("TSeries", bound="pd.Series[Any]")
 
 
 class DataClass(Protocol[P]):
