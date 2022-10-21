@@ -118,7 +118,7 @@ def get_columns(spec: Spec) -> Optional[pd.Index]:
     if len(names) == 0:
         return None
     if len(names) == 1:
-        return pd.Index(pd.array(elems), name=names[0])
+        return pd.Index(elems, name=names[0], tupleize_cols=False)
     else:
         return pd.MultiIndex.from_tuples(elems, names=names)
 
