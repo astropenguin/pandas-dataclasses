@@ -84,7 +84,7 @@ class Spec:
     fields: Fields
     """List of field specifications."""
 
-    factory: Optional[Type[Union[pd.DataFrame, pd.Series]]] = None
+    factory: Optional[Type[Union[pd.DataFrame, "pd.Series[Any]"]]] = None
     """Factory for pandas data creation."""
 
     @classmethod

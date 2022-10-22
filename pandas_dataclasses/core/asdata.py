@@ -62,7 +62,7 @@ def asseries(obj: PandasClass[P, TSeries], *, factory: None = None) -> TSeries:
 
 
 @overload
-def asseries(obj: DataClass[P], *, factory: None = None) -> pd.Series:
+def asseries(obj: DataClass[P], *, factory: None = None) -> "pd.Series[Any]":
     ...
 
 
@@ -118,7 +118,7 @@ def get_columns(spec: Spec) -> Optional[pd.Index]:
     if len(names) == 0:
         return None
     if len(names) == 1:
-        return pd.Index(pd.array(elems), name=names[0])
+        return pd.Index(elems, name=names[0], tupleize_cols=False)
     else:
         return pd.MultiIndex.from_tuples(elems, names=names)
 
@@ -147,5 +147,5 @@ def get_index(spec: Spec) -> Optional[pd.Index]:
     if len(names) == 1:
         return pd.Index(elems[0], name=names[0])
     else:
-        cast: Any = np.broadcast_arrays
-        return pd.MultiIndex.from_arrays(cast(*elems), names=names)
+        elems = np.broadcast_arrays(*elems)
+        return pd.MultiIndex.from_arrays(elems, names=names)

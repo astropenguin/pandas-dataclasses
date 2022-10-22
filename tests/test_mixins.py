@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 # dependencies
 import pandas as pd
+from pandas.testing import assert_frame_equal, assert_series_equal
 from data import Weather, weather, df_weather_true, ser_weather_true
 from pandas_dataclasses import As, AsDataFrame, AsSeries
 
@@ -13,7 +14,7 @@ class CustomDataFrame(pd.DataFrame):
     pass
 
 
-class CustomSeries(pd.Series):
+class CustomSeries(pd.Series):  # type: ignore
     pass
 
 
@@ -49,7 +50,7 @@ def test_dataframe_weather() -> None:
     )
 
     assert isinstance(df_weather, pd.DataFrame)
-    assert (df_weather == df_weather_true).all().all()
+    assert_frame_equal(df_weather, df_weather_true)
 
 
 def test_custom_dataframe_weather() -> None:
@@ -63,7 +64,7 @@ def test_custom_dataframe_weather() -> None:
     )
 
     assert isinstance(df_weather, CustomDataFrame)
-    assert (df_weather == df_weather_true).all().all()
+    assert_frame_equal(df_weather, df_weather_true, check_frame_type=False)
 
 
 def test_series_weather() -> None:
@@ -77,7 +78,7 @@ def test_series_weather() -> None:
     )
 
     assert isinstance(ser_weather, pd.Series)
-    assert (ser_weather == ser_weather_true).all()
+    assert_series_equal(ser_weather, ser_weather_true)
 
 
 def test_custom_series_weather() -> None:
@@ -91,4 +92,4 @@ def test_custom_series_weather() -> None:
     )
 
     assert isinstance(ser_weather, CustomSeries)
-    assert (ser_weather == ser_weather_true).all()
+    assert_series_equal(ser_weather, ser_weather_true, check_series_type=False)
