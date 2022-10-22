@@ -64,7 +64,7 @@ def wraps(func: Any, return_: Any) -> Callable[[T], T]:
 class As(Generic[TPandas]):
     """Mix-in class that provides shorthand methods."""
 
-    __pandas_factory__: Type[TPandas]
+    __pandas_factory__: Callable[..., TPandas]
     """Factory for pandas data creation."""
 
     def __init_subclass__(cls, **kwargs: Any) -> None:

@@ -7,13 +7,13 @@ from enum import Enum, auto
 from itertools import chain
 from typing import (
     Any,
+    Callable,
     Collection,
     Dict,
     Hashable,
     Iterable,
     Optional,
     Tuple,
-    Type,
     TypeVar,
     Union,
 )
@@ -54,7 +54,7 @@ class PandasClass(Protocol[P, TPandas]):
     """Type hint for dataclass objects with a pandas factory."""
 
     __dataclass_fields__: Dict[str, "Field[Any]"]
-    __pandas_factory__: Type[TPandas]
+    __pandas_factory__: Callable[..., TPandas]
 
     def __init__(self, *args: P.args, **kwargs: P.kwargs) -> None:
         ...

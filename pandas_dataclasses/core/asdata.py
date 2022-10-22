@@ -2,7 +2,7 @@ __all__ = ["asdataframe", "asseries"]
 
 
 # standard library
-from typing import Any, Dict, Hashable, List, Optional, Type, overload
+from typing import Any, Callable, Dict, Hashable, List, Optional, overload
 
 
 # dependencies
@@ -17,12 +17,12 @@ from .typing import P, DataClass, PandasClass, TDataFrame, TSeries
 
 # runtime functions
 @overload
-def asdataframe(obj: Any, *, factory: Type[TDataFrame]) -> TDataFrame:
+def asdataframe(obj: PandasClass[P, TDataFrame], *, factory: None = None) -> TDataFrame:
     ...
 
 
 @overload
-def asdataframe(obj: PandasClass[P, TDataFrame], *, factory: None = None) -> TDataFrame:
+def asdataframe(obj: DataClass[P], *, factory: Callable[..., TDataFrame]) -> TDataFrame:
     ...
 
 
@@ -52,12 +52,12 @@ def asdataframe(obj: Any, *, factory: Any = None) -> Any:
 
 
 @overload
-def asseries(obj: Any, *, factory: Type[TSeries]) -> TSeries:
+def asseries(obj: PandasClass[P, TSeries], *, factory: None = None) -> TSeries:
     ...
 
 
 @overload
-def asseries(obj: PandasClass[P, TSeries], *, factory: None = None) -> TSeries:
+def asseries(obj: DataClass[P], *, factory: Callable[..., TSeries]) -> TSeries:
     ...
 
 
