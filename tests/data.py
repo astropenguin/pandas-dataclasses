@@ -1,13 +1,9 @@
-__all__ = [
-    "Weather",
-    "weather",
-    "df_weather_true",
-    "ser_weather_true",
-]
+__all__ = ["Weather", "weather", "df_weather_true", "ser_weather_true"]
 
 
 # standard library
 from dataclasses import dataclass, field
+from typing import Any
 
 
 # dependencies
@@ -109,7 +105,7 @@ df_weather_true.attrs = {
 }
 
 
-ser_weather_true = pd.Series(
+ser_weather_true: "pd.Series[Any]" = pd.Series(
     data=[7.1, 24.3, 5.4, 25.9, 4.9],
     index=pd.MultiIndex.from_arrays(
         [
