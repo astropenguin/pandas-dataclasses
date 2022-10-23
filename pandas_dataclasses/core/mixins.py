@@ -19,9 +19,9 @@ from .typing import P, T, PandasClass, TPandas
 
 
 class classproperty:
-    """Class property dedicated to ``As.new``."""
+    """Class property decorator dedicated to ``As.new``."""
 
-    def __init__(self, func: Any) -> None:
+    def __init__(self, func: Callable[..., Any]) -> None:
         self.__doc__ = func.__doc__
         self.func = func
 
@@ -31,34 +31,6 @@ class classproperty:
         cls: Type[PandasClass[P, TPandas]],
     ) -> Callable[P, TPandas]:
         return self.func(cls)  # type: ignore
-
-
-def wraps(func: Any, return_: Any) -> Callable[[T], T]:
-    """Function decorator dedicated to ``As.new``."""
-    if not isinstance(func, FunctionType):
-        return wraps_(func)
-
-    copied = type(func)(
-        func.__code__,
-        func.__globals__,
-        "new",
-        func.__defaults__,
-        func.__closure__,
-    )
-
-    for name in (
-        "__annotations__",
-        "__dict__",
-        "__doc__",
-        "__kwdefaults__",
-        "__module__",
-        "__name__",
-        "__qualname__",
-    ):
-        setattr(copied, name, copy(getattr(func, name)))
-
-    copied.__annotations__["return"] = return_
-    return wraps_(copied)
 
 
 class As(Generic[TPandas]):
@@ -73,22 +45,9 @@ class As(Generic[TPandas]):
         super().__init_subclass__(**kwargs)
 
     @classproperty
-    def new(cls) -> Any:
+    def new(cls) -> MethodType:
         """Create a pandas object from dataclass parameters."""
-        factory = cls.__pandas_factory__
-
-        if issubclass(factory, pd.DataFrame):
-            aspandas: Any = asdataframe
-        elif issubclass(factory, pd.Series):
-            aspandas = asseries
-        else:
-            raise TypeError("Not a valid pandas factory.")
-
-        @wraps(cls.__init__, factory)  # type: ignore
-        def new(cls: Any, *args: Any, **kwargs: Any) -> Any:
-            return aspandas(cls(*args, **kwargs))
-
-        return MethodType(new, cls)
+        return MethodType(get_new(cls), cls)
 
 
 AsDataFrame = As[pd.DataFrame]
@@ -115,3 +74,49 @@ def get_factory(cls: Any) -> Callable[..., Any]:
 
     raise TypeError("Could not find any factory.")
 
+
+def get_new(cls: Any) -> Callable[..., Any]:
+    """Create a runtime new function from a class."""
+    factory = cls.__pandas_factory__
+    origin = get_origin(factory) or factory
+
+    if issubclass(origin, pd.DataFrame):
+        converter: Any = asdataframe
+    elif issubclass(origin, pd.Series):
+        converter = asseries
+    else:
+        raise TypeError("Could not choose a converter.")
+
+    @wraps(cls.__init__, "new", factory)
+    def wrapper(cls: Any, *args: Any, **kwargs: Any) -> Any:
+        return converter(cls(*args, **kwargs))
+
+    return wrapper
+
+
+def wraps(func: Any, name: str, return_: Any) -> Callable[[T], T]:
+    """functools.wraps with modifiable name and return type."""
+    if not isinstance(func, FunctionType):
+        return wraps_(func)
+
+    copied = type(func)(
+        func.__code__,
+        func.__globals__,
+        name,
+        func.__defaults__,
+        func.__closure__,
+    )
+
+    for attr in (
+        "__annotations__",
+        "__dict__",
+        "__doc__",
+        "__kwdefaults__",
+        "__module__",
+        "__name__",
+        "__qualname__",
+    ):
+        setattr(copied, attr, copy(getattr(func, attr)))
+
+    copied.__annotations__["return"] = return_
+    return wraps_(copied)
