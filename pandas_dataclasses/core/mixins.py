@@ -69,18 +69,8 @@ class As(Generic[TPandas]):
 
     def __init_subclass__(cls, **kwargs: Any) -> None:
         """Add a pandas factory to an inheriting class."""
+        cls.__pandas_factory__ = kwargs.pop("factory", get_factory(cls))
         super().__init_subclass__(**kwargs)
-
-        for base in cls.__orig_bases__:  # type: ignore
-            if get_origin(base) is not As:
-                continue
-
-            factory = get_args(base)[0]
-
-            if factory == ForwardRef("pd.Series[Any]"):
-                cls.__pandas_factory__ = cast(Any, pd.Series)
-            else:
-                cls.__pandas_factory__ = factory
 
     @classproperty
     def new(cls) -> Any:
@@ -107,3 +97,21 @@ AsDataFrame = As[pd.DataFrame]
 
 AsSeries = As["pd.Series[Any]"]
 """Alias of ``As[pandas.Series[Any]]``."""
+
+
+def get_factory(cls: Any) -> Callable[..., Any]:
+    """Extract a pandas factory from a class."""
+    for base in getattr(cls, "__orig_bases__", ()):
+        if get_origin(base) is not As:
+            continue
+
+        factory = get_args(base)[0]
+
+        # special handling for AsSeries
+        if factory == ForwardRef("pd.Series[Any]"):
+            return pd.Series
+
+        return cast(Callable[..., Any], factory)
+
+    raise TypeError("Could not find any factory.")
+
