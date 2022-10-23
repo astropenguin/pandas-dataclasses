@@ -34,9 +34,10 @@ from typing_extensions import (
 
 
 # type hints (private)
+Pandas = Union[pd.DataFrame, "pd.Series[Any]"]
 P = ParamSpec("P")
 T = TypeVar("T")
-TPandas = TypeVar("TPandas", bound=Union[pd.DataFrame, "pd.Series[Any]"])
+TPandas = TypeVar("TPandas", bound=Pandas)
 TDataFrame = TypeVar("TDataFrame", bound=pd.DataFrame)
 TSeries = TypeVar("TSeries", bound="pd.Series[Any]")
 
