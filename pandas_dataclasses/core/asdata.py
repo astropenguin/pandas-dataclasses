@@ -38,9 +38,6 @@ def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     if factory is None:
         factory = spec.factory or pd.DataFrame
 
-    if not issubclass(factory, pd.DataFrame):
-        raise TypeError("Factory must be a subclass of DataFrame.")
-
     dataframe = factory(
         data=get_data(spec),
         index=get_index(spec),
@@ -72,9 +69,6 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
 
     if factory is None:
         factory = spec.factory or pd.Series
-
-    if not issubclass(factory, pd.Series):
-        raise TypeError("Factory must be a subclass of Series.")
 
     data = get_data(spec)
     index = get_index(spec)
