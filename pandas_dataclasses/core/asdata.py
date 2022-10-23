@@ -2,7 +2,7 @@ __all__ = ["asdataframe", "asseries"]
 
 
 # standard library
-from typing import Any, Dict, Hashable, List, Optional, Type, overload
+from typing import Any, Callable, Dict, Hashable, List, Optional, overload
 
 
 # dependencies
@@ -17,12 +17,12 @@ from .typing import P, DataClass, PandasClass, TDataFrame, TSeries
 
 # runtime functions
 @overload
-def asdataframe(obj: Any, *, factory: Type[TDataFrame]) -> TDataFrame:
+def asdataframe(obj: PandasClass[P, TDataFrame], *, factory: None = None) -> TDataFrame:
     ...
 
 
 @overload
-def asdataframe(obj: PandasClass[P, TDataFrame], *, factory: None = None) -> TDataFrame:
+def asdataframe(obj: DataClass[P], *, factory: Callable[..., TDataFrame]) -> TDataFrame:
     ...
 
 
@@ -38,9 +38,6 @@ def asdataframe(obj: Any, *, factory: Any = None) -> Any:
     if factory is None:
         factory = spec.factory or pd.DataFrame
 
-    if not issubclass(factory, pd.DataFrame):
-        raise TypeError("Factory must be a subclass of DataFrame.")
-
     dataframe = factory(
         data=get_data(spec),
         index=get_index(spec),
@@ -52,12 +49,12 @@ def asdataframe(obj: Any, *, factory: Any = None) -> Any:
 
 
 @overload
-def asseries(obj: Any, *, factory: Type[TSeries]) -> TSeries:
+def asseries(obj: PandasClass[P, TSeries], *, factory: None = None) -> TSeries:
     ...
 
 
 @overload
-def asseries(obj: PandasClass[P, TSeries], *, factory: None = None) -> TSeries:
+def asseries(obj: DataClass[P], *, factory: Callable[..., TSeries]) -> TSeries:
     ...
 
 
@@ -72,9 +69,6 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
 
     if factory is None:
         factory = spec.factory or pd.Series
-
-    if not issubclass(factory, pd.Series):
-        raise TypeError("Factory must be a subclass of Series.")
 
     data = get_data(spec)
     index = get_index(spec)
