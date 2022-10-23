@@ -24,17 +24,22 @@ class DataFrameWeather(Weather, AsDataFrame):
 
 
 @dataclass
-class SeriesWeather(Weather, AsSeries):
-    pass
-
-
-@dataclass
 class CustomDataFrameWeather(Weather, As[CustomDataFrame]):
     pass
 
 
 @dataclass
+class SeriesWeather(Weather, AsSeries):
+    pass
+
+
+@dataclass
 class CustomSeriesWeather(Weather, As[CustomSeries]):
+    pass
+
+
+@dataclass
+class FloatSeriesWeather(Weather, As["pd.Series[float]"], factory=pd.Series):
     pass
 
 
@@ -92,4 +97,18 @@ def test_custom_series_weather() -> None:
     )
 
     assert isinstance(ser_weather, CustomSeries)
+    assert_series_equal(ser_weather, ser_weather_true, check_series_type=False)
+
+
+def test_float_series_weather() -> None:
+    ser_weather = FloatSeriesWeather.new(
+        year=weather.year,
+        month=weather.month,
+        temp_avg=weather.temp_avg,
+        temp_max=weather.temp_max,
+        wind_avg=weather.wind_avg,
+        wind_max=weather.wind_max,
+    )
+
+    assert isinstance(ser_weather, pd.Series)
     assert_series_equal(ser_weather, ser_weather_true, check_series_type=False)
