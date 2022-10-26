@@ -1,4 +1,4 @@
-__all__ = ["As", "AsDataFrame", "AsSeries"]
+__all__ = ["As", "AsFrame", "AsSeries"]
 
 
 # standard library
@@ -51,7 +51,7 @@ class As(Generic[TPandas]):
         return MethodType(get_creator(cls), cls)
 
 
-AsDataFrame = As[pd.DataFrame]
+AsFrame = As[pd.DataFrame]
 """Alias of ``As[pandas.DataFrame]``."""
 
 

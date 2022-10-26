@@ -1,6 +1,6 @@
 __all__ = [
     "As",
-    "AsDataFrame",
+    "AsFrame",
     "AsSeries",
     "Attr",
     "Column",

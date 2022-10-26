@@ -7,7 +7,7 @@ from typing import Any
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
 from data import Weather, weather, df_weather_true, ser_weather_true
-from pandas_dataclasses import As, AsDataFrame, AsSeries
+from pandas_dataclasses import As, AsFrame, AsSeries
 
 
 # test data
@@ -24,7 +24,7 @@ class CustomSeries(pd.Series):  # type: ignore
 
 
 @dataclass
-class DataFrameWeather(Weather, AsDataFrame):
+class DataFrameWeather(Weather, AsFrame):
     pass
 
 
