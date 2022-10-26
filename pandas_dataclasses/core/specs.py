@@ -133,8 +133,8 @@ def eval_types(dataclass: Type[DataClass[P]]) -> Type[DataClass[P]]:
     """Evaluate field types of a dataclass."""
     types = get_type_hints(dataclass, include_extras=True)
 
-    for field in fields_(dataclass):
-        field.type = types[field.name]
+    for field_ in fields_(dataclass):
+        field_.type = types[field_.name]
 
     return dataclass
 
