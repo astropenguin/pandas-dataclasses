@@ -1,5 +1,6 @@
 # standard library
 from dataclasses import dataclass
+from typing import Any
 
 
 # dependencies
@@ -10,6 +11,10 @@ from pandas_dataclasses import As, AsDataFrame, AsSeries
 
 
 # test data
+def factory(*args: Any, **kwargs: Any) -> pd.Series:  # type: ignore
+    return pd.Series(*args, **kwargs)  # type: ignore
+
+
 class CustomDataFrame(pd.DataFrame):
     pass
 
@@ -30,6 +35,11 @@ class CustomDataFrameWeather(Weather, As[CustomDataFrame]):
 
 @dataclass
 class SeriesWeather(Weather, AsSeries):
+    pass
+
+
+@dataclass
+class FactorySeriesWeather(Weather, AsSeries, factory=factory):
     pass
 
 
@@ -74,6 +84,20 @@ def test_custom_dataframe_weather() -> None:
 
 def test_series_weather() -> None:
     ser_weather = SeriesWeather.new(
+        year=weather.year,
+        month=weather.month,
+        temp_avg=weather.temp_avg,
+        temp_max=weather.temp_max,
+        wind_avg=weather.wind_avg,
+        wind_max=weather.wind_max,
+    )
+
+    assert isinstance(ser_weather, pd.Series)
+    assert_series_equal(ser_weather, ser_weather_true)
+
+
+def test_factory_series_weather() -> None:
+    ser_weather = FactorySeriesWeather.new(
         year=weather.year,
         month=weather.month,
         temp_avg=weather.temp_avg,

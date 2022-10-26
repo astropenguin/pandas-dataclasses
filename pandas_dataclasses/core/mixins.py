@@ -3,9 +3,9 @@ __all__ = ["As", "AsDataFrame", "AsSeries"]
 
 # standard library
 from copy import copy
-from functools import wraps as wraps_
+from functools import lru_cache, wraps as wraps_
 from types import FunctionType, MethodType
-from typing import Any, Callable, ForwardRef, Generic, Type
+from typing import Any, Callable, ForwardRef, Generic, Type, Union
 
 
 # dependencies
@@ -34,7 +34,7 @@ class classproperty:
 
 
 class As(Generic[TPandas]):
-    """Mix-in class for runtime pandas data creator."""
+    """Mix-in class for runtime pandas data creation."""
 
     __pandas_factory__: Callable[..., TPandas]
     """Factory for pandas data creation."""
@@ -48,7 +48,7 @@ class As(Generic[TPandas]):
     @classproperty
     def new(cls) -> MethodType:
         """Runtime pandas data creator as a classmethod."""
-        return MethodType(get_new(cls), cls)
+        return MethodType(get_creator(cls), cls)
 
 
 AsDataFrame = As[pd.DataFrame]
@@ -59,27 +59,17 @@ AsSeries = As["pd.Series[Any]"]
 """Alias of ``As[pandas.Series[Any]]``."""
 
 
-def get_factory(cls: Any) -> Callable[..., Any]:
-    """Extract a pandas factory from a class."""
-    for base in getattr(cls, "__orig_bases__", ()):
-        if get_origin(base) is not As:
-            continue
-
-        factory = get_args(base)[0]
-
-        # special handling for AsSeries
-        if factory == ForwardRef("pd.Series[Any]"):
-            return pd.Series
-
-        return factory  # type: ignore
-
-    raise TypeError("Could not find any factory.")
-
-
-def get_new(cls: Any) -> Callable[..., Pandas]:
-    """Create a runtime new function from a class."""
+@lru_cache(maxsize=None)
+def get_creator(cls: Any) -> Callable[..., Pandas]:
+    """Create a runtime pandas data creator."""
     factory = cls.__pandas_factory__
-    origin = get_origin(factory) or factory
+
+    if isinstance(factory, FunctionType):
+        return_ = factory.__annotations__["return"]
+    else:
+        return_ = factory
+
+    origin = get_origin(return_) or return_
 
     if issubclass(origin, pd.DataFrame):
         converter: Any = asdataframe
@@ -88,11 +78,41 @@ def get_new(cls: Any) -> Callable[..., Pandas]:
     else:
         raise TypeError("Could not choose a converter.")
 
-    @wraps(cls.__init__, "new", factory)
-    def new(cls: Any, *args: Any, **kwargs: Any) -> Any:
+    @wraps(cls.__init__, "new", get_return(cls))
+    def wrapper(cls: Any, *args: Any, **kwargs: Any) -> Any:
         return converter(cls(*args, **kwargs))
 
-    return new
+    return wrapper
+
+
+def get_factory(cls: Any) -> Callable[..., Any]:
+    """Extract a pandas factory from a class."""
+    return_ = get_return(cls)
+
+    if not isinstance(return_, str):
+        return return_
+
+    # special handling for AsSeries
+    if return_ == "pd.Series[Any]":
+        return pd.Series
+
+    raise TypeError("Return type must be evaluated.")
+
+
+def get_return(cls: Any) -> Union[Type[Any], str]:
+    """Extract a return type from a class."""
+    for base in getattr(cls, "__orig_bases__", ()):
+        if get_origin(base) is not As:
+            continue
+
+        tp = get_args(base)[0]
+
+        if isinstance(tp, ForwardRef):
+            return tp.__forward_arg__
+        else:
+            return tp  # type: ignore
+
+    raise TypeError("Could not find any return type.")
 
 
 def wraps(func: Any, name: str, return_: Any) -> Callable[[T], T]:
