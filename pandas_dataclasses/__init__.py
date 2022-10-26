@@ -8,7 +8,7 @@ __all__ = [
     "Index",
     "Other",
     "Spec",
-    "asdataframe",
+    "asframe",
     "asseries",
     "core",
 ]

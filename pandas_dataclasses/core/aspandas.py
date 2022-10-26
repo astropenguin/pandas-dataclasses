@@ -1,4 +1,4 @@
-__all__ = ["asdataframe", "asseries"]
+__all__ = ["asframe", "asseries"]
 
 
 # standard library
@@ -12,26 +12,26 @@ import pandas as pd
 
 # submodules
 from .specs import Spec
-from .typing import P, DataClass, PandasClass, TDataFrame, TSeries
+from .typing import P, DataClass, PandasClass, TFrame, TSeries
 
 
 # runtime functions
 @overload
-def asdataframe(obj: PandasClass[P, TDataFrame], *, factory: None = None) -> TDataFrame:
+def asframe(obj: PandasClass[P, TFrame], *, factory: None = None) -> TFrame:
     ...
 
 
 @overload
-def asdataframe(obj: DataClass[P], *, factory: Callable[..., TDataFrame]) -> TDataFrame:
+def asframe(obj: DataClass[P], *, factory: Callable[..., TFrame]) -> TFrame:
     ...
 
 
 @overload
-def asdataframe(obj: DataClass[P], *, factory: None = None) -> pd.DataFrame:
+def asframe(obj: DataClass[P], *, factory: None = None) -> pd.DataFrame:
     ...
 
 
-def asdataframe(obj: Any, *, factory: Any = None) -> Any:
+def asframe(obj: Any, *, factory: Any = None) -> Any:
     """Create a DataFrame object from a dataclass object."""
     spec = Spec.from_dataclass(type(obj)) @ obj
 

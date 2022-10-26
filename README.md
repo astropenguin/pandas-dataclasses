@@ -81,16 +81,16 @@ In the example above, `df = Weather.new(...)` is thus equivalent to:
 <summary>Click to see all imports</summary>
 
 ```python
-from pandas_dataclasses import asdataframe
+from pandas_dataclasses import asframe
 ```
 </details>
 
 ```python
 obj = Weather([2020, ...], [1, ...], [7.1, ...], [2.4, ...])
-df = asdataframe(obj)
+df = asframe(obj)
 ```
 
-where `asdataframe` is a conversion function.
+where `asframe` is a conversion function.
 pandas-dataclasses does not touch the dataclass object creation itself; this allows you to fully customize your dataclass before conversion by the dataclass features (`field`, `__post_init__`, ...).
 
 ## Basic usage

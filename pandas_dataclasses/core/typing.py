@@ -38,7 +38,7 @@ Pandas = Union[pd.DataFrame, "pd.Series[Any]"]
 P = ParamSpec("P")
 T = TypeVar("T")
 TPandas = TypeVar("TPandas", bound=Pandas)
-TDataFrame = TypeVar("TDataFrame", bound=pd.DataFrame)
+TFrame = TypeVar("TFrame", bound=pd.DataFrame)
 TSeries = TypeVar("TSeries", bound="pd.Series[Any]")
 
 

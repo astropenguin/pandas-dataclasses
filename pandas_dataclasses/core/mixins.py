@@ -14,7 +14,7 @@ from typing_extensions import get_args, get_origin
 
 
 # submodules
-from .aspandas import asdataframe, asseries
+from .aspandas import asframe, asseries
 from .typing import P, T, Pandas, PandasClass, TPandas
 
 
@@ -72,7 +72,7 @@ def get_creator(cls: Any) -> Callable[..., Pandas]:
     origin = get_origin(return_) or return_
 
     if issubclass(origin, pd.DataFrame):
-        converter: Any = asdataframe
+        converter: Any = asframe
     elif issubclass(origin, pd.Series):
         converter = asseries
     else:

@@ -6,7 +6,7 @@ from typing import cast
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
 from data import Weather, weather, df_weather_true, ser_weather_true
-from pandas_dataclasses import Spec, asdataframe, asseries
+from pandas_dataclasses import Spec, asframe, asseries
 from pandas_dataclasses.core.aspandas import get_attrs, get_columns, get_data, get_index
 
 
@@ -15,12 +15,12 @@ spec = Spec.from_dataclass(Weather) @ weather
 
 
 # test functions
+def test_asframe() -> None:
+    assert_frame_equal(asframe(weather), df_weather_true)
+
+
 def test_asseries() -> None:
     assert_series_equal(asseries(weather), ser_weather_true)
-
-
-def test_asdataframe() -> None:
-    assert_frame_equal(asdataframe(weather), df_weather_true)
 
 
 def test_get_attrs() -> None:
