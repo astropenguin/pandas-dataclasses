@@ -5,7 +5,7 @@ __all__ = ["As", "AsDataFrame", "AsSeries"]
 from copy import copy
 from functools import wraps as wraps_
 from types import FunctionType, MethodType
-from typing import Any, Callable, ForwardRef, Generic, Type
+from typing import Any, Callable, ForwardRef, Generic, Type, Union
 
 
 # dependencies
@@ -61,19 +61,32 @@ AsSeries = As["pd.Series[Any]"]
 
 def get_factory(cls: Any) -> Callable[..., Any]:
     """Extract a pandas factory from a class."""
+    return_ = get_return(cls)
+
+    if not isinstance(return_, str):
+        return return_
+
+    # special handling for AsSeries
+    if return_ == "pd.Series[Any]":
+        return pd.Series
+
+    raise TypeError("Return type must be evaluated.")
+
+
+def get_return(cls: Any) -> Union[Type[Any], str]:
+    """Extract a return type from a class."""
     for base in getattr(cls, "__orig_bases__", ()):
         if get_origin(base) is not As:
             continue
 
-        factory = get_args(base)[0]
+        tp = get_args(base)[0]
 
-        # special handling for AsSeries
-        if factory == ForwardRef("pd.Series[Any]"):
-            return pd.Series
+        if isinstance(tp, ForwardRef):
+            return tp.__forward_arg__
+        else:
+            return tp
 
-        return factory  # type: ignore
-
-    raise TypeError("Could not find any factory.")
+    raise TypeError("Could not find any return type.")
 
 
 def get_new(cls: Any) -> Callable[..., Pandas]:
@@ -88,7 +101,7 @@ def get_new(cls: Any) -> Callable[..., Pandas]:
     else:
         raise TypeError("Could not choose a converter.")
 
-    @wraps(cls.__init__, "new", factory)
+    @wraps(cls.__init__, "new", get_return(cls))
     def new(cls: Any, *args: Any, **kwargs: Any) -> Any:
         return converter(cls(*args, **kwargs))
 
