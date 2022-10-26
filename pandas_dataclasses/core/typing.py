@@ -162,6 +162,9 @@ def get_name(tp: Any, default: Hashable = None) -> Hashable:
     except (IndexError, TypeError):
         return default
 
+    if name is Ellipsis:
+        return default
+
     try:
         hash(name)
     except TypeError:
