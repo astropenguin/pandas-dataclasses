@@ -478,6 +478,7 @@ from pandas_dataclasses import Data
 Type hint | Inferred name
 --- | ---
 `Data[Any]` | (field name)
+`Ann[Data[Any], ..., "spam"]` | (field name)
 `Ann[Data[Any], "spam"]` | `"spam"`
 `Ann[Data[Any], "spam", "ham"]` | `"spam"`
 `Ann[Data[Any], "spam"] \| Ann[str, "ham"]` | `"spam"`

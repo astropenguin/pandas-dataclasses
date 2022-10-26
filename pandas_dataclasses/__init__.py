@@ -14,17 +14,15 @@ __all__ = [
     "asseries",
     "core",
 ]
+__version__ = "0.9.0"
 
 
+# submodules
 from . import core
 from .core.aspandas import *
 from .core.mixins import *
 from .core.specs import *
 from .core.typing import *
-
-
-# metadata
-__version__ = "0.8.0"
 
 
 # aliases
