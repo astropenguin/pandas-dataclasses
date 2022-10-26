@@ -40,6 +40,10 @@ testdata_name = [
     (Ann[Data[Any], "data"], "data"),
     (Ann[Index[Any], "index"], "index"),
     (Ann[Any, "other"], None),
+    (Ann[Attr[Any], ..., "attr"], None),  # type: ignore
+    (Ann[Data[Any], ..., "data"], None),
+    (Ann[Index[Any], ..., "index"], None),
+    (Ann[Any, ..., "other"], None),
     (Union[Ann[Attr[Any], "attr"], Ann[Any, "any"]], "attr"),  # type: ignore
     (Union[Ann[Data[Any], "data"], Ann[Any, "any"]], "data"),
     (Union[Ann[Index[Any], "index"], Ann[Any, "any"]], "index"),
