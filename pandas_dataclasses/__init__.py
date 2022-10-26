@@ -1,5 +1,6 @@
 __all__ = [
     "As",
+    "AsDataFrame",
     "AsFrame",
     "AsSeries",
     "Attr",
@@ -8,6 +9,7 @@ __all__ = [
     "Index",
     "Other",
     "Spec",
+    "asdataframe",
     "asframe",
     "asseries",
     "core",
@@ -23,3 +25,12 @@ from .core.typing import *
 
 # metadata
 __version__ = "0.8.0"
+
+
+# aliases
+AsDataFrame = AsFrame
+"""Alias of ``core.mixins.AsFrame``."""
+
+
+asdataframe = asframe
+"""Alias of ``core.aspandas.asframe``."""
