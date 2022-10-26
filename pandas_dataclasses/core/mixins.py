@@ -1,4 +1,4 @@
-__all__ = ["As", "AsDataFrame", "AsSeries"]
+__all__ = ["As", "AsFrame", "AsSeries"]
 
 
 # standard library
@@ -14,7 +14,7 @@ from typing_extensions import get_args, get_origin
 
 
 # submodules
-from .asdata import asdataframe, asseries
+from .aspandas import asframe, asseries
 from .typing import P, T, Pandas, PandasClass, TPandas
 
 
@@ -51,7 +51,7 @@ class As(Generic[TPandas]):
         return MethodType(get_creator(cls), cls)
 
 
-AsDataFrame = As[pd.DataFrame]
+AsFrame = As[pd.DataFrame]
 """Alias of ``As[pandas.DataFrame]``."""
 
 
@@ -72,7 +72,7 @@ def get_creator(cls: Any) -> Callable[..., Pandas]:
     origin = get_origin(return_) or return_
 
     if issubclass(origin, pd.DataFrame):
-        converter: Any = asdataframe
+        converter: Any = asframe
     elif issubclass(origin, pd.Series):
         converter = asseries
     else:

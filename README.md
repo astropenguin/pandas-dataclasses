@@ -17,13 +17,13 @@ pandas-dataclass makes it easy to create [pandas] data (DataFrame and Series) by
 
 ```python
 from dataclasses import dataclass
-from pandas_dataclasses import AsDataFrame, Data, Index
+from pandas_dataclasses import AsFrame, Data, Index
 ```
 </details>
 
 ```python
 @dataclass
-class Weather(AsDataFrame):
+class Weather(AsFrame):
     """Weather information."""
 
     year: Index[int]
@@ -72,7 +72,7 @@ pip install pandas-dataclasses
 pandas-dataclasses provides you the following features:
 
 - Type hints for dataclass fields (`Attr`, `Column`, `Data`, `Index`) to specify the data type and name of each element in pandas data
-- Mix-in classes for dataclasses (`As`, `AsDataFrame`, `AsSeries`) to create pandas data by a classmethod (`new`) that takes the same arguments as dataclass initialization
+- Mix-in classes for dataclasses (`As`, `AsFrame`, `AsSeries`) to create pandas data by a classmethod (`new`) that takes the same arguments as dataclass initialization
 
 When you call `new`, it will first create a dataclass object and then create a Series or DataFrame object from the dataclass object according the type hints and values in it.
 In the example above, `df = Weather.new(...)` is thus equivalent to:
@@ -81,36 +81,36 @@ In the example above, `df = Weather.new(...)` is thus equivalent to:
 <summary>Click to see all imports</summary>
 
 ```python
-from pandas_dataclasses import asdataframe
+from pandas_dataclasses import asframe
 ```
 </details>
 
 ```python
 obj = Weather([2020, ...], [1, ...], [7.1, ...], [2.4, ...])
-df = asdataframe(obj)
+df = asframe(obj)
 ```
 
-where `asdataframe` is a conversion function.
+where `asframe` is a conversion function.
 pandas-dataclasses does not touch the dataclass object creation itself; this allows you to fully customize your dataclass before conversion by the dataclass features (`field`, `__post_init__`, ...).
 
 ## Basic usage
 
 ### DataFrame creation
 
-As shown in the example above, a dataclass that has the `AsDataFrame` mix-in will create DataFrame objects:
+As shown in the example above, a dataclass that has the `AsFrame` mix-in will create DataFrame objects:
 
 <details>
 <summary>Click to see all imports</summary>
 
 ```python
 from dataclasses import dataclass
-from pandas_dataclasses import AsDataFrame, Data, Index
+from pandas_dataclasses import AsFrame, Data, Index
 ```
 </details>
 
 ```python
 @dataclass
-class Weather(AsDataFrame):
+class Weather(AsFrame):
     """Weather information."""
 
     year: Index[int]
@@ -159,7 +159,7 @@ class Weather(AsSeries):
 ser = Weather.new(...)
 ```
 
-Unlike `AsDataFrame`, the second and subsequent data fields are ignored in the Series creation even if they exist.
+Unlike `AsFrame`, the second and subsequent data fields are ignored in the Series creation even if they exist.
 Other rules are the same as for the DataFrame creation.
 
 ## Advanced usage
@@ -173,13 +173,13 @@ Fields typed by `Attr` are *attribute fields*, each value of which will become a
 
 ```python
 from dataclasses import dataclass
-from pandas_dataclasses import AsDataFrame, Attr, Data, Index
+from pandas_dataclasses import AsFrame, Attr, Data, Index
 ```
 </details>
 
 ```python
 @dataclass
-class Weather(AsDataFrame):
+class Weather(AsFrame):
     """Weather information."""
 
     year: Index[int]
@@ -210,13 +210,13 @@ The name of attribute, data, or index can be explicitly specified by adding a ha
 ```python
 from dataclasses import dataclass
 from typing import Annotated as Ann
-from pandas_dataclasses import AsDataFrame, Attr, Data, Index
+from pandas_dataclasses import AsFrame, Attr, Data, Index
 ```
 </details>
 
 ```python
 @dataclass
-class Weather(AsDataFrame):
+class Weather(AsFrame):
     """Weather information."""
 
     year: Ann[Index[int], "Year"]
@@ -255,13 +255,13 @@ If an annotation is a [format string], it will be formatted by a dataclass objec
 ```python
 from dataclasses import dataclass
 from typing import Annotated as Ann
-from pandas_dataclasses import AsDataFrame, Data, Index
+from pandas_dataclasses import AsFrame, Data, Index
 ```
 </details>
 
 ```python
 @dataclass
-class Weather(AsDataFrame):
+class Weather(AsFrame):
     """Weather information."""
 
     year: Ann[Index[int], "Year"]
@@ -287,13 +287,13 @@ Adding tuple annotations to data fields will create DataFrame objects with hiera
 ```python
 from dataclasses import dataclass
 from typing import Annotated as Ann
-from pandas_dataclasses import AsDataFrame, Data, Index
+from pandas_dataclasses import AsFrame, Data, Index
 ```
 </details>
 
 ```python
 @dataclass
-class Weather(AsDataFrame):
+class Weather(AsFrame):
     """Weather information."""
 
     year: Ann[Index[int], "Year"]
@@ -328,13 +328,13 @@ Column names can be (explicitly) specified by *column fields* (with hashable ann
 ```python
 from dataclasses import dataclass
 from typing import Annotated as Ann
-from pandas_dataclasses import AsDataFrame, Column, Data, Index
+from pandas_dataclasses import AsFrame, Column, Data, Index
 ```
 </details>
 
 ```python
 @dataclass
-class Weather(AsDataFrame):
+class Weather(AsFrame):
     """Weather information."""
 
     year: Ann[Index[int], "Year"]
@@ -368,7 +368,7 @@ If a tuple annotation has [format string]s, they will also be formatted by a dat
 
 ### Custom pandas factory
 
-A custom class can be specified as a factory for the Series or DataFrame creation by `As`, the generic version of `AsDataFrame` and `AsSeries`.
+A custom class can be specified as a factory for the Series or DataFrame creation by `As`, the generic version of `AsFrame` and `AsSeries`.
 Note that the custom class must be a subclass of either `pandas.Series` or `pandas.DataFrame`:
 
 <details>
