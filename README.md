@@ -10,7 +10,7 @@ pandas data creation made easy by dataclass
 
 ## Overview
 
-pandas-dataclass makes it easy to create [pandas] data (Series and DataFrame) by Python's [dataclass] that enables to specify their data types, attributes, and names:
+pandas-dataclass makes it easy to create [pandas] data (DataFrame and Series) by specifying their data types, attributes, and names using the Python's dataclass:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -54,11 +54,12 @@ year month
 
 ### Features
 
-- Type specification of pandas indexes and data
-- Metadata storing in pandas data attributes
+- Specifying data types and names of each element in pandas data
+- Specifying metadata stored in pandas data attributes (attrs)
 - Support for hierarchical index and columns
+- Support for custom factory for data creation
 - Support for full [dataclass] features
-- Support for static type check by [Pyright] ([Pylance])
+- Support for static type check by [mypy] and [Pyright] ([Pylance])
 
 ### Installation
 
@@ -70,11 +71,19 @@ pip install pandas-dataclasses
 
 pandas-dataclasses provides you the following features:
 
-- Type hints for dataclass fields (`Attr`, `Data`, `Index`) to specify index(es), data, and attributes of pandas data
+- Type hints for dataclass fields (`Attr`, `Column`, `Data`, `Index`) to specify the data type and name of each element in pandas data
 - Mix-in classes for dataclasses (`As`, `AsDataFrame`, `AsSeries`) to create pandas data by a classmethod (`new`) that takes the same arguments as dataclass initialization
 
 When you call `new`, it will first create a dataclass object and then create a Series or DataFrame object from the dataclass object according the type hints and values in it.
 In the example above, `df = Weather.new(...)` is thus equivalent to:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+from pandas_dataclasses import asdataframe
+```
+</details>
 
 ```python
 obj = Weather([2020, ...], [1, ...], [7.1, ...], [2.4, ...])
@@ -193,7 +202,7 @@ where `df.attrs` will become like:
 
 ### Custom naming
 
-The name of data, index, or attribute can be explicitly specified by adding a hashable annotation to the corresponding type:
+The name of attribute, data, or index can be explicitly specified by adding a hashable annotation to the corresponding type:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -391,7 +400,35 @@ class Temperature(As[CustomSeries]):
 ser = Temperature.new(...)
 ```
 
-where `ser` will be a `CustomSeries` object.
+where `ser` will become a `CustomSeries` object.
+
+Generic Series type (`Series[T]`) is also supported, however, only for static the type check in the current pandas versions.
+In such cases, you can additionally give a factory that must work in runtime as a class argument:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+import pandas as pd
+from dataclasses import dataclass
+from pandas_dataclasses import As, Data, Index
+```
+</details>
+
+```python
+@dataclass
+class Temperature(As["pd.Series[float]"], factory=pd.Series):
+    """Temperature information."""
+
+    year: Index[int]
+    month: Index[int]
+    temp: Data[float]
+
+
+ser = Temperature.new(...)
+```
+
+where `ser` is statically regarded as `Series[float]` but will become a `Series` object in runtime.
 
 ## Appendix
 
@@ -424,7 +461,7 @@ Type hint | Inferred data type
 
 ### Naming rules
 
-The name of column, data, index, or attribute is determined from the first annotation of the first `Column`, `Data`, `Index`, or `Attr` type of the corresponding field, respectively.
+The name of attribute, column, data, or index is determined from the first annotation of the first `Attr`, `Column`, `Data`, or `Index` type of the corresponding field, respectively.
 If the annotation is a [format string] or a tuple that has [format string]s, it (they) will be formatted by a dataclass object before the data creation.
 Otherwise, the field name (i.e. argument name) will be used.
 The following table shows how the name is inferred:
@@ -458,11 +495,13 @@ Release version | Features
 v0.5 | Support for dynamic naming
 v0.6 | Support for extension array and dtype
 v0.7 | Support for hierarchical columns
+v0.8 | Support for mypy and callable pandas factory
 v1.0 | Initial major release (freezing public features until v2.0)
 
 <!-- References -->
 [dataclass]: https://docs.python.org/3/library/dataclasses.html
 [format string]: https://docs.python.org/3/library/string.html#format-string-syntax
+[mypy]: http://www.mypy-lang.org
 [NumPy]: https://numpy.org
 [pandas]: https://pandas.pydata.org
 [Pylance]: https://github.com/microsoft/pylance-release
