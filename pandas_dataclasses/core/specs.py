@@ -87,6 +87,7 @@ class Spec:
     """Factory for pandas data creation."""
 
     @classmethod
+    @lru_cache(maxsize=None)
     def from_dataclass(cls, dataclass: Type[DataClass[P]]) -> "Spec":
         """Create a specification from a data class."""
         fields = Fields()
@@ -110,7 +111,6 @@ class Spec:
 
 
 # runtime functions
-@lru_cache(maxsize=None)
 def convert_field(field_: "Field_[Any]") -> Optional[Field]:
     """Convert a dataclass field to a field specification."""
     role = get_role(field_.type)
@@ -128,7 +128,6 @@ def convert_field(field_: "Field_[Any]") -> Optional[Field]:
     )
 
 
-@lru_cache(maxsize=None)
 def eval_types(dataclass: Type[DataClass[P]]) -> Type[DataClass[P]]:
     """Evaluate field types of a dataclass."""
     types = get_type_hints(dataclass, include_extras=True)

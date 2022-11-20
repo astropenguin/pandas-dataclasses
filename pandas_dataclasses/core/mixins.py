@@ -46,6 +46,7 @@ class As(Generic[TPandas]):
         super().__init_subclass__(**kwargs)
 
     @classproperty
+    @lru_cache(maxsize=None)
     def new(cls) -> MethodType:
         """Runtime pandas data creator as a classmethod."""
         return MethodType(get_creator(cls), cls)
@@ -59,7 +60,6 @@ AsSeries = As["pd.Series[Any]"]
 """Alias of ``As[pandas.Series[Any]]``."""
 
 
-@lru_cache(maxsize=None)
 def get_creator(cls: Any) -> Callable[..., Pandas]:
     """Create a runtime pandas data creator."""
     factory = cls.__pandas_factory__
