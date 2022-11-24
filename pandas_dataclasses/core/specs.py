@@ -6,6 +6,7 @@ from dataclasses import (
     MISSING,
     Field as Field_,
     dataclass,
+    field as field_,
     fields as fields_,
     replace,
 )
@@ -83,13 +84,16 @@ class Fields(List[Field]):
 
 @dataclass(frozen=True)
 class Spec:
-    """Specification of a pandas dataclass."""
+    """Specification of pandas data creation."""
 
-    fields: Fields
-    """List of field specifications."""
+    name: Optional[str] = None
+    """Name of the specification."""
 
     factory: Optional[Callable[..., Pandas]] = None
     """Factory for pandas data creation."""
+
+    fields: Fields = field_(default_factory=Fields)
+    """List of field specifications."""
 
     @classmethod
     def from_dataclass(cls, dataclass: Type[DataClass[P]]) -> "Spec":
@@ -103,7 +107,7 @@ class Spec:
                 fields.append(field)
 
         factory = getattr(dataclass, "__pandas_factory__", None)
-        return cls(fields, factory)
+        return cls(dataclass.__name__, factory, fields)
 
     def update(self, obj: DataClass[P]) -> "Spec":
         """Update the specification by a dataclass object."""
