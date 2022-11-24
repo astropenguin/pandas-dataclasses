@@ -30,7 +30,7 @@ def test_year_updated() -> None:
     assert field.name == "Year"
     assert field.role == "index"
     assert field.dtype == "int64"
-    assert field.default == [2020, 2020, 2021, 2021, 2022]
+    assert field.default == weather.year
 
 
 def test_month() -> None:
@@ -50,7 +50,7 @@ def test_month_updated() -> None:
     assert field.name == "Month"
     assert field.role == "index"
     assert field.dtype == "int64"
-    assert field.default == [1, 7, 1, 7, 1]
+    assert field.default == weather.month
 
 
 def test_meas() -> None:
@@ -106,7 +106,7 @@ def test_temp_avg_updated() -> None:
     assert field.name == ("Temperature (deg C)", "Average")
     assert field.role == "data"
     assert field.dtype == "float64"
-    assert field.default == [7.1, 24.3, 5.4, 25.9, 4.9]
+    assert field.default == weather.temp_avg
 
 
 def test_temp_max() -> None:
@@ -126,7 +126,7 @@ def test_temp_max_updated() -> None:
     assert field.name == ("Temperature (deg C)", "Maximum")
     assert field.role == "data"
     assert field.dtype == "float64"
-    assert field.default == [11.1, 27.7, 10.3, 30.3, 9.4]
+    assert field.default == weather.temp_max
 
 
 def test_wind_avg() -> None:
@@ -146,7 +146,7 @@ def test_wind_avg_updated() -> None:
     assert field.name == ("Wind speed (m/s)", "Average")
     assert field.role == "data"
     assert field.dtype == "float64"
-    assert field.default == [2.4, 3.1, 2.3, 2.4, 2.6]
+    assert field.default == weather.wind_avg
 
 
 def test_wind_max() -> None:
@@ -166,7 +166,7 @@ def test_wind_max_updated() -> None:
     assert field.name == ("Wind speed (m/s)", "Maximum")
     assert field.role == "data"
     assert field.dtype == "float64"
-    assert field.default == [8.8, 10.2, 10.7, 9.0, 8.8]
+    assert field.default == weather.wind_max
 
 
 def test_loc() -> None:
@@ -175,7 +175,7 @@ def test_loc() -> None:
     assert field.id == "loc"
     assert field.name == "Location"
     assert field.role == "attr"
-    assert field.default == "Tokyo"
+    assert field.default == Weather.loc
 
 
 def test_loc_updated() -> None:
@@ -184,7 +184,7 @@ def test_loc_updated() -> None:
     assert field.id == "loc"
     assert field.name == "Location"
     assert field.role == "attr"
-    assert field.default == "Tokyo"
+    assert field.default == weather.loc
 
 
 def test_lon() -> None:
@@ -193,7 +193,7 @@ def test_lon() -> None:
     assert field.id == "lon"
     assert field.name == "Longitude ({.lon_unit})"
     assert field.role == "attr"
-    assert field.default == 139.69167
+    assert field.default == Weather.lon
 
 
 def test_lon_updated() -> None:
@@ -202,7 +202,7 @@ def test_lon_updated() -> None:
     assert field.id == "lon"
     assert field.name == "Longitude (deg)"
     assert field.role == "attr"
-    assert field.default == 139.69167
+    assert field.default == weather.lon
 
 
 def test_lat() -> None:
@@ -211,7 +211,7 @@ def test_lat() -> None:
     assert field.id == "lat"
     assert field.name == "Latitude ({.lat_unit})"
     assert field.role == "attr"
-    assert field.default == 35.68944
+    assert field.default == Weather.lat
 
 
 def test_lat_updated() -> None:
@@ -220,8 +220,12 @@ def test_lat_updated() -> None:
     assert field.id == "lat"
     assert field.name == "Latitude (deg)"
     assert field.role == "attr"
-    assert field.default == 35.68944
+    assert field.default == weather.lat
 
 
 def test_factory() -> None:
     assert spec.factory is None
+
+
+def test_name() -> None:
+    assert spec.name == Weather.__name__
