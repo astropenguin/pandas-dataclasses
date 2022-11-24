@@ -16,9 +16,6 @@ from typing import Any, Callable, Hashable, List, Optional, Type
 
 # dependencies
 from typing_extensions import Literal, get_type_hints
-
-
-# submodules
 from .typing import P, DataClass, Pandas, Role, get_dtype, get_name, get_role
 
 
