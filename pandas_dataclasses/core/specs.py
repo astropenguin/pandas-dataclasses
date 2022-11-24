@@ -2,8 +2,13 @@ __all__ = ["Spec"]
 
 
 # standard library
-from dataclasses import dataclass, replace
-from dataclasses import Field as Field_, fields as fields_
+from dataclasses import (
+    MISSING,
+    Field as Field_,
+    dataclass,
+    fields as fields_,
+    replace,
+)
 from functools import lru_cache
 from typing import Any, Callable, Hashable, List, Optional, Type
 
@@ -30,14 +35,14 @@ class Field:
     role: Literal["attr", "column", "data", "index"]
     """Role of the field."""
 
-    type: Optional[Any]
+    default: Any = MISSING
+    """Default value of the field data."""
+
+    type: Optional[Any] = None
     """Type (hint) of the field data."""
 
-    dtype: Optional[str]
+    dtype: Optional[str] = None
     """Data type of the field data."""
-
-    default: Any
-    """Default value of the field data."""
 
     def update(self, obj: DataClass[P]) -> "Field":
         """Update the specification by a dataclass object."""
@@ -122,9 +127,9 @@ def convert_field(field_: "Field_[Any]") -> Optional[Field]:
         id=field_.name,
         name=get_name(field_.type, field_.name),
         role=role.name.lower(),  # type: ignore
+        default=field_.default,
         type=field_.type,
         dtype=get_dtype(field_.type),
-        default=field_.default,
     )
 
 
