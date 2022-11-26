@@ -10,7 +10,7 @@ from typing import Any, Callable, ForwardRef, Generic, Type, Union
 # dependencies
 import pandas as pd
 from typing_extensions import get_args, get_origin
-from .aspandas import aspandas
+from .api import aspandas
 from .typing import P, PandasClass, TPandas
 
 

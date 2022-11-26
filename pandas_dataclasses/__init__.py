@@ -20,7 +20,7 @@ __version__ = "0.9.0"
 
 # submodules
 from . import core
-from .core.aspandas import *
+from .core.api import *
 from .core.mixins import *
 from .core.specs import *
 from .core.typing import *

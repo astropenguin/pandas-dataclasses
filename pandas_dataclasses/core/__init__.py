@@ -1,7 +1,7 @@
-__all__ = ["aspandas", "mixins", "specs", "typing"]
+__all__ = ["api", "mixins", "specs", "typing"]
 
 
-from . import aspandas
+from . import api
 from . import mixins
 from . import specs
 from . import typing
