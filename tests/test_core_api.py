@@ -7,7 +7,7 @@ import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
 from data import Weather, weather, df_weather_true, ser_weather_true
 from pandas_dataclasses import Spec, asframe, asseries
-from pandas_dataclasses.core.aspandas import get_attrs, get_columns, get_data, get_index
+from pandas_dataclasses.core.api import get_attrs, get_columns, get_data, get_index
 
 
 # test data
