@@ -97,7 +97,7 @@ pandas-dataclasses does not touch the dataclass object creation itself; this all
 
 ### DataFrame creation
 
-As shown in the example above, a dataclass that has the `AsFrame` mix-in will create DataFrame objects:
+As shown in the example above, a dataclass that has the `AsFrame` (or `AsDataFrame` as an alias) mix-in will create DataFrame objects:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -451,6 +451,7 @@ Type hint | Inferred data type
 `Data[Any]` | `None` (no type casting)
 `Data[None]` | `None` (no type casting)
 `Data[int]` | `numpy.int64`
+`Data[int | str]` | `numpy.int64`
 `Data[numpy.int32]` | `numpy.int32`
 `Data[L["datetime64[ns]"]]` | `numpy.dtype("<M8[ns]")`
 `Data[L["category"]]` | `pandas.CategoricalDtype()`

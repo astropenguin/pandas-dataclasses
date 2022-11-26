@@ -16,7 +16,7 @@ __all__ = [
     "core",
     "extras",
 ]
-__version__ = "0.9.0"
+__version__ = "0.10.0"
 
 
 # submodules
