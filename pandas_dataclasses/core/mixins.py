@@ -2,39 +2,34 @@ __all__ = ["As", "AsFrame", "AsSeries"]
 
 
 # standard library
-from copy import copy
-from functools import lru_cache, wraps as wraps_
-from types import FunctionType, MethodType
+from inspect import signature
+from types import MethodType
 from typing import Any, Callable, ForwardRef, Generic, Type, Union
 
 
 # dependencies
 import pandas as pd
 from typing_extensions import get_args, get_origin
-
-
-# submodules
-from .aspandas import asframe, asseries
-from .typing import P, T, Pandas, PandasClass, TPandas
+from .aspandas import aspandas
+from .typing import P, PandasClass, TPandas
 
 
 class classproperty:
     """Class property decorator dedicated to ``As.new``."""
 
-    def __init__(self, func: Callable[..., Any]) -> None:
-        self.__doc__ = func.__doc__
-        self.func = func
+    def __init__(self, fget: Callable[..., Any]) -> None:
+        self.fget = fget
 
     def __get__(
         self,
         obj: Any,
         cls: Type[PandasClass[P, TPandas]],
     ) -> Callable[P, TPandas]:
-        return self.func(cls)  # type: ignore
+        return self.fget(cls)  # type: ignore
 
 
 class As(Generic[TPandas]):
-    """Mix-in class for runtime pandas data creation."""
+    """Pandas data creation by a classmethod (``new``)."""
 
     __pandas_factory__: Callable[..., TPandas]
     """Factory for pandas data creation."""
@@ -47,8 +42,17 @@ class As(Generic[TPandas]):
 
     @classproperty
     def new(cls) -> MethodType:
-        """Runtime pandas data creator as a classmethod."""
-        return MethodType(get_creator(cls), cls)
+        """Return a classmethod for pandas data creation."""
+
+        sig = signature(cls.__init__)  # type: ignore
+        sig = sig.replace(return_annotation=get_return(cls))
+
+        def new(cls: Any, *args: Any, **kwargs: Any) -> Any:
+            """Create a pandas data from dataclass arguments."""
+            return aspandas(cls(*args, **kwargs))
+
+        setattr(new, "__signature__", sig)
+        return MethodType(new, cls)
 
 
 AsFrame = As[pd.DataFrame]
@@ -59,44 +63,18 @@ AsSeries = As["pd.Series[Any]"]
 """Alias of ``As[pandas.Series[Any]]``."""
 
 
-@lru_cache(maxsize=None)
-def get_creator(cls: Any) -> Callable[..., Pandas]:
-    """Create a runtime pandas data creator."""
-    factory = cls.__pandas_factory__
-
-    if isinstance(factory, FunctionType):
-        return_ = factory.__annotations__["return"]
-    else:
-        return_ = factory
-
-    origin = get_origin(return_) or return_
-
-    if issubclass(origin, pd.DataFrame):
-        converter: Any = asframe
-    elif issubclass(origin, pd.Series):
-        converter = asseries
-    else:
-        raise TypeError("Could not choose a converter.")
-
-    @wraps(cls.__init__, "new", get_return(cls))
-    def wrapper(cls: Any, *args: Any, **kwargs: Any) -> Any:
-        return converter(cls(*args, **kwargs))
-
-    return wrapper
-
-
 def get_factory(cls: Any) -> Callable[..., Any]:
     """Extract a pandas factory from a class."""
-    return_ = get_return(cls)
+    factory = get_return(cls)
 
-    if not isinstance(return_, str):
-        return return_
+    if callable(factory):
+        return factory
 
     # special handling for AsSeries
-    if return_ == "pd.Series[Any]":
+    if factory == "pd.Series[Any]":
         return pd.Series
 
-    raise TypeError("Return type must be evaluated.")
+    raise TypeError("Factory must be callable.")
 
 
 def get_return(cls: Any) -> Union[Type[Any], str]:
@@ -113,31 +91,3 @@ def get_return(cls: Any) -> Union[Type[Any], str]:
             return tp  # type: ignore
 
     raise TypeError("Could not find any return type.")
-
-
-def wraps(func: Any, name: str, return_: Any) -> Callable[[T], T]:
-    """functools.wraps with modifiable name and return type."""
-    if not isinstance(func, FunctionType):
-        return wraps_(func)
-
-    copied = type(func)(
-        func.__code__,
-        func.__globals__,
-        name,
-        func.__defaults__,
-        func.__closure__,
-    )
-
-    for attr in (
-        "__annotations__",
-        "__dict__",
-        "__doc__",
-        "__kwdefaults__",
-        "__module__",
-        "__name__",
-        "__qualname__",
-    ):
-        setattr(copied, attr, copy(getattr(func, attr)))
-
-    copied.__annotations__["return"] = return_
-    return wraps_(copied)
