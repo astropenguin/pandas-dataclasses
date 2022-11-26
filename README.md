@@ -451,7 +451,7 @@ Type hint | Inferred data type
 `Data[Any]` | `None` (no type casting)
 `Data[None]` | `None` (no type casting)
 `Data[int]` | `numpy.int64`
-`Data[int | str]` | `numpy.int64`
+`Data[int \| str]` | `numpy.int64`
 `Data[numpy.int32]` | `numpy.int32`
 `Data[L["datetime64[ns]"]]` | `numpy.dtype("<M8[ns]")`
 `Data[L["category"]]` | `pandas.CategoricalDtype()`
