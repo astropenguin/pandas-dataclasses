@@ -9,6 +9,7 @@ from typing import Any, Callable, Dict, Hashable, List, Optional, overload
 # dependencies
 import numpy as np
 import pandas as pd
+from pandas.api.types import is_list_like
 from typing_extensions import get_origin
 from .specs import Spec
 from .typing import P, DataClass, PandasClass, TFrame, TPandas, TSeries
@@ -119,7 +120,7 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
 
 def ensure(data: Any, dtype: Optional[str]) -> Any:
     """Ensure data to be 1D and have given data type."""
-    if ndim(data, dtype) == 0:
+    if not is_list_like(data):
         data = [data]
 
     if isinstance(data, (pd.Index, pd.Series)):
@@ -177,11 +178,3 @@ def get_index(spec: Spec) -> Optional[pd.Index]:
     else:
         elems = np.broadcast_arrays(*elems)
         return pd.MultiIndex.from_arrays(elems, names=names)
-
-
-def ndim(data: Any, dtype: Optional[str]) -> int:
-    """numpy.ndim with data type option."""
-    try:
-        return data.ndim  # type: ignore
-    except AttributeError:
-        return np.asarray(data, dtype=dtype).ndim
