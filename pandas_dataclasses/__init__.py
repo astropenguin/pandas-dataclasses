@@ -11,6 +11,7 @@ __all__ = [
     "Spec",
     "asdataframe",
     "asframe",
+    "aspandas",
     "asseries",
     "core",
 ]

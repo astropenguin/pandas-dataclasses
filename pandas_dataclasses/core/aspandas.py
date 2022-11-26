@@ -1,21 +1,55 @@
-__all__ = ["asframe", "asseries"]
+__all__ = ["asframe", "aspandas", "asseries"]
 
 
 # standard library
+from types import FunctionType
 from typing import Any, Callable, Dict, Hashable, List, Optional, overload
 
 
 # dependencies
 import numpy as np
 import pandas as pd
-
-
-# submodules
+from typing_extensions import get_origin
 from .specs import Spec
-from .typing import P, DataClass, PandasClass, TFrame, TSeries
+from .typing import P, DataClass, PandasClass, TFrame, TPandas, TSeries
 
 
 # runtime functions
+@overload
+def aspandas(obj: PandasClass[P, TPandas], *, factory: None = None) -> TPandas:
+    ...
+
+
+@overload
+def aspandas(obj: DataClass[P], *, factory: Callable[..., TPandas]) -> TPandas:
+    ...
+
+
+def aspandas(obj: Any, *, factory: Any = None) -> Any:
+    """Create a DataFrame or Series object from a dataclass object."""
+    spec = Spec.from_dataclass(type(obj)) @ obj
+
+    if factory is None:
+        factory = spec.factory
+
+    if factory is None:
+        raise ValueError("Could not find any factory.")
+
+    if isinstance(factory, FunctionType):
+        return_ = factory.__annotations__["return"]
+    else:
+        return_ = factory
+
+    origin = get_origin(return_) or return_
+
+    if issubclass(origin, pd.DataFrame):
+        return asframe(obj, factory=factory)
+    elif issubclass(origin, pd.Series):
+        return asseries(obj, factory=factory)
+    else:
+        raise ValueError("Could not infer an object type.")
+
+
 @overload
 def asframe(obj: PandasClass[P, TFrame], *, factory: None = None) -> TFrame:
     ...
