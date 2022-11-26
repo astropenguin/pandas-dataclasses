@@ -4,7 +4,7 @@ message: "If you use this software, please cite it as below."
 title: "pandas-dataclasses"
 abstract: "pandas data creation made easy by dataclass"
 version: 0.10.0
-date-released: 2022-10-26
+date-released: 2022-11-26
 license: "MIT"
 doi: "10.5281/zenodo.6127352"
 url: "https://github.com/astropenguin/pandas-dataclasses"
