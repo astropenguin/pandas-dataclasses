@@ -16,7 +16,7 @@ from typing import Any, Callable, Hashable, List, Literal, Optional, Type
 
 # dependencies
 from typing_extensions import get_type_hints
-from .typing import P, DataClass, Pandas, Role, get_dtype, get_name, get_role
+from .typing import P, DataClass, Pandas, Tag, get_dtype, get_name, get_tag
 
 
 # runtime classes
@@ -30,8 +30,8 @@ class Field:
     name: Hashable
     """Name of the field."""
 
-    role: Literal["attr", "column", "data", "index"]
-    """Role of the field."""
+    tag: Literal["attr", "column", "data", "index"]
+    """Tag of the field."""
 
     default: Any = MISSING
     """Default value of the field data."""
@@ -57,22 +57,22 @@ class Fields(List[Field]):
     @property
     def of_attr(self) -> "Fields":
         """Select only attribute field specifications."""
-        return Fields(field for field in self if field.role == "attr")
+        return Fields(field for field in self if field.tag == "attr")
 
     @property
     def of_column(self) -> "Fields":
         """Select only column field specifications."""
-        return Fields(field for field in self if field.role == "column")
+        return Fields(field for field in self if field.tag == "column")
 
     @property
     def of_data(self) -> "Fields":
         """Select only data field specifications."""
-        return Fields(field for field in self if field.role == "data")
+        return Fields(field for field in self if field.tag == "data")
 
     @property
     def of_index(self) -> "Fields":
         """Select only index field specifications."""
-        return Fields(field for field in self if field.role == "index")
+        return Fields(field for field in self if field.tag == "index")
 
     def update(self, obj: DataClass[P]) -> "Fields":
         """Update the specifications by a dataclass object."""
@@ -119,15 +119,15 @@ class Spec:
 @lru_cache(maxsize=None)
 def convert_field(field_: "Field_[Any]") -> Optional[Field]:
     """Convert a dataclass field to a field specification."""
-    role = get_role(field_.type)
+    tag = get_tag(field_.type)
 
-    if role is Role.OTHER:
+    if tag is Tag.OTHER:
         return None
 
     return Field(
         id=field_.name,
         name=get_name(field_.type, field_.name),
-        role=role.name.lower(),  # type: ignore
+        tag=tag.name.lower(),  # type: ignore
         default=field_.default,
         type=field_.type,
         dtype=get_dtype(field_.type),

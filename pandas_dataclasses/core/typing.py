@@ -56,7 +56,7 @@ class PandasClass(Protocol[P, TPandas]):
         ...
 
 
-class Role(Enum):
+class Tag(Enum):
     """Annotations for typing dataclass fields."""
 
     ATTR = auto()
@@ -76,24 +76,24 @@ class Role(Enum):
 
     @classmethod
     def annotates(cls, tp: Any) -> bool:
-        """Check if any role annotates a type hint."""
+        """Check if any tag annotates a type hint."""
         return any(isinstance(arg, cls) for arg in get_args(tp))
 
 
 # type hints (public)
-Attr = Annotated[T, Role.ATTR]
+Attr = Annotated[T, Tag.ATTR]
 """Type hint for attribute fields (``Attr[T]``)."""
 
-Column = Annotated[T, Role.COLUMN]
+Column = Annotated[T, Tag.COLUMN]
 """Type hint for column fields (``Column[T]``)."""
 
-Data = Annotated[Collection[T], Role.DATA]
+Data = Annotated[Collection[T], Tag.DATA]
 """Type hint for data fields (``Data[T]``)."""
 
-Index = Annotated[Collection[T], Role.INDEX]
+Index = Annotated[Collection[T], Tag.INDEX]
 """Type hint for index fields (``Index[T]``)."""
 
-Other = Annotated[T, Role.OTHER]
+Other = Annotated[T, Tag.OTHER]
 """Type hint for other fields (``Other[T]``)."""
 
 
@@ -119,19 +119,19 @@ def find_annotated(tp: Any) -> Iterable[Any]:
 
 
 def get_annotated(tp: Any) -> Any:
-    """Extract the first role-annotated type."""
-    for annotated in filter(Role.annotates, find_annotated(tp)):
+    """Extract the first tag-annotated type."""
+    for annotated in filter(Tag.annotates, find_annotated(tp)):
         return deannotate(annotated)
 
-    raise TypeError("Could not find any role-annotated type.")
+    raise TypeError("Could not find any tag-annotated type.")
 
 
 def get_annotations(tp: Any) -> Tuple[Any, ...]:
-    """Extract annotations of the first role-annotated type."""
-    for annotated in filter(Role.annotates, find_annotated(tp)):
+    """Extract annotations of the first tag-annotated type."""
+    for annotated in filter(Tag.annotates, find_annotated(tp)):
         return get_args(annotated)[1:]
 
-    raise TypeError("Could not find any role-annotated type.")
+    raise TypeError("Could not find any tag-annotated type.")
 
 
 def get_dtype(tp: Any) -> Optional[str]:
@@ -171,8 +171,8 @@ def get_name(tp: Any, default: Hashable = None) -> Hashable:
     return name  # type: ignore
 
 
-def get_role(tp: Any, default: Role = Role.OTHER) -> Role:
-    """Extract a role if found or return given default."""
+def get_tag(tp: Any, default: Tag = Tag.OTHER) -> Tag:
+    """Extract a tag if found or return given default."""
     try:
         return get_annotations(tp)[0]  # type: ignore
     except TypeError:
