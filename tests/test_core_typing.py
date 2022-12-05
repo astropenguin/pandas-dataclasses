@@ -1,5 +1,5 @@
 # standard library
-from typing import Any, Union
+from typing import Any, Literal as L, Union
 
 
 # dependencies
@@ -8,7 +8,7 @@ import pandas as pd
 from pandas_dataclasses import Attr, Column, Data, Index
 from pandas_dataclasses.core.typing import Role, get_dtype, get_name, get_role
 from pytest import mark
-from typing_extensions import Annotated as Ann, Literal as L
+from typing_extensions import Annotated as Ann
 
 
 # test data
