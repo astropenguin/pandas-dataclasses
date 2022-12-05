@@ -27,11 +27,11 @@ class Field:
     id: str
     """Identifier of the field."""
 
-    name: Hashable
-    """Name of the field."""
-
     tag: Literal["attr", "column", "data", "index"]
     """Tag of the field."""
+
+    name: Hashable
+    """Name of the field."""
 
     default: Any = MISSING
     """Default value of the field data."""
@@ -126,8 +126,8 @@ def convert_field(field_: "Field_[Any]") -> Optional[Field]:
 
     return Field(
         id=field_.name,
-        name=get_name(field_.type, field_.name),
         tag=tag.name.lower(),  # type: ignore
+        name=get_name(field_.type, field_.name),
         default=field_.default,
         type=field_.type,
         dtype=get_dtype(field_.type),
