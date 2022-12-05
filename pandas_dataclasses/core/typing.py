@@ -13,7 +13,9 @@ from typing import (
     Dict,
     Hashable,
     Iterable,
+    Literal,
     Optional,
+    Protocol,
     Tuple,
     TypeVar,
     Union,
@@ -23,15 +25,7 @@ from typing import (
 # dependencies
 import pandas as pd
 from pandas.api.types import pandas_dtype
-from typing_extensions import (
-    Annotated,
-    Literal,
-    ParamSpec,
-    Protocol,
-    get_args,
-    get_origin,
-    get_type_hints,
-)
+from typing_extensions import Annotated, ParamSpec, get_args, get_origin, get_type_hints
 
 
 # type hints (private)

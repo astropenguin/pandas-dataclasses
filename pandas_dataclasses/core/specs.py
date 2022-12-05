@@ -11,11 +11,11 @@ from dataclasses import (
     replace,
 )
 from functools import lru_cache
-from typing import Any, Callable, Hashable, List, Optional, Type
+from typing import Any, Callable, Hashable, List, Literal, Optional, Type
 
 
 # dependencies
-from typing_extensions import Literal, get_type_hints
+from typing_extensions import get_type_hints
 from .typing import P, DataClass, Pandas, Role, get_dtype, get_name, get_role
 
 
