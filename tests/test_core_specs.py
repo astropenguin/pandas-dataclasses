@@ -229,3 +229,7 @@ def test_factory() -> None:
 
 def test_name() -> None:
     assert spec.name == Weather.__name__
+
+
+def test_origin() -> None:
+    assert spec.origin is Weather
