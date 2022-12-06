@@ -6,7 +6,7 @@ from typing import Any, Literal as L, Union
 import numpy as np
 import pandas as pd
 from pandas_dataclasses import Attr, Column, Data, Index
-from pandas_dataclasses.core.typing import Role, get_dtype, get_name, get_role
+from pandas_dataclasses.core.typing import Tag, get_dtype, get_name, get_tag
 from pytest import mark
 from typing_extensions import Annotated as Ann
 
@@ -56,22 +56,22 @@ testdata_name = [
     (Union[Ann[Any, "other"], Ann[Any, "any"]], None),
 ]
 
-testdata_role = [
-    (Attr[Any], Role.ATTR),  # type: ignore
-    (Column[Any], Role.COLUMN),  # type: ignore
-    (Data[Any], Role.DATA),
-    (Index[Any], Role.INDEX),
-    (Any, Role.OTHER),
-    (Ann[Attr[Any], "attr"], Role.ATTR),  # type: ignore
-    (Ann[Column[Any], "attr"], Role.COLUMN),  # type: ignore
-    (Ann[Data[Any], "data"], Role.DATA),
-    (Ann[Index[Any], "index"], Role.INDEX),
-    (Ann[Any, "other"], Role.OTHER),
-    (Union[Ann[Attr[Any], "attr"], Ann[Any, "any"]], Role.ATTR),  # type: ignore
-    (Union[Ann[Column[Any], "attr"], Ann[Any, "any"]], Role.COLUMN),  # type: ignore
-    (Union[Ann[Data[Any], "data"], Ann[Any, "any"]], Role.DATA),
-    (Union[Ann[Index[Any], "index"], Ann[Any, "any"]], Role.INDEX),
-    (Union[Ann[Any, "other"], Ann[Any, "any"]], Role.OTHER),
+testdata_tag = [
+    (Attr[Any], Tag.ATTR),  # type: ignore
+    (Column[Any], Tag.COLUMN),  # type: ignore
+    (Data[Any], Tag.DATA),
+    (Index[Any], Tag.INDEX),
+    (Any, Tag.OTHER),
+    (Ann[Attr[Any], "attr"], Tag.ATTR),  # type: ignore
+    (Ann[Column[Any], "attr"], Tag.COLUMN),  # type: ignore
+    (Ann[Data[Any], "data"], Tag.DATA),
+    (Ann[Index[Any], "index"], Tag.INDEX),
+    (Ann[Any, "other"], Tag.OTHER),
+    (Union[Ann[Attr[Any], "attr"], Ann[Any, "any"]], Tag.ATTR),  # type: ignore
+    (Union[Ann[Column[Any], "attr"], Ann[Any, "any"]], Tag.COLUMN),  # type: ignore
+    (Union[Ann[Data[Any], "data"], Ann[Any, "any"]], Tag.DATA),
+    (Union[Ann[Index[Any], "index"], Ann[Any, "any"]], Tag.INDEX),
+    (Union[Ann[Any, "other"], Ann[Any, "any"]], Tag.OTHER),
 ]
 
 
@@ -86,6 +86,6 @@ def test_get_name(tp: Any, name: Any) -> None:
     assert get_name(tp) == name
 
 
-@mark.parametrize("tp, role", testdata_role)
-def test_get_role(tp: Any, role: Any) -> None:
-    assert get_role(tp) is role
+@mark.parametrize("tp, tag", testdata_tag)
+def test_get_tag(tp: Any, tag: Any) -> None:
+    assert get_tag(tp) is tag
