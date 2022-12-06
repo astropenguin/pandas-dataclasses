@@ -3,7 +3,6 @@ __all__ = ["Spec"]
 
 # standard library
 from dataclasses import (
-    MISSING,
     Field as Field_,
     dataclass,
     field as field_,
@@ -30,14 +29,14 @@ class Field:
     tag: Literal["attr", "column", "data", "index"]
     """Tag of the field."""
 
-    name: Hashable
-    """Name of the field."""
+    name: Hashable = None
+    """Name of the field data."""
 
-    default: Any = MISSING
+    default: Any = None
     """Default value of the field data."""
 
     type: Optional[Any] = None
-    """Type (hint) of the field data."""
+    """Type or type hint of the field data."""
 
     dtype: Optional[str] = None
     """Data type of the field data."""
