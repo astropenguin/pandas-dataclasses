@@ -4,7 +4,7 @@ __all__ = ["Attr", "Column", "Data", "Index", "Other"]
 # standard library
 import types
 from dataclasses import Field
-from enum import Enum, auto
+from enum import Flag, auto
 from itertools import chain
 from typing import (
     Any,
@@ -56,7 +56,7 @@ class PandasClass(Protocol[P, TPandas]):
         ...
 
 
-class Tag(Enum):
+class Tag(Flag):
     """Annotations for typing dataclass fields."""
 
     ATTR = auto()
@@ -175,7 +175,7 @@ def get_tag(tp: Any, default: Tag = Tag.OTHER) -> Tag:
     """Extract a tag if found or return given default."""
     try:
         return get_annotations(tp)[0]  # type: ignore
-    except TypeError:
+    except (IndexError, TypeError):
         return default
 
 
