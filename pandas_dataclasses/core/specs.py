@@ -100,7 +100,7 @@ class Spec:
         fields = Fields()
 
         for field_ in fields_(eval_types(dataclass)):
-            if (field := convert_field(field_)) is not None:
+            if (field := get_field(field_)) is not None:
                 fields.append(field)
 
         factory = getattr(dataclass, "__pandas_factory__", None)
@@ -119,29 +119,6 @@ class Spec:
 
 
 # runtime functions
-@lru_cache(maxsize=None)
-def convert_field(field_: "Field_[Any]") -> Optional[Field]:
-    """Convert a dataclass field to a field specification."""
-    tag = get_tag(field_.type)
-
-    if tag is Tag.OTHER:
-        return None
-
-    if tag in Tag.DATA | Tag.INDEX:
-        dtype = get_dtype(field_.type)
-    else:
-        dtype = None
-
-    return Field(
-        id=field_.name,
-        tag=tag.name.lower(),  # type: ignore
-        name=get_name(field_.type, field_.name),
-        default=field_.default,
-        type=field_.type,
-        dtype=dtype,
-    )
-
-
 @lru_cache(maxsize=None)
 def eval_types(dataclass: Type[T]) -> Type[T]:
     """Evaluate field types of a dataclass."""
@@ -165,3 +142,26 @@ def format_(obj: T, by: Any) -> T:
         return tp(format_(item, by) for item in obj.items())  # type: ignore
     else:
         return obj
+
+
+@lru_cache(maxsize=None)
+def get_field(field_: "Field_[Any]") -> Optional[Field]:
+    """Create a field specification from a dataclass field."""
+    tag = get_tag(field_.type)
+
+    if tag is Tag.OTHER:
+        return None
+
+    if tag in Tag.DATA | Tag.INDEX:
+        dtype = get_dtype(field_.type)
+    else:
+        dtype = None
+
+    return Field(
+        id=field_.name,
+        tag=tag.name.lower(),  # type: ignore
+        name=get_name(field_.type, field_.name),
+        default=field_.default,
+        type=field_.type,
+        dtype=dtype,
+    )
