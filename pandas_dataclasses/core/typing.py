@@ -175,7 +175,7 @@ def get_tag(tp: Any, default: Tag = Tag.OTHER) -> Tag:
     """Extract a tag if found or return given default."""
     try:
         return get_annotations(tp)[0]  # type: ignore
-    except TypeError:
+    except (IndexError, TypeError):
         return default
 
 
