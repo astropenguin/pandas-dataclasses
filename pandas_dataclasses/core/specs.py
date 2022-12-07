@@ -127,13 +127,18 @@ def convert_field(field_: "Field_[Any]") -> Optional[Field]:
     if tag is Tag.OTHER:
         return None
 
+    if tag in Tag.DATA | Tag.INDEX:
+        dtype = get_dtype(field_.type)
+    else:
+        dtype = None
+
     return Field(
         id=field_.name,
         tag=tag.name.lower(),  # type: ignore
         name=get_name(field_.type, field_.name),
         default=field_.default,
         type=field_.type,
-        dtype=get_dtype(field_.type),
+        dtype=dtype,
     )
 
 
