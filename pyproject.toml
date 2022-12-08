@@ -10,7 +10,7 @@ homepage = "https://github.com/astropenguin/pandas-dataclasses/"
 documentation = "https://astropenguin.github.io/pandas-dataclasses/"
 
 [tool.poetry.dependencies]
-python = ">=3.8, <3.11"
+python = ">=3.8, <3.12"
 numpy = "^1.20"
 pandas = "^1.2"
 pandas-stubs = "^1.2"
@@ -18,7 +18,7 @@ typing-extensions = ">=3.10, <5.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.10"
-ipython = "^8.6"
+ipython = "^8.7"
 mypy = "^0.982"
 myst-parser = "^0.18"
 pydata-sphinx-theme = "^0.12"
@@ -28,6 +28,7 @@ sphinx = "^5.3"
 
 [tool.mypy]
 strict = true
+warn_unused_ignores = false
 
 [tool.pyright]
 reportUnknownArgumentType = "warning"
