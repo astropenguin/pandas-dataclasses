@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 ENV PATH=$PATH:/root/.local/bin
 ENV POETRY_VIRTUALENVS_CREATE=false
