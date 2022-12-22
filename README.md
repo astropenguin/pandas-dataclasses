@@ -498,6 +498,10 @@ v0.5 | Support for dynamic naming
 v0.6 | Support for extension array and dtype
 v0.7 | Support for hierarchical columns
 v0.8 | Support for mypy and callable pandas factory
+v0.9 | Support for Ellipsis (`...`) as an alias of field name
+v0.10 | Support for union type in type hints
+v0.11 | Support for Python 3.11 and drop support for Python 3.7
+v0.12 | Support for multiple items received in a single field
 v1.0 | Initial major release (freezing public features until v2.0)
 
 <!-- References -->
