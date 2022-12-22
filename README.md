@@ -400,9 +400,9 @@ class Temperature(As[CustomSeries]):
 ser = Temperature.new(...)
 ```
 
-where `ser` will become a `CustomSeries` object.
+where `ser` is statically regarded as `CustomSeries` and will become a `CustomSeries` object.
 
-Generic Series type (`Series[T]`) is also supported, however, only for static the type check in the current pandas versions.
+Generic Series type (`Series[T]`) is also supported, however, it is only for static the type check in the current pandas versions.
 In such cases, you can additionally give a factory that must work in runtime as a class argument:
 
 <details>
