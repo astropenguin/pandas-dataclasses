@@ -27,7 +27,36 @@ def aspandas(obj: DataClass[P], *, factory: Callable[..., TPandas]) -> TPandas:
 
 
 def aspandas(obj: Any, *, factory: Any = None) -> Any:
-    """Create a DataFrame or Series object from a dataclass object."""
+    """Create a DataFrame or Series object from a dataclass object.
+
+    Which data structure is created will be determined by a factory
+    defined as the ``__pandas_factory__`` attribute in the original
+    dataclass of ``obj`` or the ``factory`` argument. If a factory is
+    a function, it must have an annotation of the return type.
+
+    Args:
+        obj: Dataclass object that should have attribute, column, data,
+            and/or index fields. If the original dataclass has the
+            ``__pandas_factory__`` attribute, it will be used as a
+            factory for the data creation.
+
+    Keyword Args:
+        factory: Class or function for the DataFrame or Series creation.
+            It must take the same parameters as ``pandas.DataFrame``
+            or ``pandas.Series``, and return an object of it or its
+            subclass. If it is a function, it must have an annotation
+            of the return type. If passed, it will be preferentially
+            used even if the original dataclass of ``obj`` has the
+            ``__pandas_factory__`` attribute.
+
+    Returns:
+        DataFrame or Series object that complies with the original dataclass.
+
+    Raises:
+        ValueError: Raised if no factory is found or the return type
+            cannot be inferred from a factory when it is a function.
+
+    """
     spec = Spec.from_dataclass(type(obj)) @ obj
 
     if factory is None:
@@ -67,7 +96,30 @@ def asframe(obj: DataClass[P], *, factory: None = None) -> pd.DataFrame:
 
 
 def asframe(obj: Any, *, factory: Any = None) -> Any:
-    """Create a DataFrame object from a dataclass object."""
+    """Create a DataFrame object from a dataclass object.
+
+    The return type will be determined by a factory defined as the
+    ``__pandas_factory__`` attribute in the original dataclass of
+    ``obj`` or the ``factory`` argument. If neither is specified,
+    it defaults to ``pandas.DataFrame``.
+
+    Args:
+        obj: Dataclass object that should have attribute, column, data,
+            and/or index fields. If the original dataclass has the
+            ``__pandas_factory__`` attribute, it will be used as a
+            factory for the DataFrame creation.
+
+    Keyword Args:
+        factory: Class or function for the DataFrame creation.
+            It must take the same parameters as ``pandas.DataFrame``,
+            and return an object of it or its subclass. If passed, it
+            will be preferentially used even if the original dataclass
+            of ``obj`` has the ``__pandas_factory__`` attribute.
+
+    Returns:
+        DataFrame object that complies with the original dataclass.
+
+    """
     spec = Spec.from_dataclass(type(obj)) @ obj
 
     if factory is None:
@@ -99,7 +151,30 @@ def asseries(obj: DataClass[P], *, factory: None = None) -> "pd.Series[Any]":
 
 
 def asseries(obj: Any, *, factory: Any = None) -> Any:
-    """Create a Series object from a dataclass object."""
+    """Create a Series object from a dataclass object.
+
+    The return type will be determined by a factory defined as the
+    ``__pandas_factory__`` attribute in the original dataclass of
+    ``obj`` or the ``factory`` argument. If neither is specified,
+    it defaults to ``pandas.Series``.
+
+    Args:
+        obj: Dataclass object that should have attribute, column, data,
+            and/or index fields. If the original dataclass has the
+            ``__pandas_factory__`` attribute, it will be used as a
+            factory for the Series creation.
+
+    Keyword Args:
+        factory: Class or function for the Series creation.
+            It must take the same parameters as ``pandas.Series``,
+            and return an object of it or its subclass. If passed, it
+            will be preferentially used even if the original dataclass
+            of ``obj`` has the ``__pandas_factory__`` attribute.
+
+    Returns:
+        Series object that complies with the original dataclass.
+
+    """
     spec = Spec.from_dataclass(type(obj)) @ obj
 
     if factory is None:
