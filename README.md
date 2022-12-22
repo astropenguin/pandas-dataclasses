@@ -4,7 +4,7 @@
 [![Python](https://img.shields.io/pypi/pyversions/pandas-dataclasses?label=Python&color=cornflowerblue&style=flat-square)](https://pypi.org/project/pandas-dataclasses/)
 [![Downloads](https://img.shields.io/pypi/dm/pandas-dataclasses?label=Downloads&color=cornflowerblue&style=flat-square)](https://pepy.tech/project/pandas-dataclasses)
 [![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.6127352-cornflowerblue?style=flat-square)](https://doi.org/10.5281/zenodo.6127352)
-[![Tests](https://img.shields.io/github/workflow/status/astropenguin/pandas-dataclasses/Tests?label=Tests&style=flat-square)](https://github.com/astropenguin/pandas-dataclasses/actions)
+[![Tests](https://img.shields.io/github/actions/workflow/status/astropenguin/pandas-dataclasses/tests.yml?label=Tests&style=flat-square)](https://github.com/astropenguin/pandas-dataclasses/actions)
 
 pandas data creation made easy by dataclass
 
@@ -400,9 +400,9 @@ class Temperature(As[CustomSeries]):
 ser = Temperature.new(...)
 ```
 
-where `ser` will become a `CustomSeries` object.
+where `ser` is statically regarded as `CustomSeries` and will become a `CustomSeries` object.
 
-Generic Series type (`Series[T]`) is also supported, however, only for static the type check in the current pandas versions.
+Generic Series type (`Series[T]`) is also supported, however, it is only for static the type check in the current pandas versions.
 In such cases, you can additionally give a factory that must work in runtime as a class argument:
 
 <details>
@@ -498,6 +498,10 @@ v0.5 | Support for dynamic naming
 v0.6 | Support for extension array and dtype
 v0.7 | Support for hierarchical columns
 v0.8 | Support for mypy and callable pandas factory
+v0.9 | Support for Ellipsis (`...`) as an alias of field name
+v0.10 | Support for union type in type hints
+v0.11 | Support for Python 3.11 and drop support for Python 3.7
+v0.12 | Support for multiple items received in a single field
 v1.0 | Initial major release (freezing public features until v2.0)
 
 <!-- References -->
