@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Column", "Data", "Index", "Other"]
+__all__ = ["Attr", "Column", "Data", "Index"]
 
 
 # standard library
@@ -71,9 +71,6 @@ class Tag(Flag):
     INDEX = auto()
     """Annotation for index fields."""
 
-    OTHER = auto()
-    """Annotation for other fields."""
-
     @classmethod
     def annotates(cls, tp: Any) -> bool:
         """Check if any tag annotates a type hint."""
@@ -92,9 +89,6 @@ Data = Annotated[Collection[T], Tag.DATA]
 
 Index = Annotated[Collection[T], Tag.INDEX]
 """Type hint for index fields (``Index[T]``)."""
-
-Other = Annotated[T, Tag.OTHER]
-"""Type hint for other fields (``Other[T]``)."""
 
 
 # runtime functions
