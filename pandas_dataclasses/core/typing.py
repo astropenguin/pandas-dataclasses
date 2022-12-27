@@ -108,10 +108,10 @@ Attr = Annotated[T, Tag.ATTR]
 Column = Annotated[T, Tag.COLUMN]
 """Type hint for column fields (``Column[T]``)."""
 
-Data = Annotated[Collection[T], Tag.DATA]
+Data = Annotated[Collection[Annotated[T, Tag.DTYPE]], Tag.DATA]
 """Type hint for data fields (``Data[T]``)."""
 
-Index = Annotated[Collection[T], Tag.INDEX]
+Index = Annotated[Collection[Annotated[T, Tag.DTYPE]], Tag.INDEX]
 """Type hint for index fields (``Index[T]``)."""
 
 
