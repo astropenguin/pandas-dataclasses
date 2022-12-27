@@ -148,10 +148,11 @@ def get_nontags(tp: Any, bound: Tag = Tag.ANY) -> Optional[Tuple[Any, ...]]:
 
 
 def get_dtype(tp: Any) -> Optional[str]:
-    """Extract a NumPy or pandas data type."""
-    try:
-        dtype = get_args(get_annotated(tp))[0]
-    except (IndexError, TypeError):
+    """Extract a data type of NumPy or pandas from a type hint."""
+    if (tagged := get_tagged(tp, Tag.DATA | Tag.INDEX)) is None:
+        return None
+
+    if (dtype := get_tagged(tagged, Tag.DTYPE)) is None:
         return None
 
     if dtype is Any or dtype is type(None):
