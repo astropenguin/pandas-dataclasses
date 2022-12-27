@@ -25,7 +25,7 @@ from typing import (
 # dependencies
 import pandas as pd
 from pandas.api.types import pandas_dtype
-from typing_extensions import Annotated, ParamSpec, get_args, get_origin, get_type_hints
+from typing_extensions import Annotated, ParamSpec, get_args, get_origin
 
 
 # type hints (private)
@@ -116,40 +116,35 @@ Index = Annotated[Collection[T], Tag.INDEX]
 
 
 # runtime functions
-def deannotate(tp: Any) -> Any:
-    """Recursively remove annotations in a type hint."""
-
-    class Temporary:
-        __annotations__ = dict(tp=tp)
-
-    return get_type_hints(Temporary)["tp"]
-
-
-def find_annotated(tp: Any) -> Iterable[Any]:
+def gen_annotated(tp: Any) -> Iterable[Any]:
     """Generate all annotated types in a type hint."""
-    args = get_args(tp)
-
     if get_origin(tp) is Annotated:
         yield tp
-        yield from find_annotated(args[0])
+        yield from gen_annotated(get_args(tp)[0])
     else:
-        yield from chain(*map(find_annotated, args))
+        yield from chain(*map(gen_annotated, get_args(tp)))
 
 
-def get_annotated(tp: Any) -> Any:
-    """Extract the first tag-annotated type."""
-    for annotated in filter(Tag.annotates, find_annotated(tp)):
-        return deannotate(annotated)
+def get_tagged(
+    tp: Any,
+    bound: Tag = Tag.ANY,
+    keep_annotations: bool = False,
+) -> Optional[Any]:
+    """Extract the first tagged type from a type hint."""
+    for tagged in filter(bound.annotates, gen_annotated(tp)):
+        return tagged if keep_annotations else get_args(tagged)[0]
 
-    raise TypeError("Could not find any tag-annotated type.")
+
+def get_tags(tp: Any, bound: Tag = Tag.ANY) -> Optional[Tuple[Tag, ...]]:
+    """Extract all tags from the first tagged type in a type hint."""
+    if (tagged := get_tagged(tp, bound, True)) is not None:
+        return tuple(filter(bound.includes, get_args(tagged)[1:]))
 
 
-def get_annotations(tp: Any) -> Tuple[Any, ...]:
-    """Extract annotations of the first tag-annotated type."""
-    for annotated in filter(Tag.annotates, find_annotated(tp)):
-        return get_args(annotated)[1:]
-
-    raise TypeError("Could not find any tag-annotated type.")
+def get_nontags(tp: Any, bound: Tag = Tag.ANY) -> Optional[Tuple[Any, ...]]:
+    """Extract all except tags from the first tagged type in a type hint."""
+    if (tagged := get_tagged(tp, bound, True)) is not None:
+        return tuple(filter(bound.excludes, get_args(tagged)[1:]))
 
 
 def get_dtype(tp: Any) -> Optional[str]:
