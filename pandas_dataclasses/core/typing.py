@@ -74,7 +74,7 @@ class Tag(Flag):
     DTYPE = auto()
     """Tag for a type specifying a data type."""
 
-    FIELD = DATA | COLUMN | DATA | INDEX
+    FIELD = ATTR | COLUMN | DATA | INDEX
     """Union of field-related tags."""
 
     ANY = FIELD | DTYPE
