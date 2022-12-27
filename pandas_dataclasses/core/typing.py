@@ -168,21 +168,15 @@ def get_dtype(tp: Any) -> Optional[str]:
 
 
 def get_name(tp: Any, default: Hashable = None) -> Hashable:
-    """Extract a name if found or return given default."""
-    try:
-        name = get_annotations(tp)[1]
-    except (IndexError, TypeError):
+    """Extract the first hashable as a name from a type hint."""
+    if not (nontags := get_nontags(tp, Tag.FIELD)):
         return default
 
-    if name is Ellipsis:
+    if (name := nontags[0]) is Ellipsis:
         return default
-
-    try:
+    else:
         hash(name)
-    except TypeError:
-        raise ValueError("Could not find any valid name.")
-
-    return name  # type: ignore
+        return name
 
 
 def get_tag(tp: Any, default: Tag = Tag.OTHER) -> Tag:
