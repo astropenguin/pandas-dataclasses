@@ -8,6 +8,7 @@ __all__ = [
     "Data",
     "Index",
     "Spec",
+    "Tag",
     "asdataframe",
     "asframe",
     "aspandas",

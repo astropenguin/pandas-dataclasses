@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Column", "Data", "Index"]
+__all__ = ["Attr", "Column", "Data", "Index", "Tag"]
 
 
 # standard library
@@ -57,24 +57,48 @@ class PandasClass(Protocol[P, TPandas]):
 
 
 class Tag(Flag):
-    """Annotations for typing dataclass fields."""
+    """Collection of tags for annotating types."""
 
     ATTR = auto()
-    """Annotation for attribute fields."""
+    """Tag for a type specifying an attribute field."""
 
     COLUMN = auto()
-    """Annotation for column fields."""
+    """Tag for a type specifying a column field."""
 
     DATA = auto()
-    """Annotation for data fields."""
+    """Tag for a type specifying a data field."""
 
     INDEX = auto()
-    """Annotation for index fields."""
+    """Tag for a type specifying an index field."""
 
-    @classmethod
-    def annotates(cls, tp: Any) -> bool:
-        """Check if any tag annotates a type hint."""
-        return any(isinstance(arg, cls) for arg in get_args(tp))
+    DTYPE = auto()
+    """Tag for a type specifying a data type."""
+
+    FIELD = DATA | COLUMN | DATA | INDEX
+    """Union of field-related tags."""
+
+    ANY = FIELD | DTYPE
+    """Union of all tags."""
+
+    def annotates(self, tp: Any) -> bool:
+        """Check if the tag annotates a type hint."""
+        return any(map(self.includes, get_args(tp)))
+
+    def excludes(self, obj: Any) -> bool:
+        """Check if the tag excludes an object."""
+        return not self.includes(obj)
+
+    def includes(self, obj: Any) -> bool:
+        """Check if the tag includes an object."""
+        return isinstance(obj, type(self)) and obj in self
+
+    def __repr__(self) -> str:
+        """Return a hashtag-style string."""
+        return str(self)
+
+    def __str__(self) -> str:
+        """Return a hashtag-style string."""
+        return f"#{str(self.name).lower()}"
 
 
 # type hints (public)
