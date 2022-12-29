@@ -143,16 +143,16 @@ def get_tagged(
         return tagged if keep_annotations else get_args(tagged)[0]
 
 
-def get_tags(tp: Any, bound: Tag = Tag.ANY) -> Optional[Tuple[Tag, ...]]:
-    """Extract all tags from the first tagged type in a type hint."""
-    if (tagged := get_tagged(tp, bound, True)) is not None:
-        return tuple(filter(bound.includes, get_args(tagged)[1:]))
+def get_tags(tp: Any, bound: Tag = Tag.ANY) -> Tuple[Tag, ...]:
+    """Extract all tags from the first tagged type."""
+    tagged = get_tagged(tp, bound, True)
+    return tuple(filter(Tag.creates, get_args(tagged)[1:]))
 
 
-def get_nontags(tp: Any, bound: Tag = Tag.ANY) -> Optional[Tuple[Any, ...]]:
-    """Extract all except tags from the first tagged type in a type hint."""
-    if (tagged := get_tagged(tp, bound, True)) is not None:
-        return tuple(filter(bound.excludes, get_args(tagged)[1:]))
+def get_nontags(tp: Any, bound: Tag = Tag.ANY) -> Tuple[Any, ...]:
+    """Extract all except tags from the first tagged type."""
+    tagged = get_tagged(tp, bound, True)
+    return tuple(filterfalse(Tag.creates, get_args(tagged)[1:]))
 
 
 def get_dtype(tp: Any) -> Optional[str]:
