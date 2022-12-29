@@ -21,6 +21,7 @@ from typing import (
     Tuple,
     TypeVar,
     Union,
+    cast,
 )
 
 
@@ -184,7 +185,7 @@ def get_name(tp: Any, default: Hashable = None) -> Hashable:
         return default
     else:
         hash(name)
-        return name
+        return cast(Hashable, name)
 
 
 def get_tag(tp: Any, default: Tag = Tag.OTHER) -> Tag:
