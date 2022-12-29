@@ -5,7 +5,9 @@ __all__ = ["Attr", "Column", "Data", "Index", "Tag"]
 import types
 from dataclasses import Field
 from enum import Flag, auto
-from itertools import chain
+from functools import reduce
+from itertools import chain, filterfalse
+from operator import or_
 from typing import (
     Any,
     Callable,
@@ -82,22 +84,28 @@ class Tag(Flag):
 
     def annotates(self, tp: Any) -> bool:
         """Check if the tag annotates a type hint."""
-        return any(map(self.includes, get_args(tp)))
+        return any(map(self.covers, get_args(tp)))
 
-    def excludes(self, obj: Any) -> bool:
-        """Check if the tag excludes an object."""
-        return not self.includes(obj)
+    def covers(self, obj: Any) -> bool:
+        """Check if the tag is superset of an object."""
+        return type(self).creates(obj) and obj in self
 
-    def includes(self, obj: Any) -> bool:
-        """Check if the tag includes an object."""
-        return isinstance(obj, type(self)) and obj in self
+    @classmethod
+    def creates(cls, obj: Any) -> bool:
+        """Check if Tag is the type of an object."""
+        return isinstance(obj, cls)
+
+    @classmethod
+    def union(cls, tags: Iterable["Tag"]) -> "Tag":
+        """Create a tag as an union of tags."""
+        return reduce(or_, tags, Tag(0))
 
     def __repr__(self) -> str:
-        """Return a hashtag-style string."""
+        """Return the hashtag-style string of the tag."""
         return str(self)
 
     def __str__(self) -> str:
-        """Return a hashtag-style string."""
+        """Return the hashtag-style string of the tag."""
         return f"#{str(self.name).lower()}"
 
 
