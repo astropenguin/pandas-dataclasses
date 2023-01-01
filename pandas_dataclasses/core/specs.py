@@ -10,7 +10,7 @@ from dataclasses import (
     replace,
 )
 from functools import lru_cache
-from typing import Any, Callable, Hashable, List, Literal, Optional, Type
+from typing import Any, Callable, Hashable, List, Optional, Type
 
 
 # dependencies
@@ -26,20 +26,20 @@ class Field:
     id: str
     """Identifier of the field."""
 
-    tag: Literal["attr", "column", "data", "index"]
-    """Tag of the field."""
-
-    name: Hashable = None
+    name: Hashable
     """Name of the field data."""
 
-    default: Any = None
-    """Default value of the field data."""
+    tags: List[Tag] = field_(default_factory=list)
+    """Tags of the field."""
 
     type: Optional[Any] = None
     """Type or type hint of the field data."""
 
     dtype: Optional[str] = None
     """Data type of the field data."""
+
+    default: Any = None
+    """Default value of the field data."""
 
     def update(self, obj: Any) -> "Field":
         """Update the specification by an object."""
@@ -56,26 +56,30 @@ class Fields(List[Field]):
     @property
     def of_attr(self) -> "Fields":
         """Select only attribute field specifications."""
-        return Fields(field for field in self if field.tag == "attr")
+        return self.filter(lambda f: Tag.ATTR in Tag.union(f.tags))
 
     @property
     def of_column(self) -> "Fields":
         """Select only column field specifications."""
-        return Fields(field for field in self if field.tag == "column")
+        return self.filter(lambda f: Tag.COLUMN in Tag.union(f.tags))
 
     @property
     def of_data(self) -> "Fields":
         """Select only data field specifications."""
-        return Fields(field for field in self if field.tag == "data")
+        return self.filter(lambda f: Tag.DATA in Tag.union(f.tags))
 
     @property
     def of_index(self) -> "Fields":
         """Select only index field specifications."""
-        return Fields(field for field in self if field.tag == "index")
+        return self.filter(lambda f: Tag.INDEX in Tag.union(f.tags))
+
+    def filter(self, condition: Callable[[Field], bool]) -> "Fields":
+        """Select only fields that make a condition True."""
+        return type(self)(filter(condition, self))
 
     def update(self, obj: Any) -> "Fields":
         """Update the specifications by an object."""
-        return Fields(field.update(obj) for field in self)
+        return type(self)(field.update(obj) for field in self)
 
 
 @dataclass(frozen=True)
