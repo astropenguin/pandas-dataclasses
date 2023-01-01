@@ -10,7 +10,7 @@ from dataclasses import (
     replace,
 )
 from functools import lru_cache
-from typing import Any, Callable, Hashable, List, Optional, Type
+from typing import Any, Callable, Hashable, List, Optional
 
 
 # dependencies
@@ -101,7 +101,7 @@ class Spec:
     @classmethod
     def from_dataclass(cls, dataclass: type) -> "Spec":
         """Create a specification from a data class."""
-        eval_types(dataclass)
+        eval_field_types(dataclass)
 
         return cls(
             name=dataclass.__name__,
@@ -137,14 +137,12 @@ def convert_field(field_: "Field_[Any]") -> Field:
 
 
 @lru_cache(maxsize=None)
-def eval_types(dataclass: Type[T]) -> Type[T]:
+def eval_field_types(dataclass: type) -> None:
     """Evaluate field types of a dataclass."""
     types = get_type_hints(dataclass, include_extras=True)
 
     for field_ in fields_(dataclass):
         field_.type = types[field_.name]
-
-    return dataclass
 
 
 def format_(obj: T, by: Any) -> T:
