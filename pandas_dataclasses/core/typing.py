@@ -1,11 +1,13 @@
-__all__ = ["Attr", "Column", "Data", "Index", "Other"]
+__all__ = ["Attr", "Column", "Data", "Index", "Tag"]
 
 
 # standard library
 import types
 from dataclasses import Field
 from enum import Flag, auto
-from itertools import chain
+from functools import reduce
+from itertools import chain, filterfalse
+from operator import or_
 from typing import (
     Any,
     Callable,
@@ -13,19 +15,20 @@ from typing import (
     Dict,
     Hashable,
     Iterable,
+    List,
     Literal,
     Optional,
     Protocol,
-    Tuple,
     TypeVar,
     Union,
+    cast,
 )
 
 
 # dependencies
 import pandas as pd
 from pandas.api.types import pandas_dtype
-from typing_extensions import Annotated, ParamSpec, get_args, get_origin, get_type_hints
+from typing_extensions import Annotated, ParamSpec, get_args, get_origin
 
 
 # type hints (private)
@@ -57,27 +60,54 @@ class PandasClass(Protocol[P, TPandas]):
 
 
 class Tag(Flag):
-    """Annotations for typing dataclass fields."""
+    """Collection of tags for annotating types."""
 
     ATTR = auto()
-    """Annotation for attribute fields."""
+    """Tag for a type specifying an attribute field."""
 
     COLUMN = auto()
-    """Annotation for column fields."""
+    """Tag for a type specifying a column field."""
 
     DATA = auto()
-    """Annotation for data fields."""
+    """Tag for a type specifying a data field."""
 
     INDEX = auto()
-    """Annotation for index fields."""
+    """Tag for a type specifying an index field."""
 
-    OTHER = auto()
-    """Annotation for other fields."""
+    DTYPE = auto()
+    """Tag for a type specifying a data type."""
+
+    FIELD = ATTR | COLUMN | DATA | INDEX
+    """Union of field-related tags."""
+
+    ANY = FIELD | DTYPE
+    """Union of all tags."""
+
+    def annotates(self, tp: Any) -> bool:
+        """Check if the tag annotates a type hint."""
+        return any(map(self.covers, get_args(tp)))
+
+    def covers(self, obj: Any) -> bool:
+        """Check if the tag is superset of an object."""
+        return type(self).creates(obj) and obj in self
 
     @classmethod
-    def annotates(cls, tp: Any) -> bool:
-        """Check if any tag annotates a type hint."""
-        return any(isinstance(arg, cls) for arg in get_args(tp))
+    def creates(cls, obj: Any) -> bool:
+        """Check if Tag is the type of an object."""
+        return isinstance(obj, cls)
+
+    @classmethod
+    def union(cls, tags: Iterable["Tag"]) -> "Tag":
+        """Create a tag as an union of tags."""
+        return reduce(or_, tags, Tag(0))
+
+    def __repr__(self) -> str:
+        """Return the hashtag-style string of the tag."""
+        return str(self)
+
+    def __str__(self) -> str:
+        """Return the hashtag-style string of the tag."""
+        return f"#{str(self.name).lower()}"
 
 
 # type hints (public)
@@ -87,64 +117,57 @@ Attr = Annotated[T, Tag.ATTR]
 Column = Annotated[T, Tag.COLUMN]
 """Type hint for column fields (``Column[T]``)."""
 
-Data = Annotated[Collection[T], Tag.DATA]
+Data = Annotated[Collection[Annotated[T, Tag.DTYPE]], Tag.DATA]
 """Type hint for data fields (``Data[T]``)."""
 
-Index = Annotated[Collection[T], Tag.INDEX]
+Index = Annotated[Collection[Annotated[T, Tag.DTYPE]], Tag.INDEX]
 """Type hint for index fields (``Index[T]``)."""
-
-Other = Annotated[T, Tag.OTHER]
-"""Type hint for other fields (``Other[T]``)."""
 
 
 # runtime functions
-def deannotate(tp: Any) -> Any:
-    """Recursively remove annotations in a type hint."""
-
-    class Temporary:
-        __annotations__ = dict(tp=tp)
-
-    return get_type_hints(Temporary)["tp"]
-
-
-def find_annotated(tp: Any) -> Iterable[Any]:
+def gen_annotated(tp: Any) -> Iterable[Any]:
     """Generate all annotated types in a type hint."""
-    args = get_args(tp)
-
     if get_origin(tp) is Annotated:
         yield tp
-        yield from find_annotated(args[0])
+        yield from gen_annotated(get_args(tp)[0])
     else:
-        yield from chain(*map(find_annotated, args))
+        yield from chain(*map(gen_annotated, get_args(tp)))
 
 
-def get_annotated(tp: Any) -> Any:
-    """Extract the first tag-annotated type."""
-    for annotated in filter(Tag.annotates, find_annotated(tp)):
-        return deannotate(annotated)
+def get_tagged(
+    tp: Any,
+    bound: Tag = Tag.ANY,
+    keep_annotations: bool = False,
+) -> Optional[Any]:
+    """Extract the first tagged type from a type hint."""
+    for tagged in filter(bound.annotates, gen_annotated(tp)):
+        return tagged if keep_annotations else get_args(tagged)[0]
 
-    raise TypeError("Could not find any tag-annotated type.")
+
+def get_tags(tp: Any, bound: Tag = Tag.ANY) -> List[Tag]:
+    """Extract all tags from the first tagged type."""
+    tagged = get_tagged(tp, bound, True)
+    return list(filter(Tag.creates, get_args(tagged)[1:]))
 
 
-def get_annotations(tp: Any) -> Tuple[Any, ...]:
-    """Extract annotations of the first tag-annotated type."""
-    for annotated in filter(Tag.annotates, find_annotated(tp)):
-        return get_args(annotated)[1:]
-
-    raise TypeError("Could not find any tag-annotated type.")
+def get_nontags(tp: Any, bound: Tag = Tag.ANY) -> List[Any]:
+    """Extract all except tags from the first tagged type."""
+    tagged = get_tagged(tp, bound, True)
+    return list(filterfalse(Tag.creates, get_args(tagged)[1:]))
 
 
 def get_dtype(tp: Any) -> Optional[str]:
-    """Extract a NumPy or pandas data type."""
-    try:
-        dtype = get_args(get_annotated(tp))[0]
-    except (IndexError, TypeError):
+    """Extract a data type of NumPy or pandas from a type hint."""
+    if (tagged := get_tagged(tp, Tag.DATA | Tag.INDEX)) is None:
+        return None
+
+    if (dtype := get_tagged(tagged, Tag.DTYPE)) is None:
         return None
 
     if dtype is Any or dtype is type(None):
         return None
 
-    if is_union_type(dtype):
+    if is_union(dtype):
         dtype = get_args(dtype)[0]
 
     if get_origin(dtype) is Literal:
@@ -154,35 +177,20 @@ def get_dtype(tp: Any) -> Optional[str]:
 
 
 def get_name(tp: Any, default: Hashable = None) -> Hashable:
-    """Extract a name if found or return given default."""
-    try:
-        name = get_annotations(tp)[1]
-    except (IndexError, TypeError):
+    """Extract the first hashable as a name from a type hint."""
+    if not (nontags := get_nontags(tp, Tag.FIELD)):
         return default
 
-    if name is Ellipsis:
+    if (name := nontags[0]) is Ellipsis:
         return default
 
-    try:
-        hash(name)
-    except TypeError:
-        raise ValueError("Could not find any valid name.")
-
-    return name  # type: ignore
+    hash(name)
+    return cast(Hashable, name)
 
 
-def get_tag(tp: Any, default: Tag = Tag.OTHER) -> Tag:
-    """Extract a tag if found or return given default."""
-    try:
-        return get_annotations(tp)[0]  # type: ignore
-    except (IndexError, TypeError):
-        return default
-
-
-def is_union_type(tp: Any) -> bool:
-    """Check if a type hint is a union type."""
-    if get_origin(tp) is Union:
-        return True
-
-    UnionType = getattr(types, "UnionType", None)
-    return UnionType is not None and isinstance(tp, UnionType)
+def is_union(tp: Any) -> bool:
+    """Check if a type hint is a union of types."""
+    if UnionType := getattr(types, "UnionType", None):
+        return get_origin(tp) is Union or isinstance(tp, UnionType)
+    else:
+        return get_origin(tp) is Union

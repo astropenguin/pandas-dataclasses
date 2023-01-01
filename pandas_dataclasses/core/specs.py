@@ -10,12 +10,13 @@ from dataclasses import (
     replace,
 )
 from functools import lru_cache
-from typing import Any, Callable, Hashable, List, Literal, Optional, Type
+from itertools import repeat
+from typing import Any, Callable, Collection, Hashable, List, Mapping, Optional
 
 
 # dependencies
 from typing_extensions import get_type_hints
-from .typing import T, Pandas, Tag, get_dtype, get_name, get_tag
+from .typing import T, Pandas, Tag, get_dtype, get_name, get_tags
 
 
 # runtime classes
@@ -26,20 +27,20 @@ class Field:
     id: str
     """Identifier of the field."""
 
-    tag: Literal["attr", "column", "data", "index"]
-    """Tag of the field."""
-
-    name: Hashable = None
+    name: Hashable
     """Name of the field data."""
 
-    default: Any = None
-    """Default value of the field data."""
+    tags: List[Tag] = field_(default_factory=list)
+    """Tags of the field."""
 
     type: Optional[Any] = None
     """Type or type hint of the field data."""
 
     dtype: Optional[str] = None
     """Data type of the field data."""
+
+    default: Any = None
+    """Default value of the field data."""
 
     def update(self, obj: Any) -> "Field":
         """Update the specification by an object."""
@@ -56,26 +57,30 @@ class Fields(List[Field]):
     @property
     def of_attr(self) -> "Fields":
         """Select only attribute field specifications."""
-        return Fields(field for field in self if field.tag == "attr")
+        return self.filter(lambda f: Tag.ATTR in Tag.union(f.tags))
 
     @property
     def of_column(self) -> "Fields":
         """Select only column field specifications."""
-        return Fields(field for field in self if field.tag == "column")
+        return self.filter(lambda f: Tag.COLUMN in Tag.union(f.tags))
 
     @property
     def of_data(self) -> "Fields":
         """Select only data field specifications."""
-        return Fields(field for field in self if field.tag == "data")
+        return self.filter(lambda f: Tag.DATA in Tag.union(f.tags))
 
     @property
     def of_index(self) -> "Fields":
         """Select only index field specifications."""
-        return Fields(field for field in self if field.tag == "index")
+        return self.filter(lambda f: Tag.INDEX in Tag.union(f.tags))
+
+    def filter(self, condition: Callable[[Field], bool]) -> "Fields":
+        """Select only fields that make a condition True."""
+        return type(self)(filter(condition, self))
 
     def update(self, obj: Any) -> "Fields":
         """Update the specifications by an object."""
-        return Fields(field.update(obj) for field in self)
+        return type(self)(field.update(obj) for field in self)
 
 
 @dataclass(frozen=True)
@@ -97,14 +102,14 @@ class Spec:
     @classmethod
     def from_dataclass(cls, dataclass: type) -> "Spec":
         """Create a specification from a data class."""
-        fields = Fields()
+        eval_field_types(dataclass)
 
-        for field_ in fields_(eval_types(dataclass)):
-            if (field := get_field(field_)) is not None:
-                fields.append(field)
-
-        factory = getattr(dataclass, "__pandas_factory__", None)
-        return cls(dataclass.__name__, dataclass, factory, fields)
+        return cls(
+            name=dataclass.__name__,
+            origin=dataclass,
+            factory=getattr(dataclass, "__pandas_factory__", None),
+            fields=Fields(map(convert_field, fields_(dataclass))),
+        )
 
     def update(self, obj: Any) -> "Spec":
         """Update the specification by an object."""
@@ -120,14 +125,25 @@ class Spec:
 
 # runtime functions
 @lru_cache(maxsize=None)
-def eval_types(dataclass: Type[T]) -> Type[T]:
+def convert_field(field_: "Field_[Any]") -> Field:
+    """Convert a dataclass field to a field specification."""
+    return Field(
+        id=field_.name,
+        name=get_name(field_.type, field_.name),
+        tags=get_tags(field_.type, Tag.FIELD),
+        type=field_.type,
+        dtype=get_dtype(field_.type),
+        default=field_.default,
+    )
+
+
+@lru_cache(maxsize=None)
+def eval_field_types(dataclass: type) -> None:
     """Evaluate field types of a dataclass."""
     types = get_type_hints(dataclass, include_extras=True)
 
     for field_ in fields_(dataclass):
         field_.type = types[field_.name]
-
-    return dataclass
 
 
 def format_(obj: T, by: Any) -> T:
@@ -136,32 +152,11 @@ def format_(obj: T, by: Any) -> T:
 
     if isinstance(obj, str):
         return tp(obj.format(by))  # type: ignore
-    elif isinstance(obj, (list, tuple, set)):
-        return tp(format_(item, by) for item in obj)  # type: ignore
-    elif isinstance(obj, dict):
-        return tp(format_(item, by) for item in obj.items())  # type: ignore
-    else:
-        return obj
 
+    if isinstance(obj, Mapping):
+        return tp(map(format_, obj.items(), repeat(by)))  # type: ignore
 
-@lru_cache(maxsize=None)
-def get_field(field_: "Field_[Any]") -> Optional[Field]:
-    """Create a field specification from a dataclass field."""
-    tag = get_tag(field_.type)
+    if isinstance(obj, Collection):
+        return tp(map(format_, obj, repeat(by)))  # type: ignore
 
-    if tag is Tag.OTHER:
-        return None
-
-    if tag in Tag.DATA | Tag.INDEX:
-        dtype = get_dtype(field_.type)
-    else:
-        dtype = None
-
-    return Field(
-        id=field_.name,
-        tag=tag.name.lower(),  # type: ignore
-        name=get_name(field_.type, field_.name),
-        default=field_.default,
-        type=field_.type,
-        dtype=dtype,
-    )
+    return obj
