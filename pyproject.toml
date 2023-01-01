@@ -28,6 +28,7 @@ sphinx = "^5.3"
 
 [tool.mypy]
 strict = true
+warn_no_return = false
 warn_unused_ignores = false
 
 [tool.pyright]
