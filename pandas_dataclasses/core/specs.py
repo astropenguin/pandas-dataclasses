@@ -107,7 +107,7 @@ class Spec:
             name=dataclass.__name__,
             origin=dataclass,
             factory=getattr(dataclass, "__pandas_factory__", None),
-            fields=Fields(map(get_field, fields_(dataclass))),
+            fields=Fields(map(convert_field, fields_(dataclass))),
         )
 
     def update(self, obj: Any) -> "Spec":
@@ -123,6 +123,19 @@ class Spec:
 
 
 # runtime functions
+@lru_cache(maxsize=None)
+def convert_field(field_: "Field_[Any]") -> Field:
+    """Convert a dataclass field to a field specification."""
+    return Field(
+        id=field_.name,
+        name=get_name(field_.type, field_.name),
+        tags=get_tags(field_.type, Tag.FIELD),
+        type=field_.type,
+        dtype=get_dtype(field_.type),
+        default=field_.default,
+    )
+
+
 @lru_cache(maxsize=None)
 def eval_types(dataclass: Type[T]) -> Type[T]:
     """Evaluate field types of a dataclass."""
@@ -146,16 +159,3 @@ def format_(obj: T, by: Any) -> T:
         return tp(format_(item, by) for item in obj.items())  # type: ignore
     else:
         return obj
-
-
-@lru_cache(maxsize=None)
-def get_field(field_: "Field_[Any]") -> Field:
-    """Create a field specification from a dataclass field."""
-    return Field(
-        id=field_.name,
-        name=get_name(field_.type, field_.name),
-        tags=get_tags(field_.type, Tag.FIELD),
-        type=field_.type,
-        dtype=get_dtype(field_.type),
-        default=field_.default,
-    )
