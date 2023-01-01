@@ -188,14 +188,6 @@ def get_name(tp: Any, default: Hashable = None) -> Hashable:
         return cast(Hashable, name)
 
 
-def get_tag(tp: Any, default: Tag = Tag.OTHER) -> Tag:
-    """Extract a tag if found or return given default."""
-    try:
-        return get_annotations(tp)[0]  # type: ignore
-    except (IndexError, TypeError):
-        return default
-
-
 def is_union_type(tp: Any) -> bool:
     """Check if a type hint is a union type."""
     if get_origin(tp) is Union:

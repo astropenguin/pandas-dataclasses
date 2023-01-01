@@ -15,7 +15,7 @@ from typing import Any, Callable, Hashable, List, Optional, Type
 
 # dependencies
 from typing_extensions import get_type_hints
-from .typing import T, Pandas, Tag, get_dtype, get_name, get_tag
+from .typing import T, Pandas, Tag, get_dtype, get_name, get_tags
 
 
 # runtime classes
@@ -101,14 +101,14 @@ class Spec:
     @classmethod
     def from_dataclass(cls, dataclass: type) -> "Spec":
         """Create a specification from a data class."""
-        fields = Fields()
+        eval_types(dataclass)
 
-        for field_ in fields_(eval_types(dataclass)):
-            if (field := get_field(field_)) is not None:
-                fields.append(field)
-
-        factory = getattr(dataclass, "__pandas_factory__", None)
-        return cls(dataclass.__name__, dataclass, factory, fields)
+        return cls(
+            name=dataclass.__name__,
+            origin=dataclass,
+            factory=getattr(dataclass, "__pandas_factory__", None),
+            fields=Fields(map(get_field, fields_(dataclass))),
+        )
 
     def update(self, obj: Any) -> "Spec":
         """Update the specification by an object."""
@@ -149,23 +149,13 @@ def format_(obj: T, by: Any) -> T:
 
 
 @lru_cache(maxsize=None)
-def get_field(field_: "Field_[Any]") -> Optional[Field]:
+def get_field(field_: "Field_[Any]") -> Field:
     """Create a field specification from a dataclass field."""
-    tag = get_tag(field_.type)
-
-    if tag is Tag.OTHER:
-        return None
-
-    if tag in Tag.DATA | Tag.INDEX:
-        dtype = get_dtype(field_.type)
-    else:
-        dtype = None
-
     return Field(
         id=field_.name,
-        tag=tag.name.lower(),  # type: ignore
         name=get_name(field_.type, field_.name),
-        default=field_.default,
+        tags=get_tags(field_.type, Tag.FIELD),
         type=field_.type,
-        dtype=dtype,
+        dtype=get_dtype(field_.type),
+        default=field_.default,
     )
