@@ -1,18 +1,18 @@
 # standard library
-from typing import Any, Literal as L, Union
+from typing import Any, Hashable, List, Literal as L, Optional, Tuple, Union
 
 
 # dependencies
 import numpy as np
 import pandas as pd
 from pandas_dataclasses import Attr, Column, Data, Index
-from pandas_dataclasses.core.typing import Tag, get_dtype, get_name, get_tag
+from pandas_dataclasses.core.typing import Tag, get_dtype, get_name, get_tags
 from pytest import mark
 from typing_extensions import Annotated as Ann
 
 
 # test data
-testdata_dtype = [
+testdata_dtype: List[Tuple[Any, Any]] = [
     (Data[Any], None),
     (Data[None], None),
     (Data[int], np.dtype("i8")),
@@ -33,7 +33,7 @@ testdata_dtype = [
     (Union[Ann[Index[float], "index"], Ann[Any, "any"]], np.dtype("f8")),
 ]
 
-testdata_name = [
+testdata_name: List[Tuple[Any, Optional[Hashable]]] = [
     (Attr[Any], None),  # type: ignore
     (Column[Any], None),  # type: ignore
     (Data[Any], None),
@@ -56,36 +56,36 @@ testdata_name = [
     (Union[Ann[Any, "other"], Ann[Any, "any"]], None),
 ]
 
-testdata_tag = [
-    (Attr[Any], Tag.ATTR),  # type: ignore
-    (Column[Any], Tag.COLUMN),  # type: ignore
-    (Data[Any], Tag.DATA),
-    (Index[Any], Tag.INDEX),
-    (Any, Tag.OTHER),
-    (Ann[Attr[Any], "attr"], Tag.ATTR),  # type: ignore
-    (Ann[Column[Any], "attr"], Tag.COLUMN),  # type: ignore
-    (Ann[Data[Any], "data"], Tag.DATA),
-    (Ann[Index[Any], "index"], Tag.INDEX),
-    (Ann[Any, "other"], Tag.OTHER),
-    (Union[Ann[Attr[Any], "attr"], Ann[Any, "any"]], Tag.ATTR),  # type: ignore
-    (Union[Ann[Column[Any], "attr"], Ann[Any, "any"]], Tag.COLUMN),  # type: ignore
-    (Union[Ann[Data[Any], "data"], Ann[Any, "any"]], Tag.DATA),
-    (Union[Ann[Index[Any], "index"], Ann[Any, "any"]], Tag.INDEX),
-    (Union[Ann[Any, "other"], Ann[Any, "any"]], Tag.OTHER),
+testdata_tags: List[Tuple[Any, List[Tag]]] = [
+    (Attr[Any], [Tag.ATTR]),  # type: ignore
+    (Column[Any], [Tag.COLUMN]),  # type: ignore
+    (Data[Any], [Tag.DATA]),
+    (Index[Any], [Tag.INDEX]),
+    (Any, []),
+    (Ann[Attr[Any], "attr"], [Tag.ATTR]),  # type: ignore
+    (Ann[Column[Any], "attr"], [Tag.COLUMN]),  # type: ignore
+    (Ann[Data[Any], "data"], [Tag.DATA]),
+    (Ann[Index[Any], "index"], [Tag.INDEX]),
+    (Ann[Any, "other"], []),
+    (Union[Ann[Attr[Any], "attr"], Ann[Any, "any"]], [Tag.ATTR]),  # type: ignore
+    (Union[Ann[Column[Any], "attr"], Ann[Any, "any"]], [Tag.COLUMN]),  # type: ignore
+    (Union[Ann[Data[Any], "data"], Ann[Any, "any"]], [Tag.DATA]),
+    (Union[Ann[Index[Any], "index"], Ann[Any, "any"]], [Tag.INDEX]),
+    (Union[Ann[Any, "other"], Ann[Any, "any"]], []),
 ]
 
 
 # test functions
 @mark.parametrize("tp, dtype", testdata_dtype)
-def test_get_dtype(tp: Any, dtype: Any) -> None:
+def test_get_dtype(tp: Any, dtype: Optional[str]) -> None:
     assert get_dtype(tp) == dtype
 
 
 @mark.parametrize("tp, name", testdata_name)
-def test_get_name(tp: Any, name: Any) -> None:
+def test_get_name(tp: Any, name: Optional[Hashable]) -> None:
     assert get_name(tp) == name
 
 
-@mark.parametrize("tp, tag", testdata_tag)
-def test_get_tag(tp: Any, tag: Any) -> None:
-    assert get_tag(tp) is tag
+@mark.parametrize("tp, tags", testdata_tags)
+def test_get_tags(tp: Any, tags: List[Tag]) -> None:
+    assert get_tags(tp) == tags
