@@ -183,9 +183,9 @@ def get_name(tp: Any, default: Hashable = None) -> Hashable:
 
     if (name := nontags[0]) is Ellipsis:
         return default
-    else:
-        hash(name)
-        return cast(Hashable, name)
+
+    hash(name)
+    return cast(Hashable, name)
 
 
 def is_union_type(tp: Any) -> bool:
