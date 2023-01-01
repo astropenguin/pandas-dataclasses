@@ -15,10 +15,10 @@ from typing import (
     Dict,
     Hashable,
     Iterable,
+    List,
     Literal,
     Optional,
     Protocol,
-    Tuple,
     TypeVar,
     Union,
     cast,
@@ -144,16 +144,16 @@ def get_tagged(
         return tagged if keep_annotations else get_args(tagged)[0]
 
 
-def get_tags(tp: Any, bound: Tag = Tag.ANY) -> Tuple[Tag, ...]:
+def get_tags(tp: Any, bound: Tag = Tag.ANY) -> List[Tag]:
     """Extract all tags from the first tagged type."""
     tagged = get_tagged(tp, bound, True)
-    return tuple(filter(Tag.creates, get_args(tagged)[1:]))
+    return list(filter(Tag.creates, get_args(tagged)[1:]))
 
 
-def get_nontags(tp: Any, bound: Tag = Tag.ANY) -> Tuple[Any, ...]:
+def get_nontags(tp: Any, bound: Tag = Tag.ANY) -> List[Any]:
     """Extract all except tags from the first tagged type."""
     tagged = get_tagged(tp, bound, True)
-    return tuple(filterfalse(Tag.creates, get_args(tagged)[1:]))
+    return list(filterfalse(Tag.creates, get_args(tagged)[1:]))
 
 
 def get_dtype(tp: Any) -> Optional[str]:
