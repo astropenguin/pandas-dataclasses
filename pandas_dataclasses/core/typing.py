@@ -167,7 +167,7 @@ def get_dtype(tp: Any) -> Optional[str]:
     if dtype is Any or dtype is type(None):
         return None
 
-    if is_union_type(dtype):
+    if is_union(dtype):
         dtype = get_args(dtype)[0]
 
     if get_origin(dtype) is Literal:
@@ -188,10 +188,9 @@ def get_name(tp: Any, default: Hashable = None) -> Hashable:
     return cast(Hashable, name)
 
 
-def is_union_type(tp: Any) -> bool:
-    """Check if a type hint is a union type."""
-    if get_origin(tp) is Union:
-        return True
-
-    UnionType = getattr(types, "UnionType", None)
-    return UnionType is not None and isinstance(tp, UnionType)
+def is_union(tp: Any) -> bool:
+    """Check if a type hint is a union of types."""
+    if UnionType := getattr(types, "UnionType", None):
+        return get_origin(tp) is Union or isinstance(tp, UnionType)
+    else:
+        return get_origin(tp) is Union
