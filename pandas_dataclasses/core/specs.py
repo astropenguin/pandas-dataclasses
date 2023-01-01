@@ -10,7 +10,8 @@ from dataclasses import (
     replace,
 )
 from functools import lru_cache
-from typing import Any, Callable, Hashable, List, Optional
+from itertools import repeat
+from typing import Any, Callable, Collection, Hashable, List, Mapping, Optional
 
 
 # dependencies
@@ -151,9 +152,11 @@ def format_(obj: T, by: Any) -> T:
 
     if isinstance(obj, str):
         return tp(obj.format(by))  # type: ignore
-    elif isinstance(obj, (list, tuple, set)):
-        return tp(format_(item, by) for item in obj)  # type: ignore
-    elif isinstance(obj, dict):
-        return tp(format_(item, by) for item in obj.items())  # type: ignore
-    else:
-        return obj
+
+    if isinstance(obj, Mapping):
+        return tp(map(format_, obj.items(), repeat(by)))  # type: ignore
+
+    if isinstance(obj, Collection):
+        return tp(map(format_, obj, repeat(by)))  # type: ignore
+
+    return obj
