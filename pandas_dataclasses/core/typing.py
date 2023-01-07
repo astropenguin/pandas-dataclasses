@@ -158,10 +158,10 @@ def get_nontags(tp: Any, bound: Tag = Tag.ANY) -> List[Any]:
 
 def get_dtype(tp: Any) -> Optional[str]:
     """Extract a data type of NumPy or pandas from a type hint."""
-    if (tagged := get_tagged(tp, Tag.DATA | Tag.INDEX)) is None:
+    if (tp := get_tagged(tp, Tag.DATA | Tag.INDEX, True)) is None:
         return None
 
-    if (dtype := get_tagged(tagged, Tag.DTYPE)) is None:
+    if (dtype := get_tagged(tp, Tag.DTYPE)) is None:
         return None
 
     if dtype is Any or dtype is type(None):
