@@ -56,31 +56,11 @@ class Field:
 
 
 class Fields(List[Field]):
-    """List of field specifications (with selectors)."""
+    """List of field specifications with selectors."""
 
-    @property
-    def of_attr(self) -> "Fields":
-        """Select only attribute field specifications."""
-        return self.filter(lambda f: Tag.ATTR in Tag.union(f.tags))
-
-    @property
-    def of_column(self) -> "Fields":
-        """Select only column field specifications."""
-        return self.filter(lambda f: Tag.COLUMN in Tag.union(f.tags))
-
-    @property
-    def of_data(self) -> "Fields":
-        """Select only data field specifications."""
-        return self.filter(lambda f: Tag.DATA in Tag.union(f.tags))
-
-    @property
-    def of_index(self) -> "Fields":
-        """Select only index field specifications."""
-        return self.filter(lambda f: Tag.INDEX in Tag.union(f.tags))
-
-    def filter(self, condition: Callable[[Field], bool]) -> "Fields":
-        """Select only fields that make a condition True."""
-        return type(self)(filter(condition, self))
+    def of(self, tag: Tag) -> "Fields":
+        """Select only fields that have a tag."""
+        return type(self)(filter(lambda field: field.has(tag), self))
 
     def update(self, obj: Any) -> "Fields":
         """Update the specifications by an object."""

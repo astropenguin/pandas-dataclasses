@@ -12,7 +12,7 @@ import pandas as pd
 from pandas.api.types import is_list_like
 from typing_extensions import get_origin
 from .specs import Spec
-from .typing import P, DataClass, PandasClass, TFrame, TPandas, TSeries
+from .typing import P, DataClass, PandasClass, TFrame, TPandas, TSeries, Tag
 
 
 # runtime functions
@@ -208,7 +208,7 @@ def get_attrs(spec: Spec) -> Dict[Hashable, Any]:
     """Derive attributes from a specification."""
     attrs: Dict[Hashable, Any] = {}
 
-    for field in spec.fields.of_attr:
+    for field in spec.fields.of(Tag.ATTR):
         attrs[field.name] = field.default
 
     return attrs
@@ -216,8 +216,8 @@ def get_attrs(spec: Spec) -> Dict[Hashable, Any]:
 
 def get_columns(spec: Spec) -> Optional[pd.Index]:
     """Derive columns from a specification."""
-    names = [field.name for field in spec.fields.of_column]
-    elems = [field.name for field in spec.fields.of_data]
+    names = [field.name for field in spec.fields.of(Tag.COLUMN)]
+    elems = [field.name for field in spec.fields.of(Tag.DATA)]
 
     if len(names) == 0:
         return None
@@ -231,7 +231,7 @@ def get_data(spec: Spec) -> Dict[Hashable, Any]:
     """Derive data from a specification."""
     data: Dict[Hashable, Any] = {}
 
-    for field in spec.fields.of_data:
+    for field in spec.fields.of(Tag.DATA):
         data[field.name] = ensure(field.default, field.dtype)
 
     return data
@@ -242,7 +242,7 @@ def get_index(spec: Spec) -> Optional[pd.Index]:
     names: List[Hashable] = []
     elems: List[Any] = []
 
-    for field in spec.fields.of_index:
+    for field in spec.fields.of(Tag.INDEX):
         names.append(field.name)
         elems.append(ensure(field.default, field.dtype))
 
