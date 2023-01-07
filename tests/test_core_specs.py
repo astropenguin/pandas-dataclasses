@@ -14,7 +14,7 @@ spec_updated = spec @ weather
 
 # test functions
 def test_year() -> None:
-    field = spec.fields.of_index[0]
+    field = spec.fields.of(Tag.INDEX)[0]
 
     assert field.id == "year"
     assert field.tags == [Tag.INDEX]
@@ -24,7 +24,7 @@ def test_year() -> None:
 
 
 def test_year_updated() -> None:
-    field = spec_updated.fields.of_index[0]
+    field = spec_updated.fields.of(Tag.INDEX)[0]
 
     assert field.id == "year"
     assert field.tags == [Tag.INDEX]
@@ -34,7 +34,7 @@ def test_year_updated() -> None:
 
 
 def test_month() -> None:
-    field = spec.fields.of_index[1]
+    field = spec.fields.of(Tag.INDEX)[1]
 
     assert field.id == "month"
     assert field.tags == [Tag.INDEX]
@@ -44,7 +44,7 @@ def test_month() -> None:
 
 
 def test_month_updated() -> None:
-    field = spec_updated.fields.of_index[1]
+    field = spec_updated.fields.of(Tag.INDEX)[1]
 
     assert field.id == "month"
     assert field.tags == [Tag.INDEX]
@@ -54,7 +54,7 @@ def test_month_updated() -> None:
 
 
 def test_meas() -> None:
-    field = spec.fields.of_column[0]
+    field = spec.fields.of(Tag.COLUMN)[0]
 
     assert field.id == "meas"
     assert field.tags == [Tag.COLUMN]
@@ -63,7 +63,7 @@ def test_meas() -> None:
 
 
 def test_meas_updated() -> None:
-    field = spec_updated.fields.of_column[0]
+    field = spec_updated.fields.of(Tag.COLUMN)[0]
 
     assert field.id == "meas"
     assert field.tags == [Tag.COLUMN]
@@ -72,7 +72,7 @@ def test_meas_updated() -> None:
 
 
 def test_stat() -> None:
-    field = spec.fields.of_column[1]
+    field = spec.fields.of(Tag.COLUMN)[1]
 
     assert field.id == "stat"
     assert field.tags == [Tag.COLUMN]
@@ -81,7 +81,7 @@ def test_stat() -> None:
 
 
 def test_stat_updated() -> None:
-    field = spec_updated.fields.of_column[1]
+    field = spec_updated.fields.of(Tag.COLUMN)[1]
 
     assert field.id == "stat"
     assert field.tags == [Tag.COLUMN]
@@ -90,7 +90,7 @@ def test_stat_updated() -> None:
 
 
 def test_temp_avg() -> None:
-    field = spec.fields.of_data[0]
+    field = spec.fields.of(Tag.DATA)[0]
 
     assert field.id == "temp_avg"
     assert field.tags == [Tag.DATA]
@@ -100,7 +100,7 @@ def test_temp_avg() -> None:
 
 
 def test_temp_avg_updated() -> None:
-    field = spec_updated.fields.of_data[0]
+    field = spec_updated.fields.of(Tag.DATA)[0]
 
     assert field.id == "temp_avg"
     assert field.tags == [Tag.DATA]
@@ -110,7 +110,7 @@ def test_temp_avg_updated() -> None:
 
 
 def test_temp_max() -> None:
-    field = spec.fields.of_data[1]
+    field = spec.fields.of(Tag.DATA)[1]
 
     assert field.id == "temp_max"
     assert field.tags == [Tag.DATA]
@@ -120,7 +120,7 @@ def test_temp_max() -> None:
 
 
 def test_temp_max_updated() -> None:
-    field = spec_updated.fields.of_data[1]
+    field = spec_updated.fields.of(Tag.DATA)[1]
 
     assert field.id == "temp_max"
     assert field.tags == [Tag.DATA]
@@ -130,7 +130,7 @@ def test_temp_max_updated() -> None:
 
 
 def test_wind_avg() -> None:
-    field = spec.fields.of_data[2]
+    field = spec.fields.of(Tag.DATA)[2]
 
     assert field.id == "wind_avg"
     assert field.tags == [Tag.DATA]
@@ -140,7 +140,7 @@ def test_wind_avg() -> None:
 
 
 def test_wind_avg_updated() -> None:
-    field = spec_updated.fields.of_data[2]
+    field = spec_updated.fields.of(Tag.DATA)[2]
 
     assert field.id == "wind_avg"
     assert field.tags == [Tag.DATA]
@@ -150,7 +150,7 @@ def test_wind_avg_updated() -> None:
 
 
 def test_wind_max() -> None:
-    field = spec.fields.of_data[3]
+    field = spec.fields.of(Tag.DATA)[3]
 
     assert field.id == "wind_max"
     assert field.tags == [Tag.DATA]
@@ -160,7 +160,7 @@ def test_wind_max() -> None:
 
 
 def test_wind_max_updated() -> None:
-    field = spec_updated.fields.of_data[3]
+    field = spec_updated.fields.of(Tag.DATA)[3]
 
     assert field.id == "wind_max"
     assert field.tags == [Tag.DATA]
@@ -170,7 +170,7 @@ def test_wind_max_updated() -> None:
 
 
 def test_loc() -> None:
-    field = spec.fields.of_attr[0]
+    field = spec.fields.of(Tag.ATTR)[0]
 
     assert field.id == "loc"
     assert field.tags == [Tag.ATTR]
@@ -179,7 +179,7 @@ def test_loc() -> None:
 
 
 def test_loc_updated() -> None:
-    field = spec_updated.fields.of_attr[0]
+    field = spec_updated.fields.of(Tag.ATTR)[0]
 
     assert field.id == "loc"
     assert field.tags == [Tag.ATTR]
@@ -188,7 +188,7 @@ def test_loc_updated() -> None:
 
 
 def test_lon() -> None:
-    field = spec.fields.of_attr[1]
+    field = spec.fields.of(Tag.ATTR)[1]
 
     assert field.id == "lon"
     assert field.tags == [Tag.ATTR]
@@ -197,7 +197,7 @@ def test_lon() -> None:
 
 
 def test_lon_updated() -> None:
-    field = spec_updated.fields.of_attr[1]
+    field = spec_updated.fields.of(Tag.ATTR)[1]
 
     assert field.id == "lon"
     assert field.tags == [Tag.ATTR]
@@ -206,7 +206,7 @@ def test_lon_updated() -> None:
 
 
 def test_lat() -> None:
-    field = spec.fields.of_attr[2]
+    field = spec.fields.of(Tag.ATTR)[2]
 
     assert field.id == "lat"
     assert field.tags == [Tag.ATTR]
@@ -215,7 +215,7 @@ def test_lat() -> None:
 
 
 def test_lat_updated() -> None:
-    field = spec_updated.fields.of_attr[2]
+    field = spec_updated.fields.of(Tag.ATTR)[2]
 
     assert field.id == "lat"
     assert field.tags == [Tag.ATTR]
