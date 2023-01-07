@@ -28,7 +28,7 @@ from typing import (
 # dependencies
 import pandas as pd
 from pandas.api.types import pandas_dtype
-from typing_extensions import Annotated, ParamSpec, get_args, get_origin
+from typing_extensions import Annotated, ParamSpec, TypeGuard, get_args, get_origin
 
 
 # type hints (private)
@@ -85,14 +85,11 @@ class Tag(Flag):
 
     def annotates(self, tp: Any) -> bool:
         """Check if the tag annotates a type hint."""
-        return any(map(self.covers, get_args(tp)))
-
-    def covers(self, obj: Any) -> bool:
-        """Check if the tag is superset of an object."""
-        return type(self).creates(obj) and obj in self
+        tags = filter(type(self).creates, get_args(tp))
+        return bool(self & type(self).union(tags))
 
     @classmethod
-    def creates(cls, obj: Any) -> bool:
+    def creates(cls, obj: Any) -> TypeGuard["Tag"]:
         """Check if Tag is the type of an object."""
         return isinstance(obj, cls)
 
