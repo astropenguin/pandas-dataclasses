@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Column", "Data", "Index", "Multiple", "Tag"]
+__all__ = ["Tag"]
 
 
 # standard library
@@ -11,7 +11,6 @@ from operator import or_
 from typing import (
     Any,
     Callable,
-    Collection,
     Dict,
     Hashable,
     Iterable,
@@ -108,23 +107,6 @@ class Tag(Flag):
     def __str__(self) -> str:
         """Return the bracket-style string of the tag."""
         return f"<{str(self.name).lower()}>"
-
-
-# type hints (public)
-Attr = Annotated[T, Tag.ATTR]
-"""Type hint for attribute fields (``Attr[T]``)."""
-
-Column = Annotated[T, Tag.COLUMN]
-"""Type hint for column fields (``Column[T]``)."""
-
-Data = Annotated[Collection[Annotated[T, Tag.DTYPE]], Tag.DATA]
-"""Type hint for data fields (``Data[T]``)."""
-
-Index = Annotated[Collection[Annotated[T, Tag.DTYPE]], Tag.INDEX]
-"""Type hint for index fields (``Index[T]``)."""
-
-Multiple = Dict[str, Annotated[T, Tag.MULTIPLE]]
-"""Type hint for multiple-item fields (``Multiple[T]``)."""
 
 
 # runtime functions
