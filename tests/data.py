@@ -8,7 +8,7 @@ from typing import Any
 
 # dependencies
 import pandas as pd
-from pandas_dataclasses import Attr, Column, Data, Index
+from pandas_dataclasses import Attr, Column, Data, Index, Multiple
 from typing_extensions import Annotated as Ann
 
 
@@ -61,6 +61,9 @@ class Weather:
 
     lat_unit: str = "deg"
     """Units of the latitude."""
+
+    attrs: Multiple[Attr[Any]] = field(default_factory=dict)
+    """Other attributes."""
 
 
 weather = Weather(

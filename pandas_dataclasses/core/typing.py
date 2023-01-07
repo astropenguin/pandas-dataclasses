@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Column", "Data", "Index", "Tag"]
+__all__ = ["Attr", "Column", "Data", "Index", "Multiple", "Tag"]
 
 
 # standard library
@@ -28,7 +28,7 @@ from typing import (
 # dependencies
 import pandas as pd
 from pandas.api.types import pandas_dtype
-from typing_extensions import Annotated, ParamSpec, get_args, get_origin
+from typing_extensions import Annotated, ParamSpec, TypeGuard, get_args, get_origin
 
 
 # type hints (private)
@@ -77,22 +77,22 @@ class Tag(Flag):
     DTYPE = auto()
     """Tag for a type specifying a data type."""
 
+    MULTIPLE = auto()
+    """Tag for a type specifying a multiple-item field."""
+
     FIELD = ATTR | COLUMN | DATA | INDEX
     """Union of field-related tags."""
 
-    ANY = FIELD | DTYPE
+    ANY = FIELD | DTYPE | MULTIPLE
     """Union of all tags."""
 
     def annotates(self, tp: Any) -> bool:
         """Check if the tag annotates a type hint."""
-        return any(map(self.covers, get_args(tp)))
-
-    def covers(self, obj: Any) -> bool:
-        """Check if the tag is superset of an object."""
-        return type(self).creates(obj) and obj in self
+        tags = filter(type(self).creates, get_args(tp))
+        return bool(self & type(self).union(tags))
 
     @classmethod
-    def creates(cls, obj: Any) -> bool:
+    def creates(cls, obj: Any) -> TypeGuard["Tag"]:
         """Check if Tag is the type of an object."""
         return isinstance(obj, cls)
 
@@ -102,12 +102,12 @@ class Tag(Flag):
         return reduce(or_, tags, Tag(0))
 
     def __repr__(self) -> str:
-        """Return the hashtag-style string of the tag."""
+        """Return the bracket-style string of the tag."""
         return str(self)
 
     def __str__(self) -> str:
-        """Return the hashtag-style string of the tag."""
-        return f"#{str(self.name).lower()}"
+        """Return the bracket-style string of the tag."""
+        return f"<{str(self.name).lower()}>"
 
 
 # type hints (public)
@@ -122,6 +122,9 @@ Data = Annotated[Collection[Annotated[T, Tag.DTYPE]], Tag.DATA]
 
 Index = Annotated[Collection[Annotated[T, Tag.DTYPE]], Tag.INDEX]
 """Type hint for index fields (``Index[T]``)."""
+
+Multiple = Dict[str, Annotated[T, Tag.MULTIPLE]]
+"""Type hint for multiple-item fields (``Multiple[T]``)."""
 
 
 # runtime functions
@@ -158,10 +161,10 @@ def get_nontags(tp: Any, bound: Tag = Tag.ANY) -> List[Any]:
 
 def get_dtype(tp: Any) -> Optional[str]:
     """Extract a data type of NumPy or pandas from a type hint."""
-    if (tagged := get_tagged(tp, Tag.DATA | Tag.INDEX)) is None:
+    if (tp := get_tagged(tp, Tag.DATA | Tag.INDEX, True)) is None:
         return None
 
-    if (dtype := get_tagged(tagged, Tag.DTYPE)) is None:
+    if (dtype := get_tagged(tp, Tag.DTYPE)) is None:
         return None
 
     if dtype is Any or dtype is type(None):
