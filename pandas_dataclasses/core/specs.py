@@ -42,6 +42,10 @@ class Field:
     default: Any = None
     """Default value of the field data."""
 
+    def has(self, tag: Tag) -> bool:
+        """Check if the specification has a tag."""
+        return bool(tag & Tag.union(self.tags))
+
     def update(self, obj: Any) -> "Field":
         """Update the specification by an object."""
         return replace(
