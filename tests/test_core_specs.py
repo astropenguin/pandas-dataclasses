@@ -223,6 +223,24 @@ def test_lat_updated() -> None:
     assert field.default == weather.lat
 
 
+def test_attrs() -> None:
+    field = spec.fields.of(Tag.ATTR)[3]
+
+    assert field.id == "attrs"
+    assert field.tags == [Tag.ATTR, Tag.MULTIPLE]
+    assert field.name == "attrs"
+    assert field.default is MISSING
+
+
+def test_attrs_updated() -> None:
+    field = spec_updated.fields.of(Tag.ATTR)[3]
+
+    assert field.id == "attrs"
+    assert field.tags == [Tag.ATTR, Tag.MULTIPLE]
+    assert field.name == "attrs"
+    assert field.default == weather.attrs
+
+
 def test_factory() -> None:
     assert spec.factory is None
 
