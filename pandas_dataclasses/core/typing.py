@@ -102,12 +102,12 @@ class Tag(Flag):
         return reduce(or_, tags, Tag(0))
 
     def __repr__(self) -> str:
-        """Return the hashtag-style string of the tag."""
+        """Return the bracket-style string of the tag."""
         return str(self)
 
     def __str__(self) -> str:
-        """Return the hashtag-style string of the tag."""
-        return f"#{str(self.name).lower()}"
+        """Return the bracket-style string of the tag."""
+        return f"<{str(self.name).lower()}>"
 
 
 # type hints (public)
