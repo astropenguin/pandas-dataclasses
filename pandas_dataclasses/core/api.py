@@ -3,7 +3,7 @@ __all__ = ["asframe", "aspandas", "asseries"]
 
 # standard library
 from types import FunctionType
-from typing import Any, Callable, Dict, Hashable, List, Optional, overload
+from typing import Any, Callable, Dict, Hashable, Optional, overload
 
 
 # dependencies
