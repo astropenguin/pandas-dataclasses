@@ -206,12 +206,15 @@ def ensure(data: Any, dtype: Optional[str]) -> Any:
 
 def get_attrs(spec: Spec) -> Dict[Hashable, Any]:
     """Derive attributes from a specification."""
-    attrs: Dict[Hashable, Any] = {}
+    data: Dict[Hashable, Any] = {}
 
     for field in spec.fields.of(Tag.ATTR):
-        attrs[field.name] = field.default
+        if field.has(Tag.MULTIPLE):
+            data.update(field.default)
+        else:
+            data[field.name] = field.default
 
-    return attrs
+    return data
 
 
 def get_columns(spec: Spec) -> Optional[pd.Index]:
@@ -232,24 +235,39 @@ def get_data(spec: Spec) -> Dict[Hashable, Any]:
     data: Dict[Hashable, Any] = {}
 
     for field in spec.fields.of(Tag.DATA):
-        data[field.name] = ensure(field.default, field.dtype)
+        if field.has(Tag.MULTIPLE):
+            items = field.default.items()
+        else:
+            items = {field.name: field.default}.items()
+
+        for name, default in items:
+            data[name] = ensure(default, field.dtype)
 
     return data
 
 
 def get_index(spec: Spec) -> Optional[pd.Index]:
     """Derive index from a specification."""
-    names: List[Hashable] = []
-    elems: List[Any] = []
+    data: Dict[Hashable, Any] = {}
 
     for field in spec.fields.of(Tag.INDEX):
-        names.append(field.name)
-        elems.append(ensure(field.default, field.dtype))
+        if field.has(Tag.MULTIPLE):
+            items = field.default.items()
+        else:
+            items = {field.name: field.default}.items()
 
-    if len(names) == 0:
+        for name, default in items:
+            data[name] = ensure(default, field.dtype)
+
+    if len(data) == 0:
         return None
-    if len(names) == 1:
-        return pd.Index(elems[0], name=names[0])
+    if len(data) == 1:
+        return pd.Index(
+            list(data.values())[0],
+            name=list(data.keys())[0],
+        )
     else:
-        elems = np.broadcast_arrays(*elems)
-        return pd.MultiIndex.from_arrays(elems, names=names)
+        return pd.MultiIndex.from_arrays(
+            np.broadcast_arrays(*data.values()),
+            names=list(data.keys()),
+        )
