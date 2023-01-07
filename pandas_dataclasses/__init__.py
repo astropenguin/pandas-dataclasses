@@ -7,6 +7,7 @@ __all__ = [
     "Column",
     "Data",
     "Index",
+    "Multiple",
     "Spec",
     "Tag",
     "asdataframe",

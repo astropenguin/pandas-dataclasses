@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Column", "Data", "Index", "Tag"]
+__all__ = ["Attr", "Column", "Data", "Index", "Multiple", "Tag"]
 
 
 # standard library
@@ -77,10 +77,13 @@ class Tag(Flag):
     DTYPE = auto()
     """Tag for a type specifying a data type."""
 
+    MULTIPLE = auto()
+    """Tag for a type specifying a multiple-item field."""
+
     FIELD = ATTR | COLUMN | DATA | INDEX
     """Union of field-related tags."""
 
-    ANY = FIELD | DTYPE
+    ANY = FIELD | DTYPE | MULTIPLE
     """Union of all tags."""
 
     def annotates(self, tp: Any) -> bool:
@@ -119,6 +122,9 @@ Data = Annotated[Collection[Annotated[T, Tag.DTYPE]], Tag.DATA]
 
 Index = Annotated[Collection[Annotated[T, Tag.DTYPE]], Tag.INDEX]
 """Type hint for index fields (``Index[T]``)."""
+
+Multiple = Dict[str, Annotated[T, Tag.MULTIPLE]]
+"""Type hint for multiple-item fields (``Multiple[T]``)."""
 
 
 # runtime functions
