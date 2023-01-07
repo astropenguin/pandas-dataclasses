@@ -2,7 +2,6 @@ __all__ = ["Tag"]
 
 
 # standard library
-import types
 from dataclasses import Field
 from enum import Flag, auto
 from functools import reduce
@@ -12,21 +11,17 @@ from typing import (
     Any,
     Callable,
     Dict,
-    Hashable,
     Iterable,
     List,
-    Literal,
     Optional,
     Protocol,
     TypeVar,
     Union,
-    cast,
 )
 
 
 # dependencies
 import pandas as pd
-from pandas.api.types import pandas_dtype
 from typing_extensions import Annotated, ParamSpec, TypeGuard, get_args, get_origin
 
 
@@ -139,43 +134,3 @@ def get_nontags(tp: Any, bound: Tag = Tag.ANY) -> List[Any]:
     """Extract all except tags from the first tagged type."""
     tagged = get_tagged(tp, bound, True)
     return list(filterfalse(Tag.creates, get_args(tagged)[1:]))
-
-
-def get_dtype(tp: Any) -> Optional[str]:
-    """Extract a data type of NumPy or pandas from a type hint."""
-    if (tp := get_tagged(tp, Tag.DATA | Tag.INDEX, True)) is None:
-        return None
-
-    if (dtype := get_tagged(tp, Tag.DTYPE)) is None:
-        return None
-
-    if dtype is Any or dtype is type(None):
-        return None
-
-    if is_union(dtype):
-        dtype = get_args(dtype)[0]
-
-    if get_origin(dtype) is Literal:
-        dtype = get_args(dtype)[0]
-
-    return pandas_dtype(dtype).name
-
-
-def get_name(tp: Any, default: Hashable = None) -> Hashable:
-    """Extract the first hashable as a name from a type hint."""
-    if not (nontags := get_nontags(tp, Tag.FIELD)):
-        return default
-
-    if (name := nontags[0]) is Ellipsis:
-        return default
-
-    hash(name)
-    return cast(Hashable, name)
-
-
-def is_union(tp: Any) -> bool:
-    """Check if a type hint is a union of types."""
-    if UnionType := getattr(types, "UnionType", None):
-        return get_origin(tp) is Union or isinstance(tp, UnionType)
-    else:
-        return get_origin(tp) is Union

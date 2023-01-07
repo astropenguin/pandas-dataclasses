@@ -6,7 +6,8 @@ from typing import Any, Hashable, List, Literal as L, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 from pandas_dataclasses import Attr, Column, Data, Index
-from pandas_dataclasses.core.typing import Tag, get_dtype, get_name, get_tags
+from pandas_dataclasses.core.typing import Tag, get_tags
+from pandas_dataclasses.core.specs import get_dtype, get_name
 from pytest import mark
 from typing_extensions import Annotated as Ann
 
