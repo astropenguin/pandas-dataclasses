@@ -1,4 +1,5 @@
-__all__ = ["new"]
+__all__ = ["hints", "new"]
 
 
+from . import hints
 from . import new

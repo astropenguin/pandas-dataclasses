@@ -2,6 +2,7 @@ __all__ = ["Spec"]
 
 
 # standard library
+import types
 from dataclasses import (
     Field as Field_,
     dataclass,
@@ -11,15 +12,27 @@ from dataclasses import (
 )
 from functools import lru_cache
 from itertools import repeat
-from typing import Any, Callable, Collection, Hashable, List, Mapping, Optional
+from typing import (
+    Any,
+    Callable,
+    Collection,
+    Hashable,
+    List,
+    Literal,
+    Mapping,
+    Optional,
+    Union,
+    cast,
+)
 
 
 # dependencies
-from typing_extensions import get_type_hints
-from .typing import T, Pandas, Tag, get_dtype, get_name, get_tags
+from pandas.api.types import pandas_dtype
+from typing_extensions import get_args, get_origin, get_type_hints
+from .tagging import Tag, get_nontags, get_tagged, get_tags
+from .typing import T, Pandas
 
 
-# runtime classes
 @dataclass(frozen=True)
 class Field:
     """Specification of a field."""
@@ -107,7 +120,6 @@ class Spec:
         return self.update(obj)
 
 
-# runtime functions
 @lru_cache(maxsize=None)
 def convert_field(field_: "Field_[Any]") -> Field:
     """Convert a dataclass field to a field specification."""
@@ -144,3 +156,43 @@ def format_(obj: T, by: Any) -> T:
         return tp(map(format_, obj, repeat(by)))  # type: ignore
 
     return obj
+
+
+def get_dtype(tp: Any) -> Optional[str]:
+    """Extract a data type of NumPy or pandas from a type hint."""
+    if (tp := get_tagged(tp, Tag.DATA | Tag.INDEX, True)) is None:
+        return None
+
+    if (dtype := get_tagged(tp, Tag.DTYPE)) is None:
+        return None
+
+    if dtype is Any or dtype is type(None):
+        return None
+
+    if is_union(dtype):
+        dtype = get_args(dtype)[0]
+
+    if get_origin(dtype) is Literal:
+        dtype = get_args(dtype)[0]
+
+    return pandas_dtype(dtype).name
+
+
+def get_name(tp: Any, default: Hashable = None) -> Hashable:
+    """Extract the first hashable as a name from a type hint."""
+    if not (nontags := get_nontags(tp, Tag.FIELD)):
+        return default
+
+    if (name := nontags[0]) is Ellipsis:
+        return default
+
+    hash(name)
+    return cast(Hashable, name)
+
+
+def is_union(tp: Any) -> bool:
+    """Check if a type hint is a union of types."""
+    if UnionType := getattr(types, "UnionType", None):
+        return get_origin(tp) is Union or isinstance(tp, UnionType)
+    else:
+        return get_origin(tp) is Union
