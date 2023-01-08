@@ -12,10 +12,10 @@ import pandas as pd
 from pandas.api.types import is_list_like
 from typing_extensions import get_origin
 from .specs import Spec
-from .typing import P, DataClass, PandasClass, TFrame, TPandas, TSeries, Tag
+from .tagging import Tag
+from .typing import P, DataClass, PandasClass, TFrame, TPandas, TSeries
 
 
-# runtime functions
 @overload
 def aspandas(obj: PandasClass[P, TPandas], *, factory: None = None) -> TPandas:
     ...

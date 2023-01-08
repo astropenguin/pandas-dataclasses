@@ -29,10 +29,10 @@ from typing import (
 # dependencies
 from pandas.api.types import pandas_dtype
 from typing_extensions import get_args, get_origin, get_type_hints
-from .typing import T, Pandas, Tag, get_nontags, get_tagged, get_tags
+from .tagging import Tag, get_nontags, get_tagged, get_tags
+from .typing import T, Pandas
 
 
-# runtime classes
 @dataclass(frozen=True)
 class Field:
     """Specification of a field."""
@@ -120,7 +120,6 @@ class Spec:
         return self.update(obj)
 
 
-# runtime functions
 @lru_cache(maxsize=None)
 def convert_field(field_: "Field_[Any]") -> Field:
     """Convert a dataclass field to a field specification."""

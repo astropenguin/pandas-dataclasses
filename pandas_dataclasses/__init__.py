@@ -25,6 +25,7 @@ from . import core
 from . import extras
 from .core.api import *
 from .core.specs import *
+from .core.tagging import *
 from .core.typing import *
 from .extras.hints import *
 from .extras.new import *

@@ -2,18 +2,16 @@ __all__ = ["Attr", "Column", "Data", "Index", "Multiple"]
 
 
 # standard library
-from typing import Collection, Dict, TypeVar
+from typing import Collection, Dict
 
 
 # dependencies
 from typing_extensions import Annotated
-from ..core.typing import Tag
+from ..core.tagging import Tag
+from ..core.typing import T
 
 
 # type hints
-T = TypeVar("T")
-
-
 Attr = Annotated[T, Tag.ATTR]
 """Type hint for attribute fields (``Attr[T]``)."""
 
