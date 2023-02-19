@@ -2,7 +2,6 @@ __all__ = ["Spec"]
 
 
 # standard library
-import types
 from dataclasses import (
     Field as Field_,
     dataclass,
@@ -21,7 +20,6 @@ from typing import (
     Literal,
     Mapping,
     Optional,
-    Union,
     cast,
 )
 
@@ -30,7 +28,7 @@ from typing import (
 from pandas.api.types import pandas_dtype
 from typing_extensions import get_args, get_origin, get_type_hints
 from .tagging import Tag, get_nontags, get_tagged, get_tags
-from .typing import TAny, Pandas
+from .typing import TAny, Pandas, is_union
 
 
 @dataclass(frozen=True)
@@ -188,11 +186,3 @@ def get_name(tp: Any, default: Hashable = None) -> Hashable:
 
     hash(name)
     return cast(Hashable, name)
-
-
-def is_union(tp: Any) -> bool:
-    """Check if a type hint is a union of types."""
-    if UnionType := getattr(types, "UnionType", None):
-        return get_origin(tp) is Union or isinstance(tp, UnionType)
-    else:
-        return get_origin(tp) is Union
