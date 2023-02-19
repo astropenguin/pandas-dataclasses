@@ -11,7 +11,7 @@ from typing import Any, Callable, ForwardRef, Generic, Type, Union
 import pandas as pd
 from typing_extensions import get_args, get_origin
 from ..core.api import aspandas
-from ..core.typing import PAny, PandasClass, TPandas
+from ..core.typing import DataClassOf, PAny, TPandas
 
 
 class classproperty:
@@ -23,7 +23,7 @@ class classproperty:
     def __get__(
         self,
         obj: Any,
-        cls: Type[PandasClass[PAny, TPandas]],
+        cls: Type[DataClassOf[TPandas, PAny]],
     ) -> Callable[PAny, TPandas]:
         return self.fget(cls)  # type: ignore
 

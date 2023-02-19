@@ -26,7 +26,7 @@ class DataClass(Protocol[PAny]):
         ...
 
 
-class PandasClass(Protocol[PAny, TPandas]):
+class DataClassOf(Protocol[TPandas, PAny]):
     """Type hint for dataclass objects with a pandas factory."""
 
     __dataclass_fields__: Dict[str, "Field[Any]"]

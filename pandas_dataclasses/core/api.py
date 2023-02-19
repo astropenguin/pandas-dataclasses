@@ -13,11 +13,11 @@ from pandas.api.types import is_list_like
 from typing_extensions import get_origin
 from .specs import Spec
 from .tagging import Tag
-from .typing import DataClass, PandasClass, PAny, TFrame, TPandas, TSeries
+from .typing import DataClass, DataClassOf, PAny, TFrame, TPandas, TSeries
 
 
 @overload
-def aspandas(obj: PandasClass[PAny, TPandas], *, factory: None = None) -> TPandas:
+def aspandas(obj: DataClassOf[TPandas, PAny], *, factory: None = None) -> TPandas:
     ...
 
 
@@ -81,7 +81,7 @@ def aspandas(obj: Any, *, factory: Any = None) -> Any:
 
 
 @overload
-def asframe(obj: PandasClass[PAny, TFrame], *, factory: None = None) -> TFrame:
+def asframe(obj: DataClassOf[TFrame, PAny], *, factory: None = None) -> TFrame:
     ...
 
 
@@ -136,7 +136,7 @@ def asframe(obj: Any, *, factory: Any = None) -> Any:
 
 
 @overload
-def asseries(obj: PandasClass[PAny, TSeries], *, factory: None = None) -> TSeries:
+def asseries(obj: DataClassOf[TSeries, PAny], *, factory: None = None) -> TSeries:
     ...
 
 
