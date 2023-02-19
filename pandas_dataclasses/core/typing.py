@@ -1,3 +1,15 @@
+__all__ = [
+    "DataClass",
+    "DataClassOf",
+    "Pandas",
+    "PAny",
+    "TAny",
+    "TFrame",
+    "TPandas",
+    "TSeries",
+]
+
+
 # standard library
 from dataclasses import Field
 from typing import Any, Callable, Dict, Protocol, TypeVar, Union
@@ -12,8 +24,8 @@ from typing_extensions import ParamSpec
 Pandas = Union[DataFrame, "Series[Any]"]
 PAny = ParamSpec("PAny")
 TAny = TypeVar("TAny")
-TPandas = TypeVar("TPandas", bound=Pandas)
 TFrame = TypeVar("TFrame", bound=DataFrame)
+TPandas = TypeVar("TPandas", bound=Pandas)
 TSeries = TypeVar("TSeries", bound="Series[Any]")
 
 
