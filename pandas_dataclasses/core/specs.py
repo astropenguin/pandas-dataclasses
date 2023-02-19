@@ -20,6 +20,7 @@ from typing import (
     Mapping,
     Optional,
     Tuple,
+    Union,
     cast,
 )
 
@@ -28,7 +29,7 @@ from typing import (
 from pandas.api.types import pandas_dtype
 from typing_extensions import get_args, get_origin, get_type_hints
 from .tagging import Tag, get_nontags, get_tagged, get_tags
-from .typing import TAny, Pandas, is_union
+from .typing import HashDict, Pandas, TAny, is_union
 
 
 @dataclass(frozen=True)
@@ -38,7 +39,7 @@ class Field:
     id: str
     """Identifier of the field."""
 
-    name: Hashable
+    name: Union[Hashable, HashDict]
     """Name of the field data."""
 
     tags: Tuple[Tag, ...] = ()

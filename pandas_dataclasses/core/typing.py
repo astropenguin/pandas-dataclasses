@@ -1,6 +1,7 @@
 __all__ = [
     "DataClass",
     "DataClassOf",
+    "HashDict",
     "Pandas",
     "PAny",
     "TAny",
@@ -14,13 +15,16 @@ __all__ = [
 # standard library
 import types
 from dataclasses import Field
-from typing import Any, Callable, Dict, Protocol, TypeVar, Union
+from typing import Any, Callable, Dict, Hashable, Protocol, TypeVar, Union
 
 
 # dependencies
 from pandas import DataFrame, Series
 from typing_extensions import ParamSpec, get_origin
 
+
+HashDict = Dict[Hashable, Hashable]
+"""Type hint for dictionary of hashable keys and values."""
 
 Pandas = Union[DataFrame, "Series[Any]"]
 """Type hint for any pandas object."""
