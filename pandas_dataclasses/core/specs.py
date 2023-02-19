@@ -30,7 +30,7 @@ from typing import (
 from pandas.api.types import pandas_dtype
 from typing_extensions import get_args, get_origin, get_type_hints
 from .tagging import Tag, get_nontags, get_tagged, get_tags
-from .typing import T, Pandas
+from .typing import TAny, Pandas
 
 
 @dataclass(frozen=True)
@@ -142,7 +142,7 @@ def eval_field_types(dataclass: type) -> None:
         field_.type = types[field_.name]
 
 
-def format_(obj: T, by: Any) -> T:
+def format_(obj: TAny, by: Any) -> TAny:
     """Format a string or nested strings in an object."""
     tp = type(obj)
 

@@ -13,16 +13,16 @@ from pandas.api.types import is_list_like
 from typing_extensions import get_origin
 from .specs import Spec
 from .tagging import Tag
-from .typing import P, DataClass, PandasClass, TFrame, TPandas, TSeries
+from .typing import DataClass, DataClassOf, PAny, TFrame, TPandas, TSeries
 
 
 @overload
-def aspandas(obj: PandasClass[P, TPandas], *, factory: None = None) -> TPandas:
+def aspandas(obj: DataClassOf[TPandas, PAny], *, factory: None = None) -> TPandas:
     ...
 
 
 @overload
-def aspandas(obj: DataClass[P], *, factory: Callable[..., TPandas]) -> TPandas:
+def aspandas(obj: DataClass[PAny], *, factory: Callable[..., TPandas]) -> TPandas:
     ...
 
 
@@ -81,17 +81,17 @@ def aspandas(obj: Any, *, factory: Any = None) -> Any:
 
 
 @overload
-def asframe(obj: PandasClass[P, TFrame], *, factory: None = None) -> TFrame:
+def asframe(obj: DataClassOf[TFrame, PAny], *, factory: None = None) -> TFrame:
     ...
 
 
 @overload
-def asframe(obj: DataClass[P], *, factory: Callable[..., TFrame]) -> TFrame:
+def asframe(obj: DataClass[PAny], *, factory: Callable[..., TFrame]) -> TFrame:
     ...
 
 
 @overload
-def asframe(obj: DataClass[P], *, factory: None = None) -> pd.DataFrame:
+def asframe(obj: DataClass[PAny], *, factory: None = None) -> pd.DataFrame:
     ...
 
 
@@ -136,17 +136,17 @@ def asframe(obj: Any, *, factory: Any = None) -> Any:
 
 
 @overload
-def asseries(obj: PandasClass[P, TSeries], *, factory: None = None) -> TSeries:
+def asseries(obj: DataClassOf[TSeries, PAny], *, factory: None = None) -> TSeries:
     ...
 
 
 @overload
-def asseries(obj: DataClass[P], *, factory: Callable[..., TSeries]) -> TSeries:
+def asseries(obj: DataClass[PAny], *, factory: Callable[..., TSeries]) -> TSeries:
     ...
 
 
 @overload
-def asseries(obj: DataClass[P], *, factory: None = None) -> "pd.Series[Any]":
+def asseries(obj: DataClass[PAny], *, factory: None = None) -> "pd.Series[Any]":
     ...
 
 
