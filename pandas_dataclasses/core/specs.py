@@ -16,7 +16,6 @@ from typing import (
     Callable,
     Collection,
     Hashable,
-    List,
     Literal,
     Mapping,
     Optional,
@@ -67,7 +66,7 @@ class Field:
         )
 
 
-class Fields(List[Field]):
+class Fields(Tuple[Field, ...]):
     """List of field specifications with selectors."""
 
     def of(self, tag: Tag) -> "Fields":
