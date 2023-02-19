@@ -6,7 +6,7 @@ from enum import Flag, auto
 from functools import reduce
 from itertools import chain, filterfalse
 from operator import or_
-from typing import Any, Iterable, List, Optional
+from typing import Any, Iterable, Optional, Tuple
 
 
 # dependencies
@@ -83,13 +83,13 @@ def get_tagged(
         return tagged if keep_annotations else get_args(tagged)[0]
 
 
-def get_tags(tp: Any, bound: Tag = Tag.ANY) -> List[Tag]:
+def get_tags(tp: Any, bound: Tag = Tag.ANY) -> Tuple[Tag, ...]:
     """Extract all tags from the first tagged type."""
     tagged = get_tagged(tp, bound, True)
-    return list(filter(Tag.creates, get_args(tagged)[1:]))
+    return tuple(filter(Tag.creates, get_args(tagged)[1:]))
 
 
-def get_nontags(tp: Any, bound: Tag = Tag.ANY) -> List[Any]:
+def get_nontags(tp: Any, bound: Tag = Tag.ANY) -> Tuple[Any, ...]:
     """Extract all except tags from the first tagged type."""
     tagged = get_tagged(tp, bound, True)
-    return list(filterfalse(Tag.creates, get_args(tagged)[1:]))
+    return tuple(filterfalse(Tag.creates, get_args(tagged)[1:]))

@@ -20,6 +20,7 @@ from typing import (
     Literal,
     Mapping,
     Optional,
+    Tuple,
     cast,
 )
 
@@ -41,7 +42,7 @@ class Field:
     name: Hashable
     """Name of the field data."""
 
-    tags: List[Tag] = field_(default_factory=list)
+    tags: Tuple[Tag, ...] = ()
     """Tags of the field."""
 
     type: Optional[Any] = None
