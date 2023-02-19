@@ -8,21 +8,21 @@ from typing import Collection, Dict
 # dependencies
 from typing_extensions import Annotated
 from ..core.tagging import Tag
-from ..core.typing import T
+from ..core.typing import TAny
 
 
 # type hints
-Attr = Annotated[T, Tag.ATTR]
-"""Type hint for attribute fields (``Attr[T]``)."""
+Attr = Annotated[TAny, Tag.ATTR]
+"""Type hint for attribute fields (``Attr[TAny]``)."""
 
-Column = Annotated[T, Tag.COLUMN]
-"""Type hint for column fields (``Column[T]``)."""
+Column = Annotated[TAny, Tag.COLUMN]
+"""Type hint for column fields (``Column[TAny]``)."""
 
-Data = Annotated[Collection[Annotated[T, Tag.DTYPE]], Tag.DATA]
-"""Type hint for data fields (``Data[T]``)."""
+Data = Annotated[Collection[Annotated[TAny, Tag.DTYPE]], Tag.DATA]
+"""Type hint for data fields (``Data[TAny]``)."""
 
-Index = Annotated[Collection[Annotated[T, Tag.DTYPE]], Tag.INDEX]
-"""Type hint for index fields (``Index[T]``)."""
+Index = Annotated[Collection[Annotated[TAny, Tag.DTYPE]], Tag.INDEX]
+"""Type hint for index fields (``Index[TAny]``)."""
 
-Multiple = Dict[str, Annotated[T, Tag.MULTIPLE]]
-"""Type hint for multiple-item fields (``Multiple[T]``)."""
+Multiple = Dict[str, Annotated[TAny, Tag.MULTIPLE]]
+"""Type hint for multiple-item fields (``Multiple[TAny]``)."""
