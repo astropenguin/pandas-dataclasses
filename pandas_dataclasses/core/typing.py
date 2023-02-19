@@ -22,15 +22,26 @@ from typing_extensions import ParamSpec
 
 # type hints
 Pandas = Union[DataFrame, "Series[Any]"]
+"""Type hint for any pandas object."""
+
 PAny = ParamSpec("PAny")
+"""Parameter specification variable for any function."""
+
 TAny = TypeVar("TAny")
+"""Type variable for any class."""
+
 TFrame = TypeVar("TFrame", bound=DataFrame)
+"""Type variable for pandas DataFrame."""
+
 TPandas = TypeVar("TPandas", bound=Pandas)
+"""Type variable for any class of pandas object."""
+
 TSeries = TypeVar("TSeries", bound="Series[Any]")
+"""Type variable for pandas Series (of any dtype)."""
 
 
 class DataClass(Protocol[PAny]):
-    """Type hint for dataclass objects."""
+    """Protocol for any dataclass object."""
 
     __dataclass_fields__: Dict[str, "Field[Any]"]
 
@@ -39,7 +50,7 @@ class DataClass(Protocol[PAny]):
 
 
 class DataClassOf(Protocol[TPandas, PAny]):
-    """Type hint for dataclass objects with a pandas factory."""
+    """Protocol for any dataclass object with a factory."""
 
     __dataclass_fields__: Dict[str, "Field[Any]"]
     __pandas_factory__: Callable[..., TPandas]
