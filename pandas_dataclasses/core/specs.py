@@ -14,10 +14,8 @@ from itertools import repeat
 from typing import (
     Any,
     Callable,
-    Collection,
     Hashable,
     Literal,
-    Mapping,
     Optional,
     Tuple,
     Union,
@@ -62,7 +60,7 @@ class Field:
         """Update the specification by an object."""
         return replace(
             self,
-            name=format_(self.name, obj),
+            name=format(self.name, obj),
             default=getattr(obj, self.id, self.default),
         )
 
@@ -141,18 +139,16 @@ def eval_field_types(dataclass: type) -> None:
         field_.type = types[field_.name]
 
 
-def format_(obj: TAny, by: Any) -> TAny:
+def format(obj: TAny, by: Any) -> TAny:
     """Format a string or nested strings in an object."""
-    tp = type(obj)
-
     if isinstance(obj, str):
-        return tp(obj.format(by))  # type: ignore
+        return type(obj)(obj.format(by))  # type: ignore
 
-    if isinstance(obj, Mapping):
-        return tp(map(format_, obj.items(), repeat(by)))  # type: ignore
+    if isinstance(obj, (list, tuple)):
+        return type(obj)(map(format, obj, repeat(by)))  # type: ignore
 
-    if isinstance(obj, Collection):
-        return tp(map(format_, obj, repeat(by)))  # type: ignore
+    if isinstance(obj, dict):
+        return type(obj)(map(format, obj.items(), repeat(by)))  # type: ignore
 
     return obj
 
