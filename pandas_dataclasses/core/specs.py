@@ -43,6 +43,14 @@ class Field:
     default: Any = None
     """Default value of the field data."""
 
+    @property
+    def hashable_name(self) -> Hashable:
+        """Hashable name of the field data."""
+        if isinstance(name := self.name, dict):
+            return tuple(name.values())
+        else:
+            return name
+
     def has(self, tag: Tag) -> bool:
         """Check if the specification has a tag."""
         return bool(tag & Tag.union(self.tags))

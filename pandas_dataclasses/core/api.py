@@ -212,7 +212,7 @@ def get_attrs(spec: Spec) -> Dict[Hashable, Any]:
         if field.has(Tag.MULTIPLE):
             data.update(field.default)
         else:
-            data[field.name] = field.default
+            data[field.hashable_name] = field.default
 
     return data
 
@@ -238,7 +238,7 @@ def get_data(spec: Spec) -> Dict[Hashable, Any]:
         if field.has(Tag.MULTIPLE):
             items = field.default.items()
         else:
-            items = {field.name: field.default}.items()
+            items = {field.hashable_name: field.default}.items()
 
         for name, default in items:
             data[name] = ensure(default, field.dtype)
@@ -254,7 +254,7 @@ def get_index(spec: Spec) -> Optional[pd.Index]:
         if field.has(Tag.MULTIPLE):
             items = field.default.items()
         else:
-            items = {field.name: field.default}.items()
+            items = {field.hashable_name: field.default}.items()
 
         for name, default in items:
             data[name] = ensure(default, field.dtype)
