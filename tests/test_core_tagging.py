@@ -10,7 +10,7 @@ from typing_extensions import Annotated as Ann
 
 
 # test data
-testdata: List[Tuple[Any, List[Tag]]] = [
+testdata: List[Tuple[Any, Tuple[Tag, ...]]] = [
     (Attr[Any], (Tag.ATTR,)),  # type: ignore
     (Column[Any], (Tag.COLUMN,)),  # type: ignore
     (Data[Any], (Tag.DATA,)),
@@ -31,5 +31,5 @@ testdata: List[Tuple[Any, List[Tag]]] = [
 
 # test functions
 @mark.parametrize("tp, tags", testdata)
-def test_get_tags(tp: Any, tags: List[Tag]) -> None:
+def test_get_tags(tp: Any, tags: Tuple[Tag, ...]) -> None:
     assert get_tags(tp) == tags
