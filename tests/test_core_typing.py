@@ -6,7 +6,7 @@ from typing import Any, Hashable, List, Literal as L, Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 from pandas_dataclasses import Attr, Column, Data, Index
-from pandas_dataclasses.core.specs import get_dtype, get_name
+from pandas_dataclasses.core.specs import get_dtype, get_first
 from pytest import mark
 from typing_extensions import Annotated as Ann
 
@@ -33,7 +33,7 @@ testdata_dtype: List[Tuple[Any, Any]] = [
     (Union[Ann[Index[float], "index"], Ann[Any, "any"]], np.dtype("f8")),
 ]
 
-testdata_name: List[Tuple[Any, Optional[Hashable]]] = [
+testdata_first: List[Tuple[Any, Optional[Hashable]]] = [
     (Attr[Any], None),  # type: ignore
     (Column[Any], None),  # type: ignore
     (Data[Any], None),
@@ -63,6 +63,6 @@ def test_get_dtype(tp: Any, dtype: Optional[str]) -> None:
     assert get_dtype(tp) == dtype
 
 
-@mark.parametrize("tp, name", testdata_name)
-def test_get_name(tp: Any, name: Optional[Hashable]) -> None:
-    assert get_name(tp) == name
+@mark.parametrize("tp, first", testdata_first)
+def test_get_first(tp: Any, first: Optional[Any]) -> None:
+    assert get_first(tp, None) == first

@@ -11,16 +11,7 @@ from dataclasses import (
 )
 from functools import lru_cache
 from itertools import repeat
-from typing import (
-    Any,
-    Callable,
-    Hashable,
-    Literal,
-    Optional,
-    Tuple,
-    Union,
-    cast,
-)
+from typing import Any, Callable, Hashable, Literal, Optional, Tuple, Union
 
 
 # dependencies
@@ -122,7 +113,7 @@ def convert_field(field_: "Field_[Any]") -> Field:
     """Convert a dataclass field to a field specification."""
     return Field(
         id=field_.name,
-        name=get_name(field_.type, field_.name),
+        name=get_first(field_.type, field_.name),
         tags=get_tags(field_.type, Tag.FIELD),
         type=field_.type,
         dtype=get_dtype(field_.type),
@@ -173,13 +164,12 @@ def get_dtype(tp: Any) -> Optional[str]:
     return pandas_dtype(dtype).name
 
 
-def get_name(tp: Any, default: Hashable = None) -> Hashable:
-    """Extract the first hashable as a name from a type hint."""
+def get_first(tp: Any, default: Any = None) -> Optional[Any]:
+    """Extract the first nontag annotation from a type hint."""
     if not (nontags := get_nontags(tp, Tag.FIELD)):
         return default
 
-    if (name := nontags[0]) is Ellipsis:
+    if (first := nontags[0]) is Ellipsis:
         return default
 
-    hash(name)
-    return cast(Hashable, name)
+    return first
