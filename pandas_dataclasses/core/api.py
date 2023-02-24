@@ -212,7 +212,7 @@ def get_attrs(spec: Spec) -> Dict[Hashable, Any]:
         if field.has(Tag.MULTIPLE):
             data.update(field.default)
         else:
-            data[field.hashable_name] = field.default
+            data[nameof(field)] = field.default
 
     return data
 
@@ -238,7 +238,7 @@ def get_data(spec: Spec) -> Dict[Hashable, Any]:
         if field.has(Tag.MULTIPLE):
             items = field.default.items()
         else:
-            items = {field.hashable_name: field.default}.items()
+            items = {nameof(field): field.default}.items()
 
         for name, default in items:
             data[name] = ensure(default, field.dtype)
@@ -254,7 +254,7 @@ def get_index(spec: Spec) -> Optional[pd.Index]:
         if field.has(Tag.MULTIPLE):
             items = field.default.items()
         else:
-            items = {field.hashable_name: field.default}.items()
+            items = {nameof(field): field.default}.items()
 
         for name, default in items:
             data[name] = ensure(default, field.dtype)
@@ -271,3 +271,11 @@ def get_index(spec: Spec) -> Optional[pd.Index]:
             np.broadcast_arrays(*data.values()),
             names=list(data.keys()),
         )
+
+
+def nameof(field: Field) -> Hashable:
+    """Derive the name of a field specification."""
+    if isinstance(name := field.name, dict):
+        return tuple(name.values())
+    else:
+        return name
