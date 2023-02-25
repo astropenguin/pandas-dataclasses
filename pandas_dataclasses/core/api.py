@@ -193,17 +193,6 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
     return series
 
 
-def ensure(data: Any, dtype: Optional[str]) -> Any:
-    """Ensure data to be 1D and have given data type."""
-    if not is_list_like(data):
-        data = [data]
-
-    if isinstance(data, (pd.Index, pd.Series)):
-        return type(data)(data, dtype=dtype, copy=False)
-    else:
-        return pd.array(data, dtype=dtype, copy=False)
-
-
 def get_attrs(spec: Spec) -> Dict[Hashable, Any]:
     """Derive attributes from a specification."""
     data: Dict[Hashable, Any] = {}
@@ -255,6 +244,17 @@ def get_index(spec: Spec) -> Optional[pd.Index]:
             names=data.keys(),
         )
     )
+
+
+def ensure(data: Any, dtype: Optional[str]) -> Any:
+    """Ensure data to be 1D and have given data type."""
+    if not is_list_like(data):
+        data = [data]
+
+    if isinstance(data, (pd.Index, pd.Series)):
+        return type(data)(data, dtype=dtype, copy=False)
+    else:
+        return pd.array(data, dtype=dtype, copy=False)
 
 
 def items(field: Field) -> Iterable[Tuple[Hashable, Any]]:
