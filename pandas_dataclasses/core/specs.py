@@ -59,6 +59,13 @@ class Field:
 class Fields(Tuple[Field, ...]):
     """List of field specifications with selectors."""
 
+    @property
+    def names(self) -> Optional[Tuple[Hashable, ...]]:
+        """Optional names of the field specifications."""
+        for field in self:
+            if isinstance(name := field.name, dict):
+                return tuple(name.keys())
+
     def of(self, tag: Tag) -> "Fields":
         """Select only fields that have a tag."""
         return type(self)(filter(lambda field: field.has(tag), self))
@@ -98,10 +105,11 @@ class Spec:
 
     def update(self, obj: Any) -> "Spec":
         """Update the specification by an object."""
-        if self.origin is None or isinstance(obj, self.origin):
-            return replace(self, fields=self.fields.update(obj))
-        else:
-            return self.update(self.origin(obj))
+        if self.origin is not None:
+            if not isinstance(obj, self.origin):
+                obj = self.origin(obj)
+
+        return replace(self, fields=self.fields.update(obj))
 
     def __matmul__(self, obj: Any) -> "Spec":
         """Alias of the update method."""

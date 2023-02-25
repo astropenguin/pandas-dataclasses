@@ -216,15 +216,15 @@ def get_attrs(spec: Spec) -> Dict[Hashable, Any]:
 
 def get_columns(spec: Spec) -> Optional[pd.Index]:
     """Derive columns from a specification."""
-    names = [field.name for field in spec.fields.of(Tag.COLUMN)]
-    elems = [field.name for field in spec.fields.of(Tag.DATA)]
-
-    if len(names) == 0:
+    if not (fields := spec.fields.of(Tag.DATA)):
         return None
-    if len(names) == 1:
-        return pd.Index(elems, name=names[0], tupleize_cols=False)
-    else:
-        return pd.MultiIndex.from_tuples(elems, names=names)
+
+    return squeeze(
+        pd.MultiIndex.from_tuples(
+            map(name, fields),
+            names=fields.names,
+        )
+    )
 
 
 def get_data(spec: Spec) -> Dict[Hashable, Any]:
