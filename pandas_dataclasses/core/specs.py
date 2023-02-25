@@ -10,7 +10,7 @@ from typing import Any, Callable, Hashable, Literal, Optional, Tuple, Union
 
 # dependencies
 from pandas.api.types import pandas_dtype
-from typing_extensions import get_args, get_origin, get_type_hints
+from typing_extensions import Self, get_args, get_origin, get_type_hints
 from .tagging import Tag, get_nontags, get_tagged, get_tags
 from .typing import HashDict, Pandas, TAny, is_union
 
@@ -41,7 +41,7 @@ class Field:
         """Check if the specification has a tag."""
         return bool(tag & Tag.union(self.tags))
 
-    def update(self, obj: Any) -> "Field":
+    def update(self, obj: Any) -> Self:
         """Update the specification by an object."""
         return replace(
             self,
@@ -53,11 +53,11 @@ class Field:
 class Fields(Tuple[Field, ...]):
     """List of field specifications with selectors."""
 
-    def of(self, tag: Tag) -> "Fields":
+    def of(self, tag: Tag) -> Self:
         """Select only fields that have a tag."""
         return type(self)(filter(lambda field: field.has(tag), self))
 
-    def update(self, obj: Any) -> "Fields":
+    def update(self, obj: Any) -> Self:
         """Update the specifications by an object."""
         return type(self)(field.update(obj) for field in self)
 
@@ -79,7 +79,7 @@ class Spec:
     """List of field specifications."""
 
     @classmethod
-    def from_dataclass(cls, dataclass: type) -> "Spec":
+    def from_dataclass(cls, dataclass: type) -> Self:
         """Create a specification from a data class."""
         eval_field_types(dataclass)
 
@@ -90,7 +90,7 @@ class Spec:
             fields=Fields(map(convert_field, fields_(dataclass))),
         )
 
-    def update(self, obj: Any) -> "Spec":
+    def update(self, obj: Any) -> Self:
         """Update the specification by an object."""
         if self.origin is not None:
             if not isinstance(obj, self.origin):
@@ -98,7 +98,7 @@ class Spec:
 
         return replace(self, fields=self.fields.update(obj))
 
-    def __matmul__(self, obj: Any) -> "Spec":
+    def __matmul__(self, obj: Any) -> Self:
         """Alias of the update method."""
         return self.update(obj)
 

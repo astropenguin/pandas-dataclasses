@@ -10,7 +10,7 @@ from typing import Any, Iterable, Optional, Tuple
 
 
 # dependencies
-from typing_extensions import Annotated, TypeGuard, get_args, get_origin
+from typing_extensions import Annotated, Self, TypeGuard, get_args, get_origin
 
 
 class Tag(Flag):
@@ -43,14 +43,14 @@ class Tag(Flag):
         return bool(self & type(self).union(tags))
 
     @classmethod
-    def creates(cls, obj: Any) -> TypeGuard["Tag"]:
+    def creates(cls, obj: Any) -> TypeGuard[Self]:
         """Check if Tag is the type of an object."""
         return isinstance(obj, cls)
 
     @classmethod
-    def union(cls, tags: Iterable["Tag"]) -> "Tag":
+    def union(cls, tags: Iterable[Self]) -> Self:
         """Create a tag as an union of tags."""
-        return reduce(or_, tags, Tag(0))
+        return reduce(or_, tags, cls(0))
 
     def __repr__(self) -> str:
         """Return the bracket-style string of the tag."""
