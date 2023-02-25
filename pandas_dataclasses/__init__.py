@@ -4,7 +4,6 @@ __all__ = [
     "AsFrame",
     "AsSeries",
     "Attr",
-    "Column",
     "Data",
     "Index",
     "Multiple",

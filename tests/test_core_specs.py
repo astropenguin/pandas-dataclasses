@@ -3,7 +3,7 @@ from dataclasses import MISSING
 
 
 # dependencies
-from data import Weather, weather
+from data import Weather, name, weather
 from pandas_dataclasses import Spec, Tag
 
 
@@ -53,48 +53,12 @@ def test_month_updated() -> None:
     assert field.default == weather.month
 
 
-def test_meas() -> None:
-    field = spec.fields.of(Tag.COLUMN)[0]
-
-    assert field.id == "meas"
-    assert field.tags == (Tag.COLUMN,)
-    assert field.name == "Measurement"
-    assert field.default is MISSING
-
-
-def test_meas_updated() -> None:
-    field = spec_updated.fields.of(Tag.COLUMN)[0]
-
-    assert field.id == "meas"
-    assert field.tags == (Tag.COLUMN,)
-    assert field.name == "Measurement"
-    assert field.default is MISSING
-
-
-def test_stat() -> None:
-    field = spec.fields.of(Tag.COLUMN)[1]
-
-    assert field.id == "stat"
-    assert field.tags == (Tag.COLUMN,)
-    assert field.name == "Statistic"
-    assert field.default is MISSING
-
-
-def test_stat_updated() -> None:
-    field = spec_updated.fields.of(Tag.COLUMN)[1]
-
-    assert field.id == "stat"
-    assert field.tags == (Tag.COLUMN,)
-    assert field.name == "Statistic"
-    assert field.default is MISSING
-
-
 def test_temp_avg() -> None:
     field = spec.fields.of(Tag.DATA)[0]
 
     assert field.id == "temp_avg"
     assert field.tags == (Tag.DATA,)
-    assert field.name == ("Temperature ({.temp_unit})", "Average")
+    assert field.name == name("Temperature ({.temp_unit})", "Average")
     assert field.dtype == "float64"
     assert field.default is MISSING
 
@@ -104,7 +68,7 @@ def test_temp_avg_updated() -> None:
 
     assert field.id == "temp_avg"
     assert field.tags == (Tag.DATA,)
-    assert field.name == ("Temperature (deg C)", "Average")
+    assert field.name == name("Temperature (deg C)", "Average")
     assert field.dtype == "float64"
     assert field.default == weather.temp_avg
 
@@ -114,7 +78,7 @@ def test_temp_max() -> None:
 
     assert field.id == "temp_max"
     assert field.tags == (Tag.DATA,)
-    assert field.name == ("Temperature ({.temp_unit})", "Maximum")
+    assert field.name == name("Temperature ({.temp_unit})", "Maximum")
     assert field.dtype == "float64"
     assert field.default is MISSING
 
@@ -124,7 +88,7 @@ def test_temp_max_updated() -> None:
 
     assert field.id == "temp_max"
     assert field.tags == (Tag.DATA,)
-    assert field.name == ("Temperature (deg C)", "Maximum")
+    assert field.name == name("Temperature (deg C)", "Maximum")
     assert field.dtype == "float64"
     assert field.default == weather.temp_max
 
@@ -134,7 +98,7 @@ def test_wind_avg() -> None:
 
     assert field.id == "wind_avg"
     assert field.tags == (Tag.DATA,)
-    assert field.name == ("Wind speed ({.wind_unit})", "Average")
+    assert field.name == name("Wind speed ({.wind_unit})", "Average")
     assert field.dtype == "float64"
     assert field.default is MISSING
 
@@ -144,7 +108,7 @@ def test_wind_avg_updated() -> None:
 
     assert field.id == "wind_avg"
     assert field.tags == (Tag.DATA,)
-    assert field.name == ("Wind speed (m/s)", "Average")
+    assert field.name == name("Wind speed (m/s)", "Average")
     assert field.dtype == "float64"
     assert field.default == weather.wind_avg
 
@@ -154,7 +118,7 @@ def test_wind_max() -> None:
 
     assert field.id == "wind_max"
     assert field.tags == (Tag.DATA,)
-    assert field.name == ("Wind speed ({.wind_unit})", "Maximum")
+    assert field.name == name("Wind speed ({.wind_unit})", "Maximum")
     assert field.dtype == "float64"
     assert field.default is MISSING
 
@@ -164,7 +128,7 @@ def test_wind_max_updated() -> None:
 
     assert field.id == "wind_max"
     assert field.tags == (Tag.DATA,)
-    assert field.name == ("Wind speed (m/s)", "Maximum")
+    assert field.name == name("Wind speed (m/s)", "Maximum")
     assert field.dtype == "float64"
     assert field.default == weather.wind_max
 

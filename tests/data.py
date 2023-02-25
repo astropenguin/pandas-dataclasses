@@ -3,16 +3,20 @@ __all__ = ["Weather", "weather", "df_weather_true", "ser_weather_true"]
 
 # standard library
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Dict
 
 
 # dependencies
 import pandas as pd
-from pandas_dataclasses import Attr, Column, Data, Index, Multiple
+from pandas_dataclasses import Attr, Data, Index, Multiple
 from typing_extensions import Annotated as Ann
 
 
 # test dataclass and object
+def name(meas: str, stat: str) -> Dict[str, str]:
+    return {"Measurement": meas, "Statistic": stat}
+
+
 @dataclass
 class Weather:
     """Weather information."""
@@ -23,22 +27,16 @@ class Weather:
     month: Ann[Index[int], "Month"]
     """Month of the measured time."""
 
-    meas: Ann[Column[None], "Measurement"] = field(init=False, repr=False)
-    """Name of the measurement."""
-
-    stat: Ann[Column[None], "Statistic"] = field(init=False, repr=False)
-    """Name of the statistic."""
-
-    temp_avg: Ann[Data[float], ("Temperature ({.temp_unit})", "Average")]
+    temp_avg: Ann[Data[float], name("Temperature ({.temp_unit})", "Average")]
     """Monthly average temperature with given units."""
 
-    temp_max: Ann[Data[float], ("Temperature ({.temp_unit})", "Maximum")]
+    temp_max: Ann[Data[float], name("Temperature ({.temp_unit})", "Maximum")]
     """Monthly maximum temperature with given units."""
 
-    wind_avg: Ann[Data[float], ("Wind speed ({.wind_unit})", "Average")]
+    wind_avg: Ann[Data[float], name("Wind speed ({.wind_unit})", "Average")]
     """Monthly average wind speed with given units."""
 
-    wind_max: Ann[Data[float], ("Wind speed ({.wind_unit})", "Maximum")]
+    wind_max: Ann[Data[float], name("Wind speed ({.wind_unit})", "Maximum")]
     """Monthly maximum wind speed with given units."""
 
     loc: Ann[Attr[str], "Location"] = "Tokyo"

@@ -19,9 +19,6 @@ class Tag(Flag):
     ATTR = auto()
     """Tag for a type specifying an attribute field."""
 
-    COLUMN = auto()
-    """Tag for a type specifying a column field."""
-
     DATA = auto()
     """Tag for a type specifying a data field."""
 
@@ -34,7 +31,7 @@ class Tag(Flag):
     MULTIPLE = auto()
     """Tag for a type specifying a multiple-item field."""
 
-    FIELD = ATTR | COLUMN | DATA | INDEX
+    FIELD = ATTR | DATA | INDEX
     """Union of field-related tags."""
 
     ANY = FIELD | DTYPE | MULTIPLE
