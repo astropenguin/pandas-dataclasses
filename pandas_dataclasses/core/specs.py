@@ -2,13 +2,7 @@ __all__ = ["Spec"]
 
 
 # standard library
-from dataclasses import (
-    Field as Field_,
-    dataclass,
-    field as field_,
-    fields as fields_,
-    replace,
-)
+from dataclasses import Field as Field_, dataclass, fields as fields_, replace
 from functools import lru_cache
 from itertools import repeat
 from typing import Any, Callable, Hashable, Literal, Optional, Tuple, Union
@@ -81,7 +75,7 @@ class Spec:
     factory: Optional[Callable[..., Pandas]] = None
     """Factory for pandas data creation."""
 
-    fields: Fields = field_(default_factory=Fields)
+    fields: Fields = Fields()
     """List of field specifications."""
 
     @classmethod
