@@ -2,7 +2,6 @@ __all__ = ["Spec"]
 
 
 # standard library
-import types
 from dataclasses import (
     Field as Field_,
     dataclass,
@@ -12,25 +11,14 @@ from dataclasses import (
 )
 from functools import lru_cache
 from itertools import repeat
-from typing import (
-    Any,
-    Callable,
-    Collection,
-    Hashable,
-    List,
-    Literal,
-    Mapping,
-    Optional,
-    Union,
-    cast,
-)
+from typing import Any, Callable, Hashable, Literal, Optional, Tuple, Union
 
 
 # dependencies
 from pandas.api.types import pandas_dtype
 from typing_extensions import get_args, get_origin, get_type_hints
 from .tagging import Tag, get_nontags, get_tagged, get_tags
-from .typing import TAny, Pandas
+from .typing import HashDict, Pandas, TAny, is_union
 
 
 @dataclass(frozen=True)
@@ -40,10 +28,10 @@ class Field:
     id: str
     """Identifier of the field."""
 
-    name: Hashable
+    name: Union[Hashable, HashDict]
     """Name of the field data."""
 
-    tags: List[Tag] = field_(default_factory=list)
+    tags: Tuple[Tag, ...] = ()
     """Tags of the field."""
 
     type: Optional[Any] = None
@@ -63,13 +51,20 @@ class Field:
         """Update the specification by an object."""
         return replace(
             self,
-            name=format_(self.name, obj),
+            name=format(self.name, obj),
             default=getattr(obj, self.id, self.default),
         )
 
 
-class Fields(List[Field]):
+class Fields(Tuple[Field, ...]):
     """List of field specifications with selectors."""
+
+    @property
+    def names(self) -> Optional[Tuple[Hashable, ...]]:
+        """Optional names of the field specifications."""
+        for field in self:
+            if isinstance(name := field.name, dict):
+                return tuple(name.keys())
 
     def of(self, tag: Tag) -> "Fields":
         """Select only fields that have a tag."""
@@ -110,10 +105,11 @@ class Spec:
 
     def update(self, obj: Any) -> "Spec":
         """Update the specification by an object."""
-        if self.origin is None or isinstance(obj, self.origin):
-            return replace(self, fields=self.fields.update(obj))
-        else:
-            return self.update(self.origin(obj))
+        if self.origin is not None:
+            if not isinstance(obj, self.origin):
+                obj = self.origin(obj)
+
+        return replace(self, fields=self.fields.update(obj))
 
     def __matmul__(self, obj: Any) -> "Spec":
         """Alias of the update method."""
@@ -125,7 +121,7 @@ def convert_field(field_: "Field_[Any]") -> Field:
     """Convert a dataclass field to a field specification."""
     return Field(
         id=field_.name,
-        name=get_name(field_.type, field_.name),
+        name=get_first(field_.type, field_.name),
         tags=get_tags(field_.type, Tag.FIELD),
         type=field_.type,
         dtype=get_dtype(field_.type),
@@ -142,18 +138,16 @@ def eval_field_types(dataclass: type) -> None:
         field_.type = types[field_.name]
 
 
-def format_(obj: TAny, by: Any) -> TAny:
+def format(obj: TAny, by: Any) -> TAny:
     """Format a string or nested strings in an object."""
-    tp = type(obj)
-
     if isinstance(obj, str):
-        return tp(obj.format(by))  # type: ignore
+        return type(obj)(obj.format(by))  # type: ignore
 
-    if isinstance(obj, Mapping):
-        return tp(map(format_, obj.items(), repeat(by)))  # type: ignore
+    if isinstance(obj, (list, tuple)):
+        return type(obj)(map(format, obj, repeat(by)))  # type: ignore
 
-    if isinstance(obj, Collection):
-        return tp(map(format_, obj, repeat(by)))  # type: ignore
+    if isinstance(obj, dict):
+        return type(obj)(map(format, obj.items(), repeat(by)))  # type: ignore
 
     return obj
 
@@ -178,21 +172,12 @@ def get_dtype(tp: Any) -> Optional[str]:
     return pandas_dtype(dtype).name
 
 
-def get_name(tp: Any, default: Hashable = None) -> Hashable:
-    """Extract the first hashable as a name from a type hint."""
+def get_first(tp: Any, default: Any = None) -> Optional[Any]:
+    """Extract the first nontag annotation from a type hint."""
     if not (nontags := get_nontags(tp, Tag.FIELD)):
         return default
 
-    if (name := nontags[0]) is Ellipsis:
+    if (first := nontags[0]) is Ellipsis:
         return default
 
-    hash(name)
-    return cast(Hashable, name)
-
-
-def is_union(tp: Any) -> bool:
-    """Check if a type hint is a union of types."""
-    if UnionType := getattr(types, "UnionType", None):
-        return get_origin(tp) is Union or isinstance(tp, UnionType)
-    else:
-        return get_origin(tp) is Union
+    return first

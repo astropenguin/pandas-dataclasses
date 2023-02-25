@@ -1,4 +1,4 @@
-__all__ = ["Attr", "Column", "Data", "Index", "Multiple"]
+__all__ = ["Attr", "Data", "Index", "Multiple"]
 
 
 # standard library
@@ -14,9 +14,6 @@ from ..core.typing import TAny
 # type hints
 Attr = Annotated[TAny, Tag.ATTR]
 """Type hint for attribute fields (``Attr[TAny]``)."""
-
-Column = Annotated[TAny, Tag.COLUMN]
-"""Type hint for column fields (``Column[TAny]``)."""
 
 Data = Annotated[Collection[Annotated[TAny, Tag.DTYPE]], Tag.DATA]
 """Type hint for data fields (``Data[TAny]``)."""

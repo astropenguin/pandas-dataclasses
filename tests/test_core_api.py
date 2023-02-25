@@ -7,7 +7,13 @@ import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
 from data import Weather, weather, df_weather_true, ser_weather_true
 from pandas_dataclasses import Spec, Tag, asframe, asseries
-from pandas_dataclasses.core.api import get_attrs, get_columns, get_data, get_index
+from pandas_dataclasses.core.api import (
+    get_attrs,
+    get_columns,
+    get_data,
+    get_index,
+    name,
+)
 
 
 # test data
@@ -35,17 +41,16 @@ def test_get_columns() -> None:
     columns = cast(pd.Index, get_columns(spec))
 
     for i in range(len(columns)):
-        assert columns[i] == spec.fields.of(Tag.DATA)[i].name
+        assert columns[i] == name(spec.fields.of(Tag.DATA)[i])
 
-    for i in range(columns.nlevels):
-        assert columns.names[i] == spec.fields.of(Tag.COLUMN)[i].name
+    assert columns.names == spec.fields.of(Tag.DATA).names  # type: ignore
 
 
 def test_get_data() -> None:
     data = get_data(spec)
 
     for i, (key, val) in enumerate(data.items()):
-        assert key == spec.fields.of(Tag.DATA)[i].name
+        assert key == name(spec.fields.of(Tag.DATA)[i])
         assert val.dtype.name == spec.fields.of(Tag.DATA)[i].dtype
         assert (val == spec.fields.of(Tag.DATA)[i].default).all()
 
