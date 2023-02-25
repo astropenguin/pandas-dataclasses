@@ -3,7 +3,7 @@ __all__ = ["asframe", "aspandas", "asseries"]
 
 # standard library
 from types import FunctionType
-from typing import Any, Callable, Dict, Hashable, Optional, overload
+from typing import Any, Callable, Dict, Hashable, Iterable, Optional, Tuple, overload
 
 
 # dependencies
@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from pandas.api.types import is_list_like
 from typing_extensions import get_origin
-from .specs import Spec
+from .specs import Field, Spec
 from .tagging import Tag
 from .typing import DataClass, DataClassOf, PAny, TFrame, TPandas, TSeries
 
@@ -209,10 +209,7 @@ def get_attrs(spec: Spec) -> Dict[Hashable, Any]:
     data: Dict[Hashable, Any] = {}
 
     for field in spec.fields.of(Tag.ATTR):
-        if field.has(Tag.MULTIPLE):
-            data.update(field.default)
-        else:
-            data[nameof(field)] = field.default
+        data.update(items(field))
 
     return data
 
@@ -235,47 +232,50 @@ def get_data(spec: Spec) -> Dict[Hashable, Any]:
     data: Dict[Hashable, Any] = {}
 
     for field in spec.fields.of(Tag.DATA):
-        if field.has(Tag.MULTIPLE):
-            items = field.default.items()
-        else:
-            items = {nameof(field): field.default}.items()
-
-        for name, default in items:
-            data[name] = ensure(default, field.dtype)
+        for key, val in items(field):
+            data[key] = ensure(val, field.dtype)
 
     return data
 
 
 def get_index(spec: Spec) -> Optional[pd.Index]:
     """Derive index from a specification."""
+    if not (fields := spec.fields.of(Tag.INDEX)):
+        return None
+
     data: Dict[Hashable, Any] = {}
 
-    for field in spec.fields.of(Tag.INDEX):
-        if field.has(Tag.MULTIPLE):
-            items = field.default.items()
-        else:
-            items = {nameof(field): field.default}.items()
+    for field in fields:
+        for key, val in items(field):
+            data[key] = ensure(val, field.dtype)
 
-        for name, default in items:
-            data[name] = ensure(default, field.dtype)
-
-    if len(data) == 0:
-        return None
-    if len(data) == 1:
-        return pd.Index(
-            list(data.values())[0],
-            name=list(data.keys())[0],
-        )
-    else:
-        return pd.MultiIndex.from_arrays(
+    return squeeze(
+        pd.MultiIndex.from_arrays(
             np.broadcast_arrays(*data.values()),
-            names=list(data.keys()),
+            names=data.keys(),
         )
+    )
 
 
-def nameof(field: Field) -> Hashable:
+def items(field: Field) -> Iterable[Tuple[Hashable, Any]]:
+    """Generate default(s) of a field specification."""
+    if field.has(Tag.MULTIPLE):
+        yield from field.default.items()
+    else:
+        yield (name(field), field.default)
+
+
+def name(field: Field) -> Hashable:
     """Derive the name of a field specification."""
     if isinstance(name := field.name, dict):
         return tuple(name.values())
     else:
         return name
+
+
+def squeeze(index: pd.Index) -> pd.Index:
+    """Convert a MultiIndex to an Index if possible."""
+    if index.nlevels == 1:
+        return index.get_level_values(0)
+    else:
+        return index
