@@ -17,9 +17,9 @@ pandas-stubs = "^1.2"
 typing-extensions = ">=3.10, <5.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^22.10"
-ipython = "^8.7"
-mypy = "^0.982"
+black = "^23.1"
+ipython = "^8.10"
+mypy = "^1.0"
 myst-parser = "^0.18"
 pydata-sphinx-theme = "^0.12"
 pyright = "^1.1"
