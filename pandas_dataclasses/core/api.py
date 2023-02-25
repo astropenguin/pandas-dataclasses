@@ -132,7 +132,7 @@ def asframe(obj: Any, *, factory: Any = None) -> Any:
     )
 
     dataframe.attrs.update(get_attrs(spec))
-    return dataframe
+    return squeeze(dataframe)
 
 
 @overload
@@ -190,7 +190,7 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
         series = factory(data=data, index=index, name=name)
 
     series.attrs.update(get_attrs(spec))
-    return series
+    return squeeze(series)
 
 
 def ensure(data: Any, dtype: Optional[str]) -> Any:
@@ -214,7 +214,7 @@ def get_attrs(spec: Spec) -> Dict[Hashable, Any]:
     return data
 
 
-def get_columns(spec: Spec) -> Optional[pd.Index]:
+def get_columns(spec: Spec) -> Optional[pd.MultiIndex]:
     """Derive columns from a specification."""
     if not (fields := spec.fields.of(Tag.DATA)):
         return None
@@ -222,11 +222,9 @@ def get_columns(spec: Spec) -> Optional[pd.Index]:
     if (names := name(fields)) is None:
         return None
 
-    return squeeze(
-        pd.MultiIndex.from_tuples(
-            map(name, fields),
-            names=names,
-        )
+    return pd.MultiIndex.from_tuples(
+        map(name, fields),
+        names=names,
     )
 
 
@@ -241,7 +239,7 @@ def get_data(spec: Spec) -> Dict[Hashable, Any]:
     return data
 
 
-def get_index(spec: Spec) -> Optional[pd.Index]:
+def get_index(spec: Spec) -> Optional[pd.MultiIndex]:
     """Derive index from a specification."""
     if not (fields := spec.fields.of(Tag.INDEX)):
         return None
@@ -252,11 +250,9 @@ def get_index(spec: Spec) -> Optional[pd.Index]:
         for key, val in items(field):
             data[key] = ensure(val, field.dtype)
 
-    return squeeze(
-        pd.MultiIndex.from_arrays(
-            np.broadcast_arrays(*data.values()),
-            names=data.keys(),
-        )
+    return pd.MultiIndex.from_arrays(
+        np.broadcast_arrays(*data.values()),
+        names=data.keys(),
     )
 
 
@@ -292,9 +288,15 @@ def name(fields: Any) -> Any:
                 return tuple(name.keys())
 
 
-def squeeze(index: pd.Index) -> pd.Index:
-    """Convert a MultiIndex to an Index if possible."""
-    if index.nlevels == 1:
-        return index.get_level_values(0)
-    else:
-        return index
+def squeeze(data: TPandas) -> TPandas:
+    """Drop levels of an index and columns if possible."""
+    if data.index.nlevels == 1:
+        data.index = data.index.get_level_values(0)
+
+    if isinstance(data, pd.Series):
+        return data  # type: ignore
+
+    if data.columns.nlevels == 1:
+        data.columns = data.columns.get_level_values(0)
+
+    return data
