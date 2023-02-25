@@ -43,7 +43,7 @@ def test_get_columns() -> None:
     for i in range(len(columns)):
         assert columns[i] == name(spec.fields.of(Tag.DATA)[i])
 
-    assert columns.names == spec.fields.of(Tag.DATA).names  # type: ignore
+    assert columns.names == name(spec.fields.of(Tag.DATA))  # type: ignore
 
 
 def test_get_data() -> None:
