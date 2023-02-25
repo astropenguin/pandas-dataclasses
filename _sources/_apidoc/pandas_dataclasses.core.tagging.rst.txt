@@ -1,0 +1,7 @@
+pandas\_dataclasses.core.tagging module
+=======================================
+
+.. automodule:: pandas_dataclasses.core.tagging
+   :members:
+   :undoc-members:
+   :show-inheritance:

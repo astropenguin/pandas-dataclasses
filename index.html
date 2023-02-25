@@ -1,0 +1,1095 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>pandas-dataclasses &#8212; Python  documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="_static/styles/bootstrap.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+
+  
+  <link href="_static/vendor/fontawesome/6.1.2/css/all.min.css?digest=796348d33e8b1d947c94" rel="stylesheet">
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-solid-900.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-brands-400.woff2">
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.1.2/webfonts/fa-regular-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94">
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="pandas_dataclasses package" href="_apidoc/pandas_dataclasses.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="docsearch:language" content="en">
+  </head>
+  
+  
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="180" data-default-mode="">
+
+  
+  
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__primary" id="__primary">
+  <label class="overlay overlay-primary" for="__primary"></label>
+
+  
+  <input type="checkbox" class="sidebar-toggle" name="__secondary" id="__secondary">
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+      
+<form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+    </div>
+  </div>
+
+  
+  <nav class="bd-header navbar navbar-expand-lg bd-navbar" id="navbar-main"><div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+      <span class="fa-solid fa-bars"></span>
+  </label>
+  <div id="navbar-start">
+    
+    
+  
+
+
+<a class="navbar-brand logo" href="#">
+
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <img src="_static/logo-light.svg" class="logo__image only-light" alt="Logo image">
+    <img src="_static/logo-dark.svg" class="logo__image only-dark" alt="Logo image">
+  
+  
+</a>
+    
+  </div>
+
+  
+  <div class="col-lg-9 navbar-header-items">
+    <div id="navbar-center" class="mr-auto">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="#">
+                        Home
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="_apidoc/pandas_dataclasses.html">
+                        Package guide
+                      </a>
+                    </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+    </div>
+
+    <div id="navbar-end">
+      
+        <div class="navbar-end-item navbar-persistent--container">
+          
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+        </div>
+      
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/astropenguin/pandas-dataclasses/" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/astropengu_in/" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-twitter"></i></span>
+            <label class="sr-only">Twitter</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+  </div>
+
+
+  
+  
+    <div class="navbar-persistent--mobile">
+<button class="btn btn-sm navbar-btn search-button search-button__button" title="Search" aria-label="Search" data-toggle="tooltip">
+  <i class="fa-solid fa-magnifying-glass"></i>
+</button>
+    </div>
+  
+
+  
+  <label class="sidebar-toggle secondary-toggle" for="__secondary">
+      <span class="fa-solid fa-outdent"></span>
+  </label>
+  
+
+</div>
+  </nav>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+      
+      <div class="navbar-center-item">
+        <nav class="navbar-nav">
+    <p class="sidebar-header-items__title" role="heading" aria-level="1" aria-label="Site Navigation">
+        Site Navigation
+    </p>
+    <ul id="navbar-main-elements" class="navbar-nav">
+        
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="#">
+                        Home
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="_apidoc/pandas_dataclasses.html">
+                        Package guide
+                      </a>
+                    </li>
+                
+    </ul>
+</nav>
+      </div>
+      
+      </div>
+    
+
+    
+    
+    <div class="sidebar-header-items__end">
+      
+      <div class="navbar-end-item">
+        <button class="theme-switch-button btn btn-sm btn-outline-primary navbar-btn rounded-circle" title="light/dark" aria-label="light/dark" data-toggle="tooltip">
+    <span class="theme-switch" data-mode="light"><i class="fa-solid fa-sun"></i></span>
+    <span class="theme-switch" data-mode="dark"><i class="fa-solid fa-moon"></i></span>
+    <span class="theme-switch" data-mode="auto"><i class="fa-solid fa-circle-half-stroke"></i></span>
+</button>
+      </div>
+      
+      <div class="navbar-end-item">
+        <ul id="navbar-icon-links" class="navbar-nav" aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/astropenguin/pandas-dataclasses/" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-github"></i></span>
+            <label class="sr-only">GitHub</label></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://twitter.com/astropengu_in/" title="Twitter" class="nav-link" rel="noopener" target="_blank" data-toggle="tooltip"><span><i class="fa-brands fa-square-twitter"></i></span>
+            <label class="sr-only">Twitter</label></a>
+        </li>
+      </ul>
+      </div>
+      
+    </div>
+    
+  </div>
+
+  
+
+  
+  <div class="sidebar-end-items sidebar-primary__section">
+    <div class="sidebar-end-items__item">
+    </div>
+  </div>
+
+  
+  <div id="rtd-footer-container"></div>
+
+      </div>
+      <main id="main-content" class="bd-main">
+        
+        
+        <div class="bd-content">
+          <div class="bd-article-container">
+            
+            <div class="bd-header-article">
+                
+            </div>
+            
+            
+            <article class="bd-article" role="main">
+              
+  <section id="pandas-dataclasses">
+<h1>pandas-dataclasses<a class="headerlink" href="#pandas-dataclasses" title="Permalink to this heading">#</a></h1>
+<p><a class="reference external" href="https://pypi.org/project/pandas-dataclasses/"><img alt="Release" src="https://img.shields.io/pypi/v/pandas-dataclasses?label=Release&amp;color=cornflowerblue&amp;style=flat-square" /></a>
+<a class="reference external" href="https://pypi.org/project/pandas-dataclasses/"><img alt="Python" src="https://img.shields.io/pypi/pyversions/pandas-dataclasses?label=Python&amp;color=cornflowerblue&amp;style=flat-square" /></a>
+<a class="reference external" href="https://pepy.tech/project/pandas-dataclasses"><img alt="Downloads" src="https://img.shields.io/pypi/dm/pandas-dataclasses?label=Downloads&amp;color=cornflowerblue&amp;style=flat-square" /></a>
+<a class="reference external" href="https://doi.org/10.5281/zenodo.6127352"><img alt="DOI" src="https://img.shields.io/badge/DOI-10.5281/zenodo.6127352-cornflowerblue?style=flat-square" /></a>
+<a class="reference external" href="https://github.com/astropenguin/pandas-dataclasses/actions"><img alt="Tests" src="https://img.shields.io/github/actions/workflow/status/astropenguin/pandas-dataclasses/tests.yml?label=Tests&amp;style=flat-square" /></a></p>
+<p>pandas data creation made easy by dataclass</p>
+<section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this heading">#</a></h2>
+<p>pandas-dataclass makes it easy to create <a class="reference external" href="https://pandas.pydata.org">pandas</a> data (DataFrame and Series) by specifying their data types, attributes, and names using the Python’s dataclass:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">AsFrame</span><span class="p">,</span> <span class="n">Data</span><span class="p">,</span> <span class="n">Index</span>
+</pre></div>
+</div>
+</details>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Weather</span><span class="p">(</span><span class="n">AsFrame</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weather information.&quot;&quot;&quot;</span>
+
+    <span class="n">year</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">month</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">temp</span><span class="p">:</span> <span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">wind</span><span class="p">:</span> <span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">Weather</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+    <span class="p">[</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">2020</span><span class="p">,</span> <span class="mi">2021</span><span class="p">,</span> <span class="mi">2021</span><span class="p">,</span> <span class="mi">2022</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">7.1</span><span class="p">,</span> <span class="mf">24.3</span><span class="p">,</span> <span class="mf">5.4</span><span class="p">,</span> <span class="mf">25.9</span><span class="p">,</span> <span class="mf">4.9</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">2.4</span><span class="p">,</span> <span class="mf">3.1</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">,</span> <span class="mf">2.6</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">df</span></code> will become a DataFrame object like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>            <span class="n">temp</span>  <span class="n">wind</span>
+<span class="n">year</span> <span class="n">month</span>
+<span class="mi">2020</span> <span class="mi">1</span>       <span class="mf">7.1</span>   <span class="mf">2.4</span>
+     <span class="mi">7</span>      <span class="mf">24.3</span>   <span class="mf">3.1</span>
+<span class="mi">2021</span> <span class="mi">1</span>       <span class="mf">5.4</span>   <span class="mf">2.3</span>
+     <span class="mi">7</span>      <span class="mf">25.9</span>   <span class="mf">2.4</span>
+<span class="mi">2022</span> <span class="mi">1</span>       <span class="mf">4.9</span>   <span class="mf">2.6</span>
+</pre></div>
+</div>
+<section id="features">
+<h3>Features<a class="headerlink" href="#features" title="Permalink to this heading">#</a></h3>
+<ul class="simple">
+<li><p>Specifying data types and names of each element in pandas data</p></li>
+<li><p>Specifying metadata stored in pandas data attributes (attrs)</p></li>
+<li><p>Support for hierarchical index and columns</p></li>
+<li><p>Support for custom factory for data creation</p></li>
+<li><p>Support for full <a class="reference external" href="https://docs.python.org/3/library/dataclasses.html">dataclass</a> features</p></li>
+<li><p>Support for static type check by <a class="reference external" href="http://www.mypy-lang.org">mypy</a> and <a class="reference external" href="https://github.com/microsoft/pyright">Pyright</a> (<a class="reference external" href="https://github.com/microsoft/pylance-release">Pylance</a>)</p></li>
+</ul>
+</section>
+<section id="installation">
+<h3>Installation<a class="headerlink" href="#installation" title="Permalink to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>pandas-dataclasses
+</pre></div>
+</div>
+</section>
+</section>
+<section id="how-it-works">
+<h2>How it works<a class="headerlink" href="#how-it-works" title="Permalink to this heading">#</a></h2>
+<p>pandas-dataclasses provides you the following features:</p>
+<ul class="simple">
+<li><p>Type hints for dataclass fields (<code class="docutils literal notranslate"><span class="pre">Attr</span></code>, <code class="docutils literal notranslate"><span class="pre">Data</span></code>, <code class="docutils literal notranslate"><span class="pre">Index</span></code>) to specify the data type and name of each element in pandas data</p></li>
+<li><p>Mix-in classes for dataclasses (<code class="docutils literal notranslate"><span class="pre">As</span></code>, <code class="docutils literal notranslate"><span class="pre">AsFrame</span></code>, <code class="docutils literal notranslate"><span class="pre">AsSeries</span></code>) to create pandas data by a classmethod (<code class="docutils literal notranslate"><span class="pre">new</span></code>) that takes the same arguments as dataclass initialization</p></li>
+</ul>
+<p>When you call <code class="docutils literal notranslate"><span class="pre">new</span></code>, it will first create a dataclass object and then create a Series or DataFrame object from the dataclass object according the type hints and values in it.
+In the example above, <code class="docutils literal notranslate"><span class="pre">df</span> <span class="pre">=</span> <span class="pre">Weather.new(...)</span></code> is thus equivalent to:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">asframe</span>
+</pre></div>
+</div>
+</details>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">obj</span> <span class="o">=</span> <span class="n">Weather</span><span class="p">([</span><span class="mi">2020</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="p">[</span><span class="mf">7.1</span><span class="p">,</span> <span class="o">...</span><span class="p">],</span> <span class="p">[</span><span class="mf">2.4</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">asframe</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">asframe</span></code> is a conversion function.
+pandas-dataclasses does not touch the dataclass object creation itself; this allows you to fully customize your dataclass before conversion by the dataclass features (<code class="docutils literal notranslate"><span class="pre">field</span></code>, <code class="docutils literal notranslate"><span class="pre">__post_init__</span></code>, …).</p>
+</section>
+<section id="basic-usage">
+<h2>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this heading">#</a></h2>
+<section id="dataframe-creation">
+<h3>DataFrame creation<a class="headerlink" href="#dataframe-creation" title="Permalink to this heading">#</a></h3>
+<p>As shown in the example above, a dataclass that has the <code class="docutils literal notranslate"><span class="pre">AsFrame</span></code> (or <code class="docutils literal notranslate"><span class="pre">AsDataFrame</span></code> as an alias) mix-in will create DataFrame objects:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">AsFrame</span><span class="p">,</span> <span class="n">Data</span><span class="p">,</span> <span class="n">Index</span>
+</pre></div>
+</div>
+</details>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Weather</span><span class="p">(</span><span class="n">AsFrame</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weather information.&quot;&quot;&quot;</span>
+
+    <span class="n">year</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">month</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">temp</span><span class="p">:</span> <span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">wind</span><span class="p">:</span> <span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">Weather</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where fields typed by <code class="docutils literal notranslate"><span class="pre">Index</span></code> are <em>index fields</em>, each value of which will become an index or a part of a hierarchical index of a DataFrame object.
+Fields typed by <code class="docutils literal notranslate"><span class="pre">Data</span></code> are <em>data fields</em>, each value of which will become a data column of a DataFrame object.
+Fields typed by other types are just ignored in the DataFrame creation.</p>
+<p>Each data or index will be cast to the data type specified in a type hint like <code class="docutils literal notranslate"><span class="pre">Index[int]</span></code>.
+Use <code class="docutils literal notranslate"><span class="pre">Any</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code> (like <code class="docutils literal notranslate"><span class="pre">Index[Any]</span></code>) if you do not want type casting.
+See also <a class="reference internal" href="#data-typing-rules"><span class="std std-doc">data typing rules</span></a> for more examples.</p>
+<p>By default, a field name (i.e. an argument name) is used for the name of corresponding data or index.
+See also <a class="reference internal" href="#custom-naming"><span class="std std-doc">custom naming</span></a> and <a class="reference internal" href="#naming-rules"><span class="std std-doc">naming rules</span></a> if you want customization.</p>
+</section>
+<section id="series-creation">
+<h3>Series creation<a class="headerlink" href="#series-creation" title="Permalink to this heading">#</a></h3>
+<p>A dataclass that has the <code class="docutils literal notranslate"><span class="pre">AsSeries</span></code> mix-in will create Series objects:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">AsSeries</span><span class="p">,</span> <span class="n">Data</span><span class="p">,</span> <span class="n">Index</span>
+</pre></div>
+</div>
+</details>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Weather</span><span class="p">(</span><span class="n">AsSeries</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weather information.&quot;&quot;&quot;</span>
+
+    <span class="n">year</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">month</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">temp</span><span class="p">:</span> <span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+
+
+<span class="n">ser</span> <span class="o">=</span> <span class="n">Weather</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Unlike <code class="docutils literal notranslate"><span class="pre">AsFrame</span></code>, the second and subsequent data fields are ignored in the Series creation even if they exist.
+Other rules are the same as for the DataFrame creation.</p>
+</section>
+</section>
+<section id="advanced-usage">
+<h2>Advanced usage<a class="headerlink" href="#advanced-usage" title="Permalink to this heading">#</a></h2>
+<section id="metadata-storing">
+<h3>Metadata storing<a class="headerlink" href="#metadata-storing" title="Permalink to this heading">#</a></h3>
+<p>Fields typed by <code class="docutils literal notranslate"><span class="pre">Attr</span></code> are <em>attribute fields</em>, each value of which will become an item of attributes of a DataFrame or a Series object:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">AsFrame</span><span class="p">,</span> <span class="n">Attr</span><span class="p">,</span> <span class="n">Data</span><span class="p">,</span> <span class="n">Index</span>
+</pre></div>
+</div>
+</details>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Weather</span><span class="p">(</span><span class="n">AsFrame</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weather information.&quot;&quot;&quot;</span>
+
+    <span class="n">year</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">month</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">temp</span><span class="p">:</span> <span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">wind</span><span class="p">:</span> <span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">loc</span><span class="p">:</span> <span class="n">Attr</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Tokyo&quot;</span>
+    <span class="n">lon</span><span class="p">:</span> <span class="n">Attr</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">139.69167</span>
+    <span class="n">lat</span><span class="p">:</span> <span class="n">Attr</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">35.68944</span>
+
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">Weather</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">df.attrs</span></code> will become like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;loc&quot;</span><span class="p">:</span> <span class="s2">&quot;Tokyo&quot;</span><span class="p">,</span> <span class="s2">&quot;lon&quot;</span><span class="p">:</span> <span class="mf">139.69167</span><span class="p">,</span> <span class="s2">&quot;lat&quot;</span><span class="p">:</span> <span class="mf">35.68944</span><span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="custom-naming">
+<h3>Custom naming<a class="headerlink" href="#custom-naming" title="Permalink to this heading">#</a></h3>
+<p>The name of attribute, data, or index can be explicitly specified by adding a hashable annotation to the corresponding type:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Annotated</span> <span class="k">as</span> <span class="n">Ann</span>
+<span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">AsFrame</span><span class="p">,</span> <span class="n">Attr</span><span class="p">,</span> <span class="n">Data</span><span class="p">,</span> <span class="n">Index</span>
+</pre></div>
+</div>
+</details>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Weather</span><span class="p">(</span><span class="n">AsFrame</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weather information.&quot;&quot;&quot;</span>
+
+    <span class="n">year</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="s2">&quot;Year&quot;</span><span class="p">]</span>
+    <span class="n">month</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="s2">&quot;Month&quot;</span><span class="p">]</span>
+    <span class="n">temp</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="s2">&quot;Temperature (deg C)&quot;</span><span class="p">]</span>
+    <span class="n">wind</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="s2">&quot;Wind speed (m/s)&quot;</span><span class="p">]</span>
+    <span class="n">loc</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Attr</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="s2">&quot;Location&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Tokyo&quot;</span>
+    <span class="n">lon</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Attr</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="s2">&quot;Longitude (deg)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">139.69167</span>
+    <span class="n">lat</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Attr</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="s2">&quot;Latitude (deg)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">35.68944</span>
+
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">Weather</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">df</span></code> and <code class="docutils literal notranslate"><span class="pre">df.attrs</span></code> will become like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>            <span class="n">Temperature</span> <span class="p">(</span><span class="n">deg</span> <span class="n">C</span><span class="p">)</span>  <span class="n">Wind</span> <span class="n">speed</span> <span class="p">(</span><span class="n">m</span><span class="o">/</span><span class="n">s</span><span class="p">)</span>
+<span class="n">Year</span> <span class="n">Month</span>
+<span class="mi">2020</span> <span class="mi">1</span>                      <span class="mf">7.1</span>               <span class="mf">2.4</span>
+     <span class="mi">7</span>                     <span class="mf">24.3</span>               <span class="mf">3.1</span>
+<span class="mi">2021</span> <span class="mi">1</span>                      <span class="mf">5.4</span>               <span class="mf">2.3</span>
+     <span class="mi">7</span>                     <span class="mf">25.9</span>               <span class="mf">2.4</span>
+<span class="mi">2022</span> <span class="mi">1</span>                      <span class="mf">4.9</span>               <span class="mf">2.6</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;Location&quot;</span><span class="p">:</span> <span class="s2">&quot;Tokyo&quot;</span><span class="p">,</span> <span class="s2">&quot;Longitude (deg)&quot;</span><span class="p">:</span> <span class="mf">139.69167</span><span class="p">,</span> <span class="s2">&quot;Latitude (deg)&quot;</span><span class="p">:</span> <span class="mf">35.68944</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>If an annotation is a <a class="reference external" href="https://docs.python.org/3/library/string.html#format-string-syntax">format string</a>, it will be formatted by a dataclass object before the data creation:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Annotated</span> <span class="k">as</span> <span class="n">Ann</span>
+<span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">AsFrame</span><span class="p">,</span> <span class="n">Data</span><span class="p">,</span> <span class="n">Index</span>
+</pre></div>
+</div>
+</details>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Weather</span><span class="p">(</span><span class="n">AsFrame</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weather information.&quot;&quot;&quot;</span>
+
+    <span class="n">year</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="s2">&quot;Year&quot;</span><span class="p">]</span>
+    <span class="n">month</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="s2">&quot;Month&quot;</span><span class="p">]</span>
+    <span class="n">temp</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="s2">&quot;Temperature ({.temp_unit})&quot;</span><span class="p">]</span>
+    <span class="n">wind</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="s2">&quot;Wind speed ({.wind_unit})&quot;</span><span class="p">]</span>
+    <span class="n">temp_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;deg C&quot;</span>
+    <span class="n">wind_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;m/s&quot;</span>
+
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">Weather</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">temp_unit</span><span class="o">=</span><span class="s2">&quot;deg F&quot;</span><span class="p">,</span> <span class="n">wind_unit</span><span class="o">=</span><span class="s2">&quot;km/h&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where units of the temperature and the wind speed will be dynamically updated (see also <a class="reference internal" href="#naming-rules"><span class="std std-doc">naming rules</span></a>).</p>
+</section>
+<section id="hierarchical-columns">
+<h3>Hierarchical columns<a class="headerlink" href="#hierarchical-columns" title="Permalink to this heading">#</a></h3>
+<p>Adding tuple annotations to data fields will create DataFrame objects with hierarchical columns:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Annotated</span> <span class="k">as</span> <span class="n">Ann</span>
+<span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">AsFrame</span><span class="p">,</span> <span class="n">Data</span><span class="p">,</span> <span class="n">Index</span>
+</pre></div>
+</div>
+</details>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Weather</span><span class="p">(</span><span class="n">AsFrame</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weather information.&quot;&quot;&quot;</span>
+
+    <span class="n">year</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="s2">&quot;Year&quot;</span><span class="p">]</span>
+    <span class="n">month</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="s2">&quot;Month&quot;</span><span class="p">]</span>
+    <span class="n">temp_avg</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="p">(</span><span class="s2">&quot;Temperature (deg C)&quot;</span><span class="p">,</span> <span class="s2">&quot;Average&quot;</span><span class="p">)]</span>
+    <span class="n">temp_max</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="p">(</span><span class="s2">&quot;Temperature (deg C)&quot;</span><span class="p">,</span> <span class="s2">&quot;Maximum&quot;</span><span class="p">)]</span>
+    <span class="n">wind_avg</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="p">(</span><span class="s2">&quot;Wind speed (m/s)&quot;</span><span class="p">,</span> <span class="s2">&quot;Average&quot;</span><span class="p">)]</span>
+    <span class="n">wind_max</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="p">(</span><span class="s2">&quot;Wind speed (m/s)&quot;</span><span class="p">,</span> <span class="s2">&quot;Maximum&quot;</span><span class="p">)]</span>
+
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">Weather</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">df</span></code> will become like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>           <span class="n">Temperature</span> <span class="p">(</span><span class="n">deg</span> <span class="n">C</span><span class="p">)</span>         <span class="n">Wind</span> <span class="n">speed</span> <span class="p">(</span><span class="n">m</span><span class="o">/</span><span class="n">s</span><span class="p">)</span>
+                       <span class="n">Average</span> <span class="n">Maximum</span>          <span class="n">Average</span> <span class="n">Maximum</span>
+<span class="n">Year</span> <span class="n">Month</span>
+<span class="mi">2020</span> <span class="mi">1</span>                     <span class="mf">7.1</span>    <span class="mf">11.1</span>              <span class="mf">2.4</span>     <span class="mf">8.8</span>
+     <span class="mi">7</span>                    <span class="mf">24.3</span>    <span class="mf">27.7</span>              <span class="mf">3.1</span>    <span class="mf">10.2</span>
+<span class="mi">2021</span> <span class="mi">1</span>                     <span class="mf">5.4</span>    <span class="mf">10.3</span>              <span class="mf">2.3</span>    <span class="mf">10.7</span>
+     <span class="mi">7</span>                    <span class="mf">25.9</span>    <span class="mf">30.3</span>              <span class="mf">2.4</span>     <span class="mf">9.0</span>
+<span class="mi">2022</span> <span class="mi">1</span>                     <span class="mf">4.9</span>     <span class="mf">9.4</span>              <span class="mf">2.6</span>     <span class="mf">8.8</span>
+</pre></div>
+</div>
+<p>Column names can be (explicitly) specified by dictionary annotations:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Annotated</span> <span class="k">as</span> <span class="n">Ann</span>
+<span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">AsFrame</span><span class="p">,</span> <span class="n">Data</span><span class="p">,</span> <span class="n">Index</span>
+</pre></div>
+</div>
+</details>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="n">meas</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stat</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a dictionary annotation for a column name.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;Measurement&quot;</span><span class="p">:</span> <span class="n">meas</span><span class="p">,</span> <span class="s2">&quot;Statistic&quot;</span><span class="p">:</span> <span class="n">stat</span><span class="p">}</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Weather</span><span class="p">(</span><span class="n">AsFrame</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weather information.&quot;&quot;&quot;</span>
+
+    <span class="n">year</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="s2">&quot;Year&quot;</span><span class="p">]</span>
+    <span class="n">month</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="s2">&quot;Month&quot;</span><span class="p">]</span>
+    <span class="n">temp_avg</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">name</span><span class="p">(</span><span class="s2">&quot;Temperature (deg C)&quot;</span><span class="p">,</span> <span class="s2">&quot;Average&quot;</span><span class="p">)]</span>
+    <span class="n">temp_max</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">name</span><span class="p">(</span><span class="s2">&quot;Temperature (deg C)&quot;</span><span class="p">,</span> <span class="s2">&quot;Maximum&quot;</span><span class="p">)]</span>
+    <span class="n">wind_avg</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">name</span><span class="p">(</span><span class="s2">&quot;Wind speed (m/s)&quot;</span><span class="p">,</span> <span class="s2">&quot;Average&quot;</span><span class="p">)]</span>
+    <span class="n">wind_max</span><span class="p">:</span> <span class="n">Ann</span><span class="p">[</span><span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="n">name</span><span class="p">(</span><span class="s2">&quot;Wind speed (m/s)&quot;</span><span class="p">,</span> <span class="s2">&quot;Maximum&quot;</span><span class="p">)]</span>
+
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">Weather</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">df</span></code> will become like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Measurement</span> <span class="n">Temperature</span> <span class="p">(</span><span class="n">deg</span> <span class="n">C</span><span class="p">)</span>         <span class="n">Wind</span> <span class="n">speed</span> <span class="p">(</span><span class="n">m</span><span class="o">/</span><span class="n">s</span><span class="p">)</span>
+<span class="n">Statistic</span>               <span class="n">Average</span> <span class="n">Maximum</span>          <span class="n">Average</span> <span class="n">Maximum</span>
+<span class="n">Year</span> <span class="n">Month</span>
+<span class="mi">2020</span> <span class="mi">1</span>                      <span class="mf">7.1</span>    <span class="mf">11.1</span>              <span class="mf">2.4</span>     <span class="mf">8.8</span>
+     <span class="mi">7</span>                     <span class="mf">24.3</span>    <span class="mf">27.7</span>              <span class="mf">3.1</span>    <span class="mf">10.2</span>
+<span class="mi">2021</span> <span class="mi">1</span>                      <span class="mf">5.4</span>    <span class="mf">10.3</span>              <span class="mf">2.3</span>    <span class="mf">10.7</span>
+     <span class="mi">7</span>                     <span class="mf">25.9</span>    <span class="mf">30.3</span>              <span class="mf">2.4</span>     <span class="mf">9.0</span>
+<span class="mi">2022</span> <span class="mi">1</span>                      <span class="mf">4.9</span>     <span class="mf">9.4</span>              <span class="mf">2.6</span>     <span class="mf">8.8</span>
+</pre></div>
+</div>
+<p>If a tuple or dictionary annotation has <a class="reference external" href="https://docs.python.org/3/library/string.html#format-string-syntax">format string</a>s, they will also be formatted by a dataclass object (see also <a class="reference internal" href="#naming-rules"><span class="std std-doc">naming rules</span></a>).</p>
+</section>
+<section id="multiple-item-fields">
+<h3>Multiple-item fields<a class="headerlink" href="#multiple-item-fields" title="Permalink to this heading">#</a></h3>
+<p>Multiple (and possibly extra) attributes, data, or indices can be added by fields with corresponding type hints wrapped by <code class="docutils literal notranslate"><span class="pre">Multiple</span></code>:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">AsFrame</span><span class="p">,</span> <span class="n">Data</span><span class="p">,</span> <span class="n">Index</span><span class="p">,</span> <span class="n">Multiple</span>
+</pre></div>
+</div>
+</details>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Weather</span><span class="p">(</span><span class="n">AsFrame</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Weather information.&quot;&quot;&quot;</span>
+
+    <span class="n">year</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">month</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">temp</span><span class="p">:</span> <span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">wind</span><span class="p">:</span> <span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+    <span class="n">extra_index</span><span class="p">:</span> <span class="n">Multiple</span><span class="p">[</span><span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>
+    <span class="n">extra_data</span><span class="p">:</span> <span class="n">Multiple</span><span class="p">[</span><span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>
+
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">Weather</span><span class="o">.</span><span class="n">new</span><span class="p">(</span>
+    <span class="p">[</span><span class="mi">2020</span><span class="p">,</span> <span class="mi">2020</span><span class="p">,</span> <span class="mi">2021</span><span class="p">,</span> <span class="mi">2021</span><span class="p">,</span> <span class="mi">2022</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">7.1</span><span class="p">,</span> <span class="mf">24.3</span><span class="p">,</span> <span class="mf">5.4</span><span class="p">,</span> <span class="mf">25.9</span><span class="p">,</span> <span class="mf">4.9</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">2.4</span><span class="p">,</span> <span class="mf">3.1</span><span class="p">,</span> <span class="mf">2.3</span><span class="p">,</span> <span class="mf">2.4</span><span class="p">,</span> <span class="mf">2.6</span><span class="p">],</span>
+    <span class="n">extra_index</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;day&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="s2">&quot;week&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+    <span class="p">},</span>
+    <span class="n">extra_data</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;humid&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">65</span><span class="p">,</span> <span class="mi">89</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span> <span class="mi">83</span><span class="p">,</span> <span class="mi">52</span><span class="p">],</span>
+        <span class="s2">&quot;press&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1013.8</span><span class="p">,</span> <span class="mf">1006.2</span><span class="p">,</span> <span class="mf">1014.1</span><span class="p">,</span> <span class="mf">1007.7</span><span class="p">,</span> <span class="mf">1012.7</span><span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">df</span></code> will become like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>                     <span class="n">temp</span>  <span class="n">wind</span>  <span class="n">humid</span>   <span class="n">press</span>
+<span class="n">year</span> <span class="n">month</span> <span class="n">day</span> <span class="n">week</span>
+<span class="mi">2020</span> <span class="mi">1</span>     <span class="mi">1</span>   <span class="mi">2</span>      <span class="mf">7.1</span>   <span class="mf">2.4</span>   <span class="mf">65.0</span>  <span class="mf">1013.8</span>
+     <span class="mi">7</span>     <span class="mi">1</span>   <span class="mi">2</span>     <span class="mf">24.3</span>   <span class="mf">3.1</span>   <span class="mf">89.0</span>  <span class="mf">1006.2</span>
+<span class="mi">2021</span> <span class="mi">1</span>     <span class="mi">1</span>   <span class="mi">4</span>      <span class="mf">5.4</span>   <span class="mf">2.3</span>   <span class="mf">57.0</span>  <span class="mf">1014.1</span>
+     <span class="mi">7</span>     <span class="mi">1</span>   <span class="mi">3</span>     <span class="mf">25.9</span>   <span class="mf">2.4</span>   <span class="mf">83.0</span>  <span class="mf">1007.7</span>
+<span class="mi">2022</span> <span class="mi">1</span>     <span class="mi">1</span>   <span class="mi">5</span>      <span class="mf">4.9</span>   <span class="mf">2.6</span>   <span class="mf">52.0</span>  <span class="mf">1012.7</span>
+</pre></div>
+</div>
+<p>If multiple items of the same name exist, the last-defined one will be finally used.
+For example, if the <code class="docutils literal notranslate"><span class="pre">extra_index</span></code> field contains <code class="docutils literal notranslate"><span class="pre">&quot;month&quot;:</span> <span class="pre">[2,</span> <span class="pre">8,</span> <span class="pre">2,</span> <span class="pre">8,</span> <span class="pre">2]</span></code>, the values given by the <code class="docutils literal notranslate"><span class="pre">month</span></code> field will be overwritten.</p>
+</section>
+<section id="custom-pandas-factory">
+<h3>Custom pandas factory<a class="headerlink" href="#custom-pandas-factory" title="Permalink to this heading">#</a></h3>
+<p>A custom class can be specified as a factory for the Series or DataFrame creation by <code class="docutils literal notranslate"><span class="pre">As</span></code>, the generic version of <code class="docutils literal notranslate"><span class="pre">AsFrame</span></code> and <code class="docutils literal notranslate"><span class="pre">AsSeries</span></code>.
+Note that the custom class must be a subclass of either <code class="docutils literal notranslate"><span class="pre">pandas.Series</span></code> or <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code>:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">As</span><span class="p">,</span> <span class="n">Data</span><span class="p">,</span> <span class="n">Index</span>
+</pre></div>
+</div>
+</details>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">CustomSeries</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Custom pandas Series.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Temperature</span><span class="p">(</span><span class="n">As</span><span class="p">[</span><span class="n">CustomSeries</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Temperature information.&quot;&quot;&quot;</span>
+
+    <span class="n">year</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">month</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">temp</span><span class="p">:</span> <span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+
+
+<span class="n">ser</span> <span class="o">=</span> <span class="n">Temperature</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">ser</span></code> is statically regarded as <code class="docutils literal notranslate"><span class="pre">CustomSeries</span></code> and will become a <code class="docutils literal notranslate"><span class="pre">CustomSeries</span></code> object.</p>
+<p>Generic Series type (<code class="docutils literal notranslate"><span class="pre">Series[T]</span></code>) is also supported, however, it is only for static the type check in the current pandas versions.
+In such cases, you can additionally give a factory that must work in runtime as a class argument:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">As</span><span class="p">,</span> <span class="n">Data</span><span class="p">,</span> <span class="n">Index</span>
+</pre></div>
+</div>
+</details>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">Temperature</span><span class="p">(</span><span class="n">As</span><span class="p">[</span><span class="s2">&quot;pd.Series[float]&quot;</span><span class="p">],</span> <span class="n">factory</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Temperature information.&quot;&quot;&quot;</span>
+
+    <span class="n">year</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">month</span><span class="p">:</span> <span class="n">Index</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span>
+    <span class="n">temp</span><span class="p">:</span> <span class="n">Data</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span>
+
+
+<span class="n">ser</span> <span class="o">=</span> <span class="n">Temperature</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where <code class="docutils literal notranslate"><span class="pre">ser</span></code> is statically regarded as <code class="docutils literal notranslate"><span class="pre">Series[float]</span></code> but will become a <code class="docutils literal notranslate"><span class="pre">Series</span></code> object in runtime.</p>
+</section>
+</section>
+<section id="appendix">
+<h2>Appendix<a class="headerlink" href="#appendix" title="Permalink to this heading">#</a></h2>
+<section id="data-typing-rules">
+<h3>Data typing rules<a class="headerlink" href="#data-typing-rules" title="Permalink to this heading">#</a></h3>
+<p>The data type (dtype) of data or index is determined from the first <code class="docutils literal notranslate"><span class="pre">Data</span></code> or <code class="docutils literal notranslate"><span class="pre">Index</span></code> type of the corresponding field, respectively.
+The following table shows how the data type is inferred:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Annotated</span> <span class="k">as</span> <span class="n">Ann</span><span class="p">,</span> <span class="n">Literal</span> <span class="k">as</span> <span class="n">L</span>
+<span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">Data</span>
+</pre></div>
+</div>
+</details>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Type hint</p></th>
+<th class="head"><p>Inferred data type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Data[Any]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code> (no type casting)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Data[None]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code> (no type casting)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Data[int]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.int64</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Data[int</span> <span class="pre">|</span> <span class="pre">str]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.int64</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Data[numpy.int32]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.int32</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Data[L[&quot;datetime64[ns]&quot;]]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.dtype(&quot;&lt;M8[ns]&quot;)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Data[L[&quot;category&quot;]]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pandas.CategoricalDtype()</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Data[int]</span> <span class="pre">|</span> <span class="pre">str</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.int64</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Data[int]</span> <span class="pre">|</span> <span class="pre">Data[float]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.int64</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Ann[Data[int],</span> <span class="pre">&quot;spam&quot;]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.int64</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Data[Ann[int,</span> <span class="pre">&quot;spam&quot;]]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.int64</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="naming-rules">
+<h3>Naming rules<a class="headerlink" href="#naming-rules" title="Permalink to this heading">#</a></h3>
+<p>The name of attribute, data, or index is determined from the first annotation of the first <code class="docutils literal notranslate"><span class="pre">Attr</span></code>, <code class="docutils literal notranslate"><span class="pre">Data</span></code>, or <code class="docutils literal notranslate"><span class="pre">Index</span></code> type of the corresponding field, respectively.
+If the annotation is a <a class="reference external" href="https://docs.python.org/3/library/string.html#format-string-syntax">format string</a> or a tuple that has <a class="reference external" href="https://docs.python.org/3/library/string.html#format-string-syntax">format string</a>s, it (they) will be formatted by a dataclass object before the data creation.
+Otherwise, the field name (i.e. argument name) will be used.
+The following table shows how the name is inferred:</p>
+<details>
+<summary>Click to see all imports</summary>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Annotated</span> <span class="k">as</span> <span class="n">Ann</span>
+<span class="kn">from</span> <span class="nn">pandas_dataclasses</span> <span class="kn">import</span> <span class="n">Data</span>
+</pre></div>
+</div>
+</details>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Type hint</p></th>
+<th class="head"><p>Inferred name</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Data[Any]</span></code></p></td>
+<td><p>(field name)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Ann[Data[Any],</span> <span class="pre">...,</span> <span class="pre">&quot;spam&quot;]</span></code></p></td>
+<td><p>(field name)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Ann[Data[Any],</span> <span class="pre">&quot;spam&quot;]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;spam&quot;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Ann[Data[Any],</span> <span class="pre">&quot;spam&quot;,</span> <span class="pre">&quot;ham&quot;]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;spam&quot;</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Ann[Data[Any],</span> <span class="pre">&quot;spam&quot;]</span> <span class="pre">|</span> <span class="pre">Ann[str,</span> <span class="pre">&quot;ham&quot;]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;spam&quot;</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Ann[Data[Any],</span> <span class="pre">&quot;spam&quot;]</span> <span class="pre">|</span> <span class="pre">Ann[Data[float],</span> <span class="pre">&quot;ham&quot;]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;spam&quot;</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Ann[Data[Any],</span> <span class="pre">&quot;{.name}&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;{.name}&quot;.format(obj)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Ann[Data[Any],</span> <span class="pre">(&quot;spam&quot;,</span> <span class="pre">&quot;ham&quot;)]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(&quot;spam&quot;,</span> <span class="pre">&quot;ham&quot;)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">Ann[Data[Any],</span> <span class="pre">(&quot;{.name}&quot;,</span> <span class="pre">&quot;ham&quot;)]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">(&quot;{.name}&quot;.format(obj),</span> <span class="pre">&quot;ham&quot;)</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>where <code class="docutils literal notranslate"><span class="pre">obj</span></code> is a dataclass object that is expected to have <code class="docutils literal notranslate"><span class="pre">obj.name</span></code>.</p>
+</section>
+<section id="development-roadmap">
+<h3>Development roadmap<a class="headerlink" href="#development-roadmap" title="Permalink to this heading">#</a></h3>
+<table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Release version</p></th>
+<th class="head"><p>Features</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>v0.5</p></td>
+<td><p>Support for dynamic naming</p></td>
+</tr>
+<tr class="row-odd"><td><p>v0.6</p></td>
+<td><p>Support for extension array and dtype</p></td>
+</tr>
+<tr class="row-even"><td><p>v0.7</p></td>
+<td><p>Support for hierarchical columns</p></td>
+</tr>
+<tr class="row-odd"><td><p>v0.8</p></td>
+<td><p>Support for mypy and callable pandas factory</p></td>
+</tr>
+<tr class="row-even"><td><p>v0.9</p></td>
+<td><p>Support for Ellipsis (<code class="docutils literal notranslate"><span class="pre">...</span></code>) as an alias of field name</p></td>
+</tr>
+<tr class="row-odd"><td><p>v0.10</p></td>
+<td><p>Support for union type in type hints</p></td>
+</tr>
+<tr class="row-even"><td><p>v0.11</p></td>
+<td><p>Support for Python 3.11 and drop support for Python 3.7</p></td>
+</tr>
+<tr class="row-odd"><td><p>v0.12</p></td>
+<td><p>Support for multiple items received in a single field</p></td>
+</tr>
+<tr class="row-even"><td><p>v1.0</p></td>
+<td><p>Initial major release (freezing public features until v2.0)</p></td>
+</tr>
+</tbody>
+</table>
+<!-- References -->
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+</section>
+
+
+            </article>
+            
+            
+            
+            <footer class="bd-footer-article">
+                <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+  <a class='right-next' id="next-link" href="_apidoc/pandas_dataclasses.html" title="next page">
+  <div class="prev-next-info">
+      <p class="prev-next-subtitle">next</p>
+      <p class="prev-next-title">pandas_dataclasses package</p>
+  </div>
+  <i class="fa-solid fa-angle-right"></i>
+  </a>
+</div>
+            </footer>
+            
+          </div>
+          
+          
+          
+            <div class="bd-sidebar-secondary bd-toc">
+              
+<div class="toc-item">
+  
+<div class="tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+</div>
+<nav id="bd-toc-nav" class="page-toc">
+    <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#overview">
+   Overview
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#features">
+     Features
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#installation">
+     Installation
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#how-it-works">
+   How it works
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#basic-usage">
+   Basic usage
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#dataframe-creation">
+     DataFrame creation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#series-creation">
+     Series creation
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#advanced-usage">
+   Advanced usage
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#metadata-storing">
+     Metadata storing
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#custom-naming">
+     Custom naming
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#hierarchical-columns">
+     Hierarchical columns
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#multiple-item-fields">
+     Multiple-item fields
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#custom-pandas-factory">
+     Custom pandas factory
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#appendix">
+   Appendix
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#data-typing-rules">
+     Data typing rules
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#naming-rules">
+     Naming rules
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#development-roadmap">
+     Development roadmap
+    </a>
+   </li>
+  </ul>
+ </li>
+</ul>
+
+</nav>
+</div>
+
+<div class="toc-item">
+  
+<div id="searchbox"></div>
+</div>
+
+<div class="toc-item">
+  
+</div>
+
+<div class="toc-item">
+  
+<div class="tocsection sourcelink">
+    <a href="_sources/index.md.txt">
+        <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+</div>
+
+</div>
+
+            </div>
+          
+          
+        </div>
+        <footer class="bd-footer-content">
+          <div class="bd-footer-content__inner">
+            
+          </div>
+        </footer>
+        
+      </main>
+    </div>
+  </div>
+
+  
+    
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=796348d33e8b1d947c94"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=796348d33e8b1d947c94"></script>
+
+  <footer class="bd-footer"><div class="bd-footer__inner container">
+  
+  <div class="footer-item">
+    
+<p class="copyright">
+
+    &copy; Copyright 2021-2022 Akio Taniguchi.<br>
+
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    <p class="theme-version">
+    Built with the
+    <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">
+        PyData Sphinx Theme
+    </a>
+    0.12.0.
+</p>
+  </div>
+  
+  <div class="footer-item">
+    
+<p class="sphinx-version">
+Created using <a href="http://sphinx-doc.org/">Sphinx</a> 5.3.0.<br>
+</p>
+
+  </div>
+  
+</div>
+  </footer>
+  </body>
+</html>

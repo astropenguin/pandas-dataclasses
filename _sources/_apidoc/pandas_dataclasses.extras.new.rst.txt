@@ -1,0 +1,7 @@
+pandas\_dataclasses.extras.new module
+=====================================
+
+.. automodule:: pandas_dataclasses.extras.new
+   :members:
+   :undoc-members:
+   :show-inheritance:

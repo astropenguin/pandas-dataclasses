@@ -1,0 +1,7 @@
+pandas\_dataclasses.extras.hints module
+=======================================
+
+.. automodule:: pandas_dataclasses.extras.hints
+   :members:
+   :undoc-members:
+   :show-inheritance:

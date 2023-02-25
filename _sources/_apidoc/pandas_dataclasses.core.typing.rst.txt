@@ -1,0 +1,7 @@
+pandas\_dataclasses.core.typing module
+======================================
+
+.. automodule:: pandas_dataclasses.core.typing
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,7 @@
+pandas\_dataclasses.core.api module
+===================================
+
+.. automodule:: pandas_dataclasses.core.api
+   :members:
+   :undoc-members:
+   :show-inheritance:

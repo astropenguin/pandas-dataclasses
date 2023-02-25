@@ -1,0 +1,19 @@
+pandas\_dataclasses package
+===========================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   pandas_dataclasses.core
+   pandas_dataclasses.extras
+
+Module contents
+---------------
+
+.. automodule:: pandas_dataclasses
+   :members:
+   :undoc-members:
+   :show-inheritance:
