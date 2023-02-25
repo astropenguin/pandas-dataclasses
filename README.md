@@ -368,6 +368,64 @@ Year Month
 
 If a tuple or dictionary annotation has [format string]s, they will also be formatted by a dataclass object (see also [naming rules](#naming-rules)).
 
+### Multiple-item fields
+
+Multiple (and possibly extra) attributes, data, or indices can be added by fields with corresponding type hints wrapped by `Multiple`:
+
+<details>
+<summary>Click to see all imports</summary>
+
+```python
+from dataclasses import dataclass
+from pandas_dataclasses import AsFrame, Data, Index, Multiple
+```
+</details>
+
+
+```python
+@dataclass
+class Weather(AsFrame):
+    """Weather information."""
+
+    year: Index[int]
+    month: Index[int]
+    temp: Data[float]
+    wind: Data[float]
+    extra_index: Multiple[Index[int]]
+    extra_data: Multiple[Data[float]]
+
+
+df = Weather.new(
+    [2020, 2020, 2021, 2021, 2022],
+    [1, 7, 1, 7, 1],
+    [7.1, 24.3, 5.4, 25.9, 4.9],
+    [2.4, 3.1, 2.3, 2.4, 2.6],
+    extra_index={
+        "day": [1, 1, 1, 1, 1],
+        "week": [2, 2, 4, 3, 5],
+    },
+    extra_data={
+        "humid": [65, 89, 57, 83, 52],
+        "press": [1013.8, 1006.2, 1014.1, 1007.7, 1012.7],
+    },
+)
+```
+
+where `df` will become like:
+
+```
+                     temp  wind  humid   press
+year month day week
+2020 1     1   2      7.1   2.4   65.0  1013.8
+     7     1   2     24.3   3.1   89.0  1006.2
+2021 1     1   4      5.4   2.3   57.0  1014.1
+     7     1   3     25.9   2.4   83.0  1007.7
+2022 1     1   5      4.9   2.6   52.0  1012.7
+```
+
+If multiple items of the same name exist, the last-defined one will be finally used.
+For example, if the `extra_index` field contains `"month": [2, 8, 2, 8, 2]`, the values given by the `month` field will be overwritten.
+
 ### Custom pandas factory
 
 A custom class can be specified as a factory for the Series or DataFrame creation by `As`, the generic version of `AsFrame` and `AsSeries`.
