@@ -71,7 +71,7 @@ pip install pandas-dataclasses
 
 pandas-dataclasses provides you the following features:
 
-- Type hints for dataclass fields (`Attr`, `Column`, `Data`, `Index`) to specify the data type and name of each element in pandas data
+- Type hints for dataclass fields (`Attr`, `Data`, `Index`) to specify the data type and name of each element in pandas data
 - Mix-in classes for dataclasses (`As`, `AsFrame`, `AsSeries`) to create pandas data by a classmethod (`new`) that takes the same arguments as dataclass initialization
 
 When you call `new`, it will first create a dataclass object and then create a Series or DataFrame object from the dataclass object according the type hints and values in it.
@@ -320,7 +320,7 @@ Year Month
 2022 1                     4.9     9.4              2.6     8.8
 ```
 
-Column names can be (explicitly) specified by *column fields* (with hashable annotations):
+Column names can be (explicitly) specified by dictionary annotations:
 
 <details>
 <summary>Click to see all imports</summary>
@@ -328,23 +328,26 @@ Column names can be (explicitly) specified by *column fields* (with hashable ann
 ```python
 from dataclasses import dataclass
 from typing import Annotated as Ann
-from pandas_dataclasses import AsFrame, Column, Data, Index
+from pandas_dataclasses import AsFrame, Data, Index
 ```
 </details>
 
 ```python
+def name(meas: str, stat: str) -> dict[str, str]:
+    """Create a dictionary annotation for a column name."""
+    return {"Measurement": meas, "Statistic": stat}
+
+
 @dataclass
 class Weather(AsFrame):
     """Weather information."""
 
     year: Ann[Index[int], "Year"]
     month: Ann[Index[int], "Month"]
-    temp_avg: Ann[Data[float], ("Temperature (deg C)", "Average")]
-    temp_max: Ann[Data[float], ("Temperature (deg C)", "Maximum")]
-    wind_avg: Ann[Data[float], ("Wind speed (m/s)", "Average")]
-    wind_max: Ann[Data[float], ("Wind speed (m/s)", "Maximum")]
-    meas: Ann[Column[None], "Measurement"] = None
-    stat: Ann[Column[None], "Statistic"] = None
+    temp_avg: Ann[Data[float], name("Temperature (deg C)", "Average")]
+    temp_max: Ann[Data[float], name("Temperature (deg C)", "Maximum")]
+    wind_avg: Ann[Data[float], name("Wind speed (m/s)", "Average")]
+    wind_max: Ann[Data[float], name("Wind speed (m/s)", "Maximum")]
 
 
 df = Weather.new(...)
@@ -363,8 +366,7 @@ Year Month
 2022 1                      4.9     9.4              2.6     8.8
 ```
 
-Note that the values of the columns fields never be used for the data creation (i.e. dummy values).
-If a tuple annotation has [format string]s, they will also be formatted by a dataclass object (see also [naming rules](#naming-rules)).
+If a tuple or dictionary annotation has [format string]s, they will also be formatted by a dataclass object (see also [naming rules](#naming-rules)).
 
 ### Custom pandas factory
 
@@ -462,7 +464,7 @@ Type hint | Inferred data type
 
 ### Naming rules
 
-The name of attribute, column, data, or index is determined from the first annotation of the first `Attr`, `Column`, `Data`, or `Index` type of the corresponding field, respectively.
+The name of attribute, data, or index is determined from the first annotation of the first `Attr`, `Data`, or `Index` type of the corresponding field, respectively.
 If the annotation is a [format string] or a tuple that has [format string]s, it (they) will be formatted by a dataclass object before the data creation.
 Otherwise, the field name (i.e. argument name) will be used.
 The following table shows how the name is inferred:
