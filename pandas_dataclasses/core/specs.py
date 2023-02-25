@@ -59,13 +59,6 @@ class Field:
 class Fields(Tuple[Field, ...]):
     """List of field specifications with selectors."""
 
-    @property
-    def names(self) -> Optional[Tuple[Hashable, ...]]:
-        """Optional names of the field specifications."""
-        for field in self:
-            if isinstance(name := field.name, dict):
-                return tuple(name.keys())
-
     def of(self, tag: Tag) -> "Fields":
         """Select only fields that have a tag."""
         return type(self)(filter(lambda field: field.has(tag), self))

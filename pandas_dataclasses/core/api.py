@@ -11,7 +11,7 @@ import numpy as np
 import pandas as pd
 from pandas.api.types import is_list_like
 from typing_extensions import get_origin
-from .specs import Field, Spec
+from .specs import Field, Fields, Spec
 from .tagging import Tag
 from .typing import DataClass, DataClassOf, PAny, TFrame, TPandas, TSeries
 
@@ -219,10 +219,13 @@ def get_columns(spec: Spec) -> Optional[pd.Index]:
     if not (fields := spec.fields.of(Tag.DATA)):
         return None
 
+    if (names := name(fields)) is None:
+        return None
+
     return squeeze(
         pd.MultiIndex.from_tuples(
             map(name, fields),
-            names=fields.names,
+            names=names,
         )
     )
 
@@ -265,12 +268,28 @@ def items(field: Field) -> Iterable[Tuple[Hashable, Any]]:
         yield (name(field), field.default)
 
 
-def name(field: Field) -> Hashable:
-    """Derive the name of a field specification."""
-    if isinstance(name := field.name, dict):
-        return tuple(name.values())
-    else:
-        return name
+@overload
+def name(fields: Field) -> Hashable:
+    ...
+
+
+@overload
+def name(fields: Fields) -> Optional[Hashable]:
+    ...
+
+
+def name(fields: Any) -> Any:
+    """Derive name of a field(s) specification."""
+    if isinstance(fields, Field):
+        if isinstance(name := fields.name, dict):
+            return tuple(name.values())
+        else:
+            return name
+
+    if isinstance(fields, Fields):
+        for field in fields:
+            if isinstance(name := field.name, dict):
+                return tuple(name.keys())
 
 
 def squeeze(index: pd.Index) -> pd.Index:
