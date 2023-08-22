@@ -6,25 +6,25 @@ authors = ["Akio Taniguchi <taniguchi@a.phys.nagoya-u.ac.jp>"]
 keywords = ["pandas", "dataclass", "series", "dataframe", "typing"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/astropenguin/pandas-dataclasses/"
+repository = "https://github.com/astropenguin/pandas-dataclasses/"
 documentation = "https://astropenguin.github.io/pandas-dataclasses/"
 
 [tool.poetry.dependencies]
-python = ">=3.8, <3.12"
+python = ">=3.9, <3.12"
 numpy = "^1.20"
-pandas = "^1.2"
-pandas-stubs = "^1.2"
-typing-extensions = ">=3.10, <5.0"
+pandas = "^1.5 | ^2.0"
+pandas-stubs = "^1.5 | ^2.0"
+typing-extensions = "^4.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.1"
-ipython = "^8.10"
-mypy = "^1.0"
-myst-parser = "^0.18"
-pydata-sphinx-theme = "^0.12"
+black = "^23.7"
+ipython = "^8.14"
+mypy = "~1.4"
+myst-parser = "^2.0"
+pydata-sphinx-theme = "^0.13"
 pyright = "^1.1"
-pytest = "^7.2"
-sphinx = "^5.3"
+pytest = "^7.4"
+sphinx = "^7.2"
 
 [tool.mypy]
 strict = true
