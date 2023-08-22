@@ -3,7 +3,7 @@ __all__ = ["asframe", "aspandas", "asseries"]
 
 # standard library
 from types import FunctionType
-from typing import Any, Callable, Dict, Hashable, Iterable, Optional, Tuple, overload
+from typing import Any, Callable, Hashable, Iterable, Optional, overload
 
 
 # dependencies
@@ -193,9 +193,9 @@ def asseries(obj: Any, *, factory: Any = None) -> Any:
     return squeeze(series)
 
 
-def get_attrs(spec: Spec) -> Dict[Hashable, Any]:
+def get_attrs(spec: Spec) -> dict[Hashable, Any]:
     """Derive attributes from a specification."""
-    data: Dict[Hashable, Any] = {}
+    data: dict[Hashable, Any] = {}
 
     for field in spec.fields.of(Tag.ATTR):
         data.update(items(field))
@@ -217,9 +217,9 @@ def get_columns(spec: Spec) -> Optional[pd.MultiIndex]:
     )
 
 
-def get_data(spec: Spec) -> Dict[Hashable, Any]:
+def get_data(spec: Spec) -> dict[Hashable, Any]:
     """Derive data from a specification."""
-    data: Dict[Hashable, Any] = {}
+    data: dict[Hashable, Any] = {}
 
     for field in spec.fields.of(Tag.DATA):
         for key, val in items(field):
@@ -233,7 +233,7 @@ def get_index(spec: Spec) -> Optional[pd.MultiIndex]:
     if not (fields := spec.fields.of(Tag.INDEX)):
         return None
 
-    data: Dict[Hashable, Any] = {}
+    data: dict[Hashable, Any] = {}
 
     for field in fields:
         for key, val in items(field):
@@ -251,12 +251,12 @@ def ensure(data: Any, dtype: Optional[str]) -> Any:
         data = [data]
 
     if isinstance(data, (pd.Index, pd.Series)):
-        return type(data)(data, dtype=dtype, copy=False)
+        return type(data)(data, dtype=dtype, copy=False)  # type: ignore
     else:
         return pd.array(data, dtype=dtype, copy=False)
 
 
-def items(field: Field) -> Iterable[Tuple[Hashable, Any]]:
+def items(field: Field) -> Iterable[tuple[Hashable, Any]]:
     """Generate default(s) of a field specification."""
     if field.has(Tag.MULTIPLE):
         yield from field.default.items()

@@ -1,5 +1,5 @@
 # standard library
-from typing import Any, List, Tuple, Union
+from typing import Any, Union
 
 
 # dependencies
@@ -10,7 +10,7 @@ from typing_extensions import Annotated as Ann
 
 
 # test data
-testdata: List[Tuple[Any, Tuple[Tag, ...]]] = [
+testdata: list[tuple[Any, tuple[Tag, ...]]] = [
     (Attr[Any], (Tag.ATTR,)),  # type: ignore
     (Data[Any], (Tag.DATA,)),
     (Index[Any], (Tag.INDEX,)),
@@ -28,5 +28,5 @@ testdata: List[Tuple[Any, Tuple[Tag, ...]]] = [
 
 # test functions
 @mark.parametrize("tp, tags", testdata)
-def test_get_tags(tp: Any, tags: Tuple[Tag, ...]) -> None:
+def test_get_tags(tp: Any, tags: tuple[Tag, ...]) -> None:
     assert get_tags(tp) == tags

@@ -5,7 +5,7 @@ __all__ = ["Spec"]
 from dataclasses import Field as Field_, dataclass, fields as fields_, replace
 from functools import lru_cache
 from itertools import repeat
-from typing import Any, Callable, Hashable, Literal, Optional, Tuple, Union
+from typing import Any, Callable, Hashable, Literal, Optional, Union
 
 
 # dependencies
@@ -25,7 +25,7 @@ class Field:
     name: Union[Hashable, HashDict]
     """Name of the field data."""
 
-    tags: Tuple[Tag, ...] = ()
+    tags: tuple[Tag, ...] = ()
     """Tags of the field."""
 
     type: Optional[Any] = None
@@ -50,7 +50,7 @@ class Field:
         )
 
 
-class Fields(Tuple[Field, ...]):
+class Fields(tuple[Field, ...]):
     """List of field specifications with selectors."""
 
     def of(self, tag: Tag) -> Self:
@@ -104,7 +104,7 @@ class Spec:
 
 
 @lru_cache(maxsize=None)
-def convert_field(field_: "Field_[Any]") -> Field:
+def convert_field(field_: Field_[Any]) -> Field:
     """Convert a dataclass field to a field specification."""
     return Field(
         id=field_.name,

@@ -38,7 +38,7 @@ def test_get_attrs() -> None:
 
 
 def test_get_columns() -> None:
-    columns = cast(pd.Index, get_columns(spec))
+    columns = cast(pd.MultiIndex, get_columns(spec))
 
     for i in range(len(columns)):
         assert columns[i] == name(spec.fields.of(Tag.DATA)[i])
@@ -56,7 +56,7 @@ def test_get_data() -> None:
 
 
 def test_get_index() -> None:
-    index = cast(pd.Index, get_index(spec))
+    index = cast(pd.MultiIndex, get_index(spec))
 
     for i in range(index.nlevels):
         level = index.get_level_values(i)
