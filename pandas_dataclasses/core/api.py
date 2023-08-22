@@ -251,7 +251,7 @@ def ensure(data: Any, dtype: Optional[str]) -> Any:
         data = [data]
 
     if isinstance(data, (pd.Index, pd.Series)):
-        return type(data)(data, dtype=dtype, copy=False)
+        return type(data)(data, dtype=dtype, copy=False)  # type: ignore
     else:
         return pd.array(data, dtype=dtype, copy=False)
 
