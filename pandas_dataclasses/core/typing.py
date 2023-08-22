@@ -15,7 +15,7 @@ __all__ = [
 # standard library
 import types
 from dataclasses import Field
-from typing import Any, Callable, ClassVar, Dict, Hashable, Protocol, TypeVar, Union
+from typing import Any, Callable, ClassVar, Hashable, Protocol, TypeVar, Union
 
 
 # dependencies
@@ -23,7 +23,7 @@ from pandas import DataFrame, Series
 from typing_extensions import ParamSpec, get_origin
 
 
-HashDict = Dict[Hashable, Hashable]
+HashDict = dict[Hashable, Hashable]
 """Type hint for dictionary of hashable keys and values."""
 
 Pandas = Union[DataFrame, "Series[Any]"]
@@ -48,7 +48,7 @@ TSeries = TypeVar("TSeries", bound="Series[Any]")
 class DataClass(Protocol[PAny]):
     """Protocol for any dataclass object."""
 
-    __dataclass_fields__: ClassVar[Dict[str, "Field[Any]"]]
+    __dataclass_fields__: ClassVar[dict[str, Field[Any]]]
 
     def __init__(self, *args: PAny.args, **kwargs: PAny.kwargs) -> None:
         ...
@@ -57,7 +57,7 @@ class DataClass(Protocol[PAny]):
 class DataClassOf(Protocol[TPandas, PAny]):
     """Protocol for any dataclass object with a factory."""
 
-    __dataclass_fields__: ClassVar[Dict[str, "Field[Any]"]]
+    __dataclass_fields__: ClassVar[dict[str, Field[Any]]]
     __pandas_factory__: Callable[..., TPandas]
 
     def __init__(self, *args: PAny.args, **kwargs: PAny.kwargs) -> None:

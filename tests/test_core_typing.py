@@ -1,5 +1,5 @@
 # standard library
-from typing import Any, Hashable, List, Literal as L, Optional, Tuple, Union
+from typing import Annotated as Ann, Any, Hashable, Literal as L, Optional, Union
 
 
 # dependencies
@@ -8,11 +8,10 @@ import pandas as pd
 from pandas_dataclasses import Attr, Data, Index
 from pandas_dataclasses.core.specs import get_dtype, get_first
 from pytest import mark
-from typing_extensions import Annotated as Ann
 
 
 # test data
-testdata_dtype: List[Tuple[Any, Any]] = [
+testdata_dtype: list[tuple[Any, Any]] = [
     (Data[Any], None),
     (Data[None], None),
     (Data[int], np.dtype("i8")),
@@ -33,7 +32,7 @@ testdata_dtype: List[Tuple[Any, Any]] = [
     (Union[Ann[Index[float], "index"], Ann[Any, "any"]], np.dtype("f8")),
 ]
 
-testdata_first: List[Tuple[Any, Optional[Hashable]]] = [
+testdata_first: list[tuple[Any, Optional[Hashable]]] = [
     (Attr[Any], None),  # type: ignore
     (Data[Any], None),
     (Index[Any], None),

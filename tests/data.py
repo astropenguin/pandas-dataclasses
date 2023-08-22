@@ -3,17 +3,16 @@ __all__ = ["Weather", "weather", "df_weather_true", "ser_weather_true"]
 
 # standard library
 from dataclasses import dataclass, field
-from typing import Any, Dict
+from typing import Annotated as Ann, Any
 
 
 # dependencies
 import pandas as pd
 from pandas_dataclasses import Attr, Data, Index, Multiple
-from typing_extensions import Annotated as Ann
 
 
 # test dataclass and object
-def name(meas: str, stat: str) -> Dict[str, str]:
+def name(meas: str, stat: str) -> dict[str, str]:
     return {"Measurement": meas, "Statistic": stat}
 
 

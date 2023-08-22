@@ -4,7 +4,7 @@ __all__ = ["As", "AsFrame", "AsSeries"]
 # standard library
 from inspect import signature
 from types import MethodType
-from typing import Any, Callable, ForwardRef, Generic, Type, Union
+from typing import Any, Callable, ForwardRef, Generic, Union
 
 
 # dependencies
@@ -23,7 +23,7 @@ class classproperty:
     def __get__(
         self,
         obj: Any,
-        cls: Type[DataClassOf[TPandas, PAny]],
+        cls: type[DataClassOf[TPandas, PAny]],
     ) -> Callable[PAny, TPandas]:
         return self.fget(cls)  # type: ignore
 
@@ -77,7 +77,7 @@ def get_factory(cls: Any) -> Callable[..., Any]:
     raise TypeError("Factory must be callable.")
 
 
-def get_return(cls: Any) -> Union[Type[Any], str]:
+def get_return(cls: Any) -> Union[type[Any], str]:
     """Extract a return type from a class."""
     for base in getattr(cls, "__orig_bases__", ()):
         if get_origin(base) is not As:

@@ -2,11 +2,10 @@ __all__ = ["Attr", "Data", "Index", "Multiple"]
 
 
 # standard library
-from typing import Collection, Dict, Hashable
+from typing import Annotated, Collection
 
 
 # dependencies
-from typing_extensions import Annotated
 from ..core.tagging import Tag
 from ..core.typing import TAny
 
@@ -21,5 +20,5 @@ Data = Annotated[Collection[Annotated[TAny, Tag.DTYPE]], Tag.DATA]
 Index = Annotated[Collection[Annotated[TAny, Tag.DTYPE]], Tag.INDEX]
 """Type hint for index fields (``Index[TAny]``)."""
 
-Multiple = Dict[Hashable, Annotated[TAny, Tag.MULTIPLE]]
+Multiple = dict[str, Annotated[TAny, Tag.MULTIPLE]]
 """Type hint for multiple-item fields (``Multiple[TAny]``)."""
