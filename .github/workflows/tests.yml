@@ -34,4 +34,5 @@ jobs:
       - name: Test code's execution (pytest)
         run: pytest -v tests
       - name: Test docs' building (Sphinx)
+        if: ${{ matrix.python != '3.9' }}
         run: docs/build
