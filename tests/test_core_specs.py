@@ -3,8 +3,8 @@ from dataclasses import MISSING
 
 
 # dependencies
-from data import Weather, name, weather
 from pandas_dataclasses import Spec, Tag
+from .data import Weather, name, weather
 
 
 # test data
