@@ -1,10 +1,11 @@
 {
     "name": "pandas-dataclasses",
-    "build": {
-        "context": "..",
-        "dockerfile": "Dockerfile"
-    },
+    "image":"python:3.13",
+    "onCreateCommand": "pip install poetry==1.8.5",
     "postCreateCommand": "poetry install",
+    "containerEnv": {
+        "POETRY_VIRTUALENVS_CREATE": "false"
+    },
     "customizations": {
         "vscode": {
             "extensions": [
