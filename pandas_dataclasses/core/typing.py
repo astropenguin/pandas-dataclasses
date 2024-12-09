@@ -50,8 +50,7 @@ class DataClass(Protocol[PAny]):
 
     __dataclass_fields__: ClassVar[dict[str, Field[Any]]]
 
-    def __init__(self, *args: PAny.args, **kwargs: PAny.kwargs) -> None:
-        ...
+    def __init__(self, *args: PAny.args, **kwargs: PAny.kwargs) -> None: ...
 
 
 class DataClassOf(Protocol[TPandas, PAny]):
@@ -60,8 +59,7 @@ class DataClassOf(Protocol[TPandas, PAny]):
     __dataclass_fields__: ClassVar[dict[str, Field[Any]]]
     __pandas_factory__: Callable[..., TPandas]
 
-    def __init__(self, *args: PAny.args, **kwargs: PAny.kwargs) -> None:
-        ...
+    def __init__(self, *args: PAny.args, **kwargs: PAny.kwargs) -> None: ...
 
 
 def is_union(tp: Any) -> bool:
