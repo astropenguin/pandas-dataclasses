@@ -17,13 +17,11 @@ from .typing import DataClass, DataClassOf, PAny, TFrame, TPandas, TSeries
 
 
 @overload
-def aspandas(obj: DataClassOf[TPandas, PAny], *, factory: None = None) -> TPandas:
-    ...
+def aspandas(obj: DataClassOf[TPandas, PAny], *, factory: None = None) -> TPandas: ...
 
 
 @overload
-def aspandas(obj: DataClass[PAny], *, factory: Callable[..., TPandas]) -> TPandas:
-    ...
+def aspandas(obj: DataClass[PAny], *, factory: Callable[..., TPandas]) -> TPandas: ...
 
 
 def aspandas(obj: Any, *, factory: Any = None) -> Any:
@@ -81,18 +79,15 @@ def aspandas(obj: Any, *, factory: Any = None) -> Any:
 
 
 @overload
-def asframe(obj: DataClassOf[TFrame, PAny], *, factory: None = None) -> TFrame:
-    ...
+def asframe(obj: DataClassOf[TFrame, PAny], *, factory: None = None) -> TFrame: ...
 
 
 @overload
-def asframe(obj: DataClass[PAny], *, factory: Callable[..., TFrame]) -> TFrame:
-    ...
+def asframe(obj: DataClass[PAny], *, factory: Callable[..., TFrame]) -> TFrame: ...
 
 
 @overload
-def asframe(obj: DataClass[PAny], *, factory: None = None) -> pd.DataFrame:
-    ...
+def asframe(obj: DataClass[PAny], *, factory: None = None) -> pd.DataFrame: ...
 
 
 def asframe(obj: Any, *, factory: Any = None) -> Any:
@@ -136,18 +131,15 @@ def asframe(obj: Any, *, factory: Any = None) -> Any:
 
 
 @overload
-def asseries(obj: DataClassOf[TSeries, PAny], *, factory: None = None) -> TSeries:
-    ...
+def asseries(obj: DataClassOf[TSeries, PAny], *, factory: None = None) -> TSeries: ...
 
 
 @overload
-def asseries(obj: DataClass[PAny], *, factory: Callable[..., TSeries]) -> TSeries:
-    ...
+def asseries(obj: DataClass[PAny], *, factory: Callable[..., TSeries]) -> TSeries: ...
 
 
 @overload
-def asseries(obj: DataClass[PAny], *, factory: None = None) -> "pd.Series[Any]":
-    ...
+def asseries(obj: DataClass[PAny], *, factory: None = None) -> "pd.Series[Any]": ...
 
 
 def asseries(obj: Any, *, factory: Any = None) -> Any:
@@ -265,13 +257,11 @@ def items(field: Field) -> Iterable[tuple[Hashable, Any]]:
 
 
 @overload
-def name(fields: Field) -> Hashable:
-    ...
+def name(fields: Field) -> Hashable: ...
 
 
 @overload
-def name(fields: Fields) -> Optional[Hashable]:
-    ...
+def name(fields: Fields) -> Optional[Hashable]: ...
 
 
 def name(fields: Any) -> Any:

@@ -6,8 +6,8 @@ from typing import Any
 # dependencies
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
-from data import Weather, weather, df_weather_true, ser_weather_true
 from pandas_dataclasses import As, AsFrame, AsSeries
+from .data import Weather, weather, df_weather_true, ser_weather_true
 
 
 # test data

@@ -5,7 +5,6 @@ from typing import cast
 # dependencies
 import pandas as pd
 from pandas.testing import assert_frame_equal, assert_series_equal
-from data import Weather, weather, df_weather_true, ser_weather_true
 from pandas_dataclasses import Spec, Tag, asframe, asseries
 from pandas_dataclasses.core.api import (
     get_attrs,
@@ -14,6 +13,7 @@ from pandas_dataclasses.core.api import (
     get_index,
     name,
 )
+from .data import Weather, weather, df_weather_true, ser_weather_true
 
 
 # test data

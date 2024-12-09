@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pandas-dataclasses"
-version = "0.12.0"
+version = "0.13.0"
 description = "pandas data creation made easy by dataclass"
 authors = ["Akio Taniguchi <taniguchi@a.phys.nagoya-u.ac.jp>"]
 keywords = ["pandas", "dataclass", "series", "dataframe", "typing"]
@@ -10,21 +10,21 @@ repository = "https://github.com/astropenguin/pandas-dataclasses/"
 documentation = "https://astropenguin.github.io/pandas-dataclasses/"
 
 [tool.poetry.dependencies]
-python = ">=3.9, <3.12"
-numpy = "^1.20"
-pandas = "^1.5 | ^2.0"
-pandas-stubs = "^1.5 | ^2.0"
+python = ">=3.9, <3.14"
+numpy = ">=1.22, <3.0"
+pandas = ">=1.5, <3.0"
+pandas-stubs = ">=1.5, <3.0"
 typing-extensions = "^4.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.7"
-ipython = "^8.14"
+black = "^24.10"
+ipython = "^8.18"
 mypy = "~1.4"
-myst-parser = "^2.0"
-pydata-sphinx-theme = "^0.13"
+myst-parser = "^3.0"
+pydata-sphinx-theme = "^0.16"
 pyright = "^1.1"
-pytest = "^7.4"
-sphinx = "^7.2"
+pytest = "^8.2"
+sphinx = "^7.4"
 
 [tool.mypy]
 strict = true
