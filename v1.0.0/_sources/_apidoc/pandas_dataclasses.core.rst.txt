@@ -1,0 +1,18 @@
+pandas\_dataclasses.core package
+================================
+
+.. automodule:: pandas_dataclasses.core
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 2
+
+   pandas_dataclasses.core.api
+   pandas_dataclasses.core.specs
+   pandas_dataclasses.core.tagging
+   pandas_dataclasses.core.typing
