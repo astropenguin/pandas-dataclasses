@@ -6,7 +6,7 @@
 [![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.6127352-cornflowerblue?style=flat-square)](https://doi.org/10.5281/zenodo.6127352)
 [![Tests](https://img.shields.io/github/actions/workflow/status/astropenguin/pandas-dataclasses/tests.yml?label=Tests&style=flat-square)](https://github.com/astropenguin/pandas-dataclasses/actions)
 
-pandas data creation made easy by dataclass
+pandas data creation by data classes
 
 ## Overview
 
