@@ -21,6 +21,5 @@ jobs:
       - uses: peaceiris/actions-gh-pages@v4
         with:
           destination_dir: ${{ steps.tag.outputs.tag }}
-          force_orphan: true
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/_build
