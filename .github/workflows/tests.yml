@@ -32,3 +32,4 @@ jobs:
       - run: pyright ${PYTHON_DIRS}
       - run: pytest -v
       - run: docs/build
+        if: ${{ matrix.env != 'python3.9-bookworm' }}
